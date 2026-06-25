@@ -1,0 +1,3881 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pursuite - API Reference</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+
+<header class="masthead">
+<div class="masthead-inner">
+<h1>Pursuite - API Reference</h1>
+<p>Endpoint reference for Pursuite platform APIs and integration workflows.</p>
+</div>
+</header>
+<div class="wrap">
+<main><nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="pursuite--complete-api-reference">Pursuite — Complete API Reference</h1>
+<p><strong>Third-Party Integration: Account Management, Proposals, Compliance &amp; Integrations</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Version</strong></td>
+<td>2.0</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>2026-05-26</td>
+</tr>
+<tr>
+<td><strong>Classification</strong></td>
+<td>Internal / Partner Use</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Changelog" id="changelog"><h3 id="changelog">Changelog</h3>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.0</td>
+<td>2026-05-26</td>
+<td>Added A1 RFP Shredder, A2 Compliance Matrix, A3 Autonomous Pipeline, A5 Competitive Intel, B7 Teaming Workspace, Section 20 Deltek ProPricer &amp; CPQ (bridge microservice, sync, proposals); updated Error Reference and Integration Workflow; fixed BUG-08 (GET rfp-document now returns 404 not 500 when no document exists)</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>2026-05-18</td>
+<td>Initial release</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Table of Contents" id="table-of-contents"><h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-roles--permissions">Roles &amp; Permissions</a></li>
+<li><a href="#3-authentication">Authentication</a></li>
+<li><a href="#4-account-management">Account Management</a></li>
+<li><a href="#5-opportunities">Opportunities</a></li>
+<li><a href="#6-proposal-generation">Proposal Generation</a></li>
+<li><a href="#7-compliance">Compliance</a></li>
+<li><a href="#8-content-library">Content Library</a></li>
+<li><a href="#9-templates">Templates</a></li>
+<li><a href="#10-crm">CRM</a></li>
+<li><a href="#11-reports--analytics">Reports &amp; Analytics</a></li>
+<li><a href="#12-import--samgov">Import &amp; SAM.gov</a></li>
+<li><a href="#13-notifications">Notifications</a></li>
+<li><a href="#14-email--calendar-nylas">Email &amp; Calendar (Nylas)</a></li>
+<li><a href="#15-rfp-shredder-a1">RFP Shredder (A1)</a></li>
+<li><a href="#16-compliance-matrix-a2">Compliance Matrix (A2)</a></li>
+<li><a href="#17-autonomous-pipeline-a3">Autonomous Pipeline (A3)</a></li>
+<li><a href="#18-competitive-intel-a5">Competitive Intel (A5)</a></li>
+<li><a href="#19-teaming-workspace-b7">Teaming Workspace (B7)</a></li>
+<li><a href="#20-deltek-propricer--cpq">Deltek ProPricer &amp; CPQ</a></li>
+<li><a href="#21-error-reference">Error Reference</a></li>
+<li><a href="#22-complete-integration-workflow">Complete Integration Workflow</a></li>
+</ol>
+<hr/>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="1. Overview" id="1-overview"><h2 id="1-overview">1. Overview</h2>
+<p>This reference documents every REST API endpoint available in Pursuite. It is intended for third-party developers building integrations that require full account management, proposal generation, and compliance interoperability.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Base URL</strong></td>
+<td><code>https://your-instance.pursuite.com/api/v1</code></td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td><code>Authorization: Bearer &lt;accessToken&gt;</code> on all protected routes</td>
+</tr>
+<tr>
+<td><strong>Content-Type</strong></td>
+<td><code>application/json</code> (all requests unless noted)</td>
+</tr>
+<tr>
+<td><strong>Success envelope</strong></td>
+<td><code>{ "data": &lt;payload&gt; }</code></td>
+</tr>
+<tr>
+<td><strong>Error envelope</strong></td>
+<td><code>{ "error": "...", "message": "...", "statusCode": 400 }</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Permission model:</strong> each endpoint requires a specific permission. The <code>admin</code> system role grants all permissions. Narrower roles grant subsets — see <a href="#2-roles--permissions">Section 2</a>.</p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="2. Roles &amp; Permissions" id="2-roles-permissions"><h2 id="2-roles--permissions">2. Roles &amp; Permissions</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Rank</th>
+<th>Key Permissions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin</code></td>
+<td>5</td>
+<td>All permissions — full system access</td>
+</tr>
+<tr>
+<td><code>proposal_manager</code></td>
+<td>4</td>
+<td><code>proposal:*</code>, <code>compliance:scan</code>, <code>section:*</code>, <code>content:*</code>, <code>template:publish</code>, <code>report:read</code>, <code>debrief:write</code>, <code>crm:write</code>, <code>pipeline:*</code>, <code>compliance_matrix:*</code>, <code>intel:*</code>, <code>teaming:*</code>, <code>deltek:*</code></td>
+</tr>
+<tr>
+<td><code>writer</code></td>
+<td>3</td>
+<td><code>section:edit</code>, <code>section:comment</code>, <code>proposal:read</code>, <code>content:read</code>, <code>content:add</code>, <code>opportunity:read</code>, <code>intel:read</code></td>
+</tr>
+<tr>
+<td><code>executive_approver</code></td>
+<td>2</td>
+<td><code>bid_no_bid:decide</code>, <code>proposal:read</code>, <code>debrief:read</code>, <code>report:read</code></td>
+</tr>
+<tr>
+<td><code>read_only</code></td>
+<td>1</td>
+<td><code>proposal:read</code>, <code>opportunity:read</code>, <code>crm:read</code>, <code>report:read</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="3. Authentication" id="3-authentication"><h2 id="3-authentication">3. Authentication</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/local</code></td>
+<td>Public</td>
+<td>Obtain token · body: <code>{ email, password, orgSlug }</code> · returns <code>{ accessToken, expiresIn }</code> + sets <code>pursuite_refresh</code> httpOnly cookie (30-day TTL)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/refresh</code></td>
+<td>Cookie</td>
+<td>Renew token · no body · reads <code>pursuite_refresh</code> cookie · returns <code>{ accessToken, expiresIn }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/auth/login?org=&lt;slug&gt;</code></td>
+<td>Public</td>
+<td>SSO — redirects user to configured IdP</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/auth/callback</code></td>
+<td>Public</td>
+<td>SSO return — issues token pair on success</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/logout</code></td>
+<td>Bearer</td>
+<td>Revoke session and clear refresh cookie</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/accept-invite</code></td>
+<td>Public</td>
+<td>Accept invitation · body: <code>{ token, password }</code> · returns <code>{ accessToken, expiresIn }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="Token Details" id="token-details"><h3 id="token-details">Token Details</h3>
+<ul>
+<li><strong>Access token TTL:</strong> 8 hours — pass as <code>Authorization: Bearer &lt;token&gt;</code></li>
+<li><strong>Refresh token TTL:</strong> 30 days — httpOnly cookie <code>pursuite_refresh</code> scoped to <code>/api/v1/auth/refresh</code></li>
+<li><strong>JWT payload:</strong> <code>{ sub, org, role, roles[], email, iat, exp }</code></li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="4. Account Management" id="4-account-management"><h2 id="4-account-management">4. Account Management</h2>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="4.1 Users" id="4-1-users"><h3 id="41-users">4.1 Users</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users</code></td>
+<td><code>user:read</code></td>
+<td>List all org users</td>
+<td>—</td>
+<td><code>id, name, email, systemRole, systemRoles, active, createdAt</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/users</code></td>
+<td><code>user:manage</code></td>
+<td>Create user</td>
+<td><code>email, name, password</code> (8+ chars), <code>systemRole</code></td>
+<td>User object (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/:id</code></td>
+<td><code>user:manage</code></td>
+<td>Update name / email / password</td>
+<td><code>name?, email?, password?</code></td>
+<td>User object</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/:id/roles</code></td>
+<td><code>user:manage</code></td>
+<td>Replace user's role set</td>
+<td><code>systemRoles: string[]</code></td>
+<td>User object</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/:id/deactivate</code></td>
+<td><code>user:manage</code></td>
+<td>Soft-disable user login</td>
+<td>—</td>
+<td><code>{ id, active: false }</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/:id/reactivate</code></td>
+<td><code>user:manage</code></td>
+<td>Re-enable user login</td>
+<td>—</td>
+<td><code>{ id, active: true }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/users/:id</code></td>
+<td><code>user:manage</code></td>
+<td>Permanently delete user</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/bulk</code></td>
+<td><code>user:manage</code></td>
+<td>Bulk deactivate or set role</td>
+<td><code>ids: string[], action: "deactivate"|"set_role", role?</code></td>
+<td><code>{ updated: number }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/me</code></td>
+<td>Authenticated</td>
+<td>Get own profile</td>
+<td>—</td>
+<td>User + <code>hasLocalPassword</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/me</code></td>
+<td>Authenticated</td>
+<td>Update own profile</td>
+<td><code>name?, email?</code></td>
+<td>User object</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/me/password</code></td>
+<td>Authenticated</td>
+<td>Change own password</td>
+<td><code>currentPassword?, newPassword</code></td>
+<td><code>{ updated: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/me/notification-prefs</code></td>
+<td>Authenticated</td>
+<td>Get notification preferences</td>
+<td>—</td>
+<td><code>{ notificationPrefs }</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/users/me/notification-prefs</code></td>
+<td>Authenticated</td>
+<td>Update notification preferences</td>
+<td><code>prefs: object</code></td>
+<td><code>{ notificationPrefs }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/me/tasks</code></td>
+<td><code>opportunity:read</code></td>
+<td>Pending tasks (bid decisions, sections)</td>
+<td>—</td>
+<td><code>Task[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/audit-log</code></td>
+<td><code>audit:read</code></td>
+<td>Audit event log</td>
+<td><code>from?, to?, pageSize?</code></td>
+<td><code>AuditEvent[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/audit-log/export.csv</code></td>
+<td><code>audit:read</code></td>
+<td>Download audit log as CSV</td>
+<td><code>from?, to?</code></td>
+<td>CSV file</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="4.2 Invitations" id="4-2-invitations"><h3 id="42-invitations">4.2 Invitations</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/users/invite</code></td>
+<td><code>user:manage</code></td>
+<td>Send email invitation</td>
+<td><code>email, name, systemRole?</code></td>
+<td>Invitation object (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/users/invitations</code></td>
+<td><code>user:manage</code></td>
+<td>List pending invitations</td>
+<td>—</td>
+<td><code>Invitation[]</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/users/invitations/:id</code></td>
+<td><code>user:manage</code></td>
+<td>Cancel invitation</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="4.3 Organizations" id="4-3-organizations"><h3 id="43-organizations">4.3 Organizations</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/orgs/me</code></td>
+<td>Authenticated</td>
+<td>Get org details</td>
+<td>—</td>
+<td><code>id, name, slug, plan, active, onboardingCompletedAt</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/orgs/me</code></td>
+<td><code>user:manage</code></td>
+<td>Update org name</td>
+<td><code>name</code></td>
+<td>Org object</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/orgs/me/complete-onboarding</code></td>
+<td><code>user:manage</code></td>
+<td>Mark onboarding complete</td>
+<td>—</td>
+<td><code>{ completed: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/orgs/me/sam-status</code></td>
+<td>Authenticated</td>
+<td>SAM.gov config status</td>
+<td>—</td>
+<td><code>{ configured: boolean }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="4.4 Admin Operations" id="4-4-admin-operations"><h3 id="44-admin-operations">4.4 Admin Operations</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/sessions</code></td>
+<td><code>user:read</code></td>
+<td>List member sessions</td>
+<td>—</td>
+<td><code>Session[]</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/admin/sessions/:id</code></td>
+<td><code>org:manage</code></td>
+<td>Terminate user session</td>
+<td>—</td>
+<td><code>{ terminated: true, userId }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/usage</code></td>
+<td><code>org:read</code></td>
+<td>Plan quota usage vs limits</td>
+<td>—</td>
+<td><code>{ users, opportunities, proposals, storage }</code> each with <code>current / limit</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/ai/config</code></td>
+<td><code>org:manage</code></td>
+<td>Get AI provider config</td>
+<td>—</td>
+<td><code>{ provider, keyPreview, configuredAt }</code> or <code>null</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/admin/ai/config</code></td>
+<td><code>org:manage</code></td>
+<td>Save BYOK provider credentials</td>
+<td><code>provider, *ApiKey / azureEndpoint / azureDeployment</code></td>
+<td><code>{ saved: true, provider }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/ai/test</code></td>
+<td><code>org:manage</code></td>
+<td>Test AI provider connectivity</td>
+<td>—</td>
+<td><code>{ ok: boolean, latencyMs, error? }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="AI Provider Config — Request Body Reference" id="ai-provider-config-request-body-reference"><h4 id="ai-provider-config--request-body-reference">AI Provider Config — Request Body Reference</h4>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Required Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>anthropic</code></td>
+<td><code>provider: "anthropic"</code>, <code>anthropicApiKey</code></td>
+</tr>
+<tr>
+<td><code>openai</code></td>
+<td><code>provider: "openai"</code>, <code>openaiApiKey</code></td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>provider: "azure"</code>, <code>azureEndpoint</code>, <code>azureApiKey</code>, <code>azureDeployment</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Key fields are optional on subsequent PUT calls — omitting a field preserves the stored value.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="4.5 Billing" id="4-5-billing"><h3 id="45-billing">4.5 Billing</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/billing/status</code></td>
+<td><code>org:read</code></td>
+<td>Plan and subscription state</td>
+<td>—</td>
+<td><code>{ plan, stripeStatus, trialEndsAt, currentPeriodEnd }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/billing/create-checkout</code></td>
+<td><code>org:manage</code></td>
+<td>Start Stripe checkout session</td>
+<td><code>tier: "starter"|"pro"</code></td>
+<td><code>{ url }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/billing/portal</code></td>
+<td><code>org:manage</code></td>
+<td>Open Stripe customer portal</td>
+<td>—</td>
+<td><code>{ url }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="5. Opportunities" id="5-opportunities"><h2 id="5-opportunities">5. Opportunities</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities</code></td>
+<td><code>opportunity:read</code></td>
+<td>List (paginated, filterable)</td>
+<td><code>status?, bidType?, estimatedValueMin?, estimatedValueMax?, dueDateFrom?, dueDateTo?, naicsCode?, search?, page, pageSize</code></td>
+<td><code>Opportunity[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/opportunities</code></td>
+<td><code>opportunity:create</code></td>
+<td>Create opportunity</td>
+<td><code>name, agency, bidType, naicsCode?, setAside?, solicitationNum?, estimatedValue?, dueDate?, source?, crmAccountId?, crmContactId?</code></td>
+<td>Opportunity (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/:id</code></td>
+<td><code>opportunity:read</code></td>
+<td>Detail with documents + bid/no-bid history</td>
+<td>—</td>
+<td><code>Opportunity + documents + bidNoBidRecords + statusHistory</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/opportunities/:id</code></td>
+<td><code>opportunity:update</code></td>
+<td>Update fields</td>
+<td><code>name?, agency?, bidType?, naicsCode?, setAside?, solicitationNum?, estimatedValue?, dueDate?, source?</code></td>
+<td>Opportunity</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/opportunities/:id/status</code></td>
+<td><code>opportunity:update</code></td>
+<td>Change pipeline status</td>
+<td><code>status</code></td>
+<td><code>{ id, status }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/opportunities/:id</code></td>
+<td><code>opportunity:update</code></td>
+<td>Delete opportunity</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/opportunities/bulk/status</code></td>
+<td><code>opportunity:update</code></td>
+<td>Bulk status change</td>
+<td><code>ids: string[], status</code></td>
+<td><code>{ updated, status }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/opportunities/bulk</code></td>
+<td><code>opportunity:update</code></td>
+<td>Bulk delete</td>
+<td><code>ids: string[]</code></td>
+<td><code>{ deleted }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/export.csv</code></td>
+<td><code>opportunity:read</code></td>
+<td>Export to CSV</td>
+<td>same filters as list</td>
+<td>CSV file</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/duplicate-check</code></td>
+<td><code>opportunity:read</code></td>
+<td>Check for duplicate solicitations</td>
+<td><code>solicitationNum?, agency?, name?</code></td>
+<td><code>{ duplicates[], hasDuplicates }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/opportunities/:id/documents</code></td>
+<td><code>opportunity:update</code></td>
+<td>Upload document (PDF/DOCX, max 50 MB)</td>
+<td>Multipart <code>file</code></td>
+<td>Document (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/:id/documents/:docId/download</code></td>
+<td><code>opportunity:read</code></td>
+<td>Get signed download URL</td>
+<td>—</td>
+<td><code>{ url, expiresIn, fileName }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/opportunities/:id/bid-no-bid</code></td>
+<td><code>opportunity:update</code></td>
+<td>Submit bid/no-bid scoring</td>
+<td>criteria scores + weights + <code>comments?</code></td>
+<td>BidNoBidRecord + <code>weightedTotal</code> (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/opportunities/:id/bid-no-bid/:recordId/decision</code></td>
+<td><code>bid_no_bid:decide</code></td>
+<td>Executive approve / decline / request info</td>
+<td><code>decision: "approve"|"decline"|"request_more_info", comments?</code></td>
+<td>BidNoBidRecord</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/:id/bid-no-bid/export.csv</code></td>
+<td><code>opportunity:read</code></td>
+<td>Export scoring history as CSV</td>
+<td>—</td>
+<td>CSV file</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/bid-no-bid/criteria</code></td>
+<td><code>opportunity:read</code></td>
+<td>Get org bid/no-bid criteria</td>
+<td>—</td>
+<td><code>Criteria[]</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/opportunities/bid-no-bid/criteria</code></td>
+<td><code>org:manage</code></td>
+<td>Set custom criteria</td>
+<td><code>criteria: [{ key, label, description, weight }]</code></td>
+<td><code>Criteria[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/bid-no-bid/pending-reviews</code></td>
+<td><code>opportunity:read</code></td>
+<td>Pending executive decisions</td>
+<td>—</td>
+<td><code>BidNoBidRecord[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/reports/pipeline</code></td>
+<td><code>opportunity:read</code></td>
+<td>Pipeline analytics</td>
+<td>—</td>
+<td><code>{ totalOpportunities, winRate, avgDaysToClose, byStatus, byBidType, monthly }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="6. Proposal Generation" id="6-proposal-generation"><h2 id="6-proposal-generation">6. Proposal Generation</h2>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="6.1 Proposals" id="6-1-proposals"><h3 id="61-proposals">6.1 Proposals</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals</code></td>
+<td><code>proposal:read</code></td>
+<td>List proposals</td>
+<td><code>opportunityId?</code></td>
+<td><code>Proposal[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals</code></td>
+<td><code>proposal:create</code> + plan limit</td>
+<td>Create proposal</td>
+<td><code>opportunityId, name, proposalNumber?, dueDate?, pageLimit?, targetFormat?, templateId?</code></td>
+<td>Proposal (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId</code></td>
+<td><code>proposal:read</code></td>
+<td>Detail with volumes and team</td>
+<td>—</td>
+<td><code>Proposal + volumes[] + team[]</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Update metadata</td>
+<td><code>name?, dueDate?, pageLimit?, targetFormat?, status?, estimatedCost?, costNotes?</code></td>
+<td>Proposal</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/cost-history</code></td>
+<td><code>proposal:read</code></td>
+<td>Cost history log</td>
+<td>—</td>
+<td><code>CostHistory[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/save-as-template</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Save as reusable template</td>
+<td><code>name, bidType, description?</code></td>
+<td>Template (201)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/assemble</code></td>
+<td><code>proposal:assemble</code></td>
+<td>Queue DOCX/PDF assembly</td>
+<td><code>format?: "docx"|"pdf", managerOverride?: boolean</code></td>
+<td><code>{ proposalId, assemblyStatus: "queued" }</code> (202)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/assembly-status</code></td>
+<td><code>proposal:read</code></td>
+<td>Poll assembly progress</td>
+<td>—</td>
+<td><code>{ assemblyStatus, updatedAt }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/exports</code></td>
+<td><code>proposal:read</code></td>
+<td>List export history</td>
+<td>—</td>
+<td><code>Export[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/exports/:exportId/download</code></td>
+<td><code>proposal:read</code></td>
+<td>Get export download URL</td>
+<td>—</td>
+<td><code>{ url, expiresIn, fileName, format }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/remind</code></td>
+<td><code>proposal:update</code></td>
+<td>Send due-date reminder to team</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="6.2 Volumes &amp; Sections" id="6-2-volumes-sections"><h3 id="62-volumes--sections">6.2 Volumes &amp; Sections</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/volumes</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Create volume</td>
+<td><code>title, orderIndex</code></td>
+<td>Volume (201)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Add section to volume</td>
+<td><code>volumeId, title, orderIndex, instructions?, pageLimit?, wordCountTarget?, dueDate?</code></td>
+<td>Section (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId</code></td>
+<td><code>section:read</code></td>
+<td>Get section with latest content</td>
+<td>—</td>
+<td><code>Section + currentContent</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId</code></td>
+<td><code>section:edit</code></td>
+<td>Update section metadata</td>
+<td><code>title?, instructions?, pageLimit?, wordCountTarget?, status?, ownerId?, dueDate?</code></td>
+<td>Section</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/content</code></td>
+<td><code>section:edit</code></td>
+<td>Save content (creates version)</td>
+<td><code>contentHtml, changeSummary?</code></td>
+<td>SectionVersion</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/versions</code></td>
+<td><code>section:read</code></td>
+<td>List content versions</td>
+<td>—</td>
+<td><code>SectionVersion[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/versions/:versionId/restore</code></td>
+<td><code>section:restore_version</code></td>
+<td>Restore prior version</td>
+<td>—</td>
+<td>SectionVersion</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/lock</code></td>
+<td><code>section:lock</code></td>
+<td>Lock / unlock section</td>
+<td><code>locked: boolean</code></td>
+<td><code>{ sectionId, locked }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId</code></td>
+<td><code>section:edit</code></td>
+<td>Delete section (must be empty)</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections/bulk-approve</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Bulk-approve all sections</td>
+<td>—</td>
+<td><code>{ approvedCount }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="6.3 Comments &amp; Collaboration" id="6-3-comments-collaboration"><h3 id="63-comments--collaboration">6.3 Comments &amp; Collaboration</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/comments</code></td>
+<td><code>section:comment</code></td>
+<td>List section comments</td>
+<td>—</td>
+<td><code>Comment[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/comments</code></td>
+<td><code>section:comment</code></td>
+<td>Add section comment</td>
+<td><code>body, anchorText?, parentId?</code></td>
+<td>Comment (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/comments/:commentId/resolve</code></td>
+<td><code>section:comment</code></td>
+<td>Resolve comment</td>
+<td>—</td>
+<td>Comment</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/comments</code></td>
+<td><code>proposal:read</code></td>
+<td>List proposal-level comments</td>
+<td>—</td>
+<td><code>ProposalComment[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/comments</code></td>
+<td><code>proposal:read</code></td>
+<td>Add proposal comment (@mention support)</td>
+<td><code>text</code></td>
+<td>ProposalComment (201)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/proposals/:proposalId/comments/:commentId</code></td>
+<td><code>proposal:read</code></td>
+<td>Delete comment (author or manager only)</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="6.4 Team" id="6-4-team"><h3 id="64-team">6.4 Team</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/team</code></td>
+<td><code>proposal:read</code></td>
+<td>List workspace team</td>
+<td>—</td>
+<td><code>Member[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/team</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Add team member</td>
+<td><code>userId, workspaceRole</code></td>
+<td>Member (201)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/proposals/:proposalId/team/:userId</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Remove team member</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="6.5 Win Themes" id="6-5-win-themes"><h3 id="65-win-themes">6.5 Win Themes</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/win-themes</code></td>
+<td><code>proposal:read</code></td>
+<td>List win themes</td>
+<td>—</td>
+<td><code>WinTheme[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/win-themes</code></td>
+<td><code>proposal:update</code></td>
+<td>Create theme (max 5)</td>
+<td><code>statement, category: "strength"|"differentiation"|"proof_point"|"value_prop", orderIndex?, enforcePerSection?</code></td>
+<td>WinTheme (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/win-themes/:themeId</code></td>
+<td><code>proposal:update</code></td>
+<td>Update theme</td>
+<td><code>statement?, category?, orderIndex?, enabled?, enforcePerSection?</code></td>
+<td>WinTheme</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/proposals/:proposalId/win-themes/:themeId</code></td>
+<td><code>proposal:update</code></td>
+<td>Delete theme</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/win-themes/reorder</code></td>
+<td><code>proposal:update</code></td>
+<td>Reorder themes</td>
+<td><code>order: [{ id, orderIndex }]</code></td>
+<td><code>{ reordered: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/win-themes/coverage</code></td>
+<td><code>proposal:read</code></td>
+<td>Section coverage analysis</td>
+<td>—</td>
+<td><code>{ themes: CoverageReport[], totalSections }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="6.6 AI-Assisted Drafting" id="6-6-ai-assisted-drafting"><h3 id="66-ai-assisted-drafting">6.6 AI-Assisted Drafting</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/ai/draft-section</code></td>
+<td><code>proposal:edit</code> + plan limit</td>
+<td>Stream AI-generated section content via SSE</td>
+<td><code>sectionTitle</code> (required), <code>sectionContext?</code>, <code>proposalName?</code>, <code>agencyName?</code>, <code>tone: "formal"|"persuasive"|"technical"</code>, <code>wordCount: 50–1000</code></td>
+<td><code>text/event-stream</code> — frames: <code>data: {"text":"..."}</code> · error: <code>data: {"error":"..."}</code> · end: <code>data: [DONE]</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Provider used: org's saved BYOK config → falls back to server <code>ANTHROPIC_API_KEY</code>. Returns <strong>503</strong> if neither is configured.</p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="7. Compliance" id="7-compliance"><h2 id="7-compliance">7. Compliance</h2>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="7.1 Rules &amp; Rule Sets" id="7-1-rules-rule-sets"><h3 id="71-rules--rule-sets">7.1 Rules &amp; Rule Sets</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/compliance/rules</code></td>
+<td><code>compliance:scan</code></td>
+<td>List active compliance rules</td>
+<td>—</td>
+<td><code>Rule[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/compliance/rules</code></td>
+<td><code>compliance:manage_rules</code></td>
+<td>Create rule</td>
+<td><code>clauseNumber?, title, ruleType, severity, bidTypeFilter?, regexPattern?, applicabilityJson, version, effectiveDate?</code></td>
+<td>Rule (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/compliance/rules/:id</code></td>
+<td><code>compliance:manage_rules</code></td>
+<td>Update rule</td>
+<td><code>title?, ruleType?, severity?, regexPattern?, applicabilityJson?, active?</code></td>
+<td>Rule</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/compliance/rule-sets</code></td>
+<td><code>compliance:scan</code></td>
+<td>List rule sets</td>
+<td>—</td>
+<td><code>RuleSet[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/compliance/rule-sets</code></td>
+<td><code>compliance:manage_rules</code></td>
+<td>Create rule set</td>
+<td><code>name, bidType?, stateCode?, ruleIdsJson</code></td>
+<td>RuleSet (201)</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="7.2 Scanning" id="7-2-scanning"><h3 id="72-scanning">7.2 Scanning</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance/scan</code></td>
+<td><code>compliance:scan</code></td>
+<td>Trigger scan (async)</td>
+<td><code>triggerType</code></td>
+<td><code>{ scanId, status: "pending" }</code> (202)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance/scans</code></td>
+<td><code>compliance:scan</code></td>
+<td>List scan history</td>
+<td>—</td>
+<td><code>ComplianceScan[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance/scans/:scanId</code></td>
+<td><code>compliance:scan</code></td>
+<td>Get results + findings</td>
+<td>—</td>
+<td><code>{ scan, findings[], totalSections }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance/scans/:scanId/delta</code></td>
+<td><code>compliance:scan</code></td>
+<td>Diff two scans</td>
+<td><code>baseline: &lt;scanId&gt;</code> (query param)</td>
+<td><code>{ added[], resolved[], unchanged[] }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="7.3 Review Gates" id="7-3-review-gates"><h3 id="73-review-gates">7.3 Review Gates</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates</code></td>
+<td><code>proposal:read</code></td>
+<td>List review gates</td>
+<td>—</td>
+<td><code>ReviewGate[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Create gate</td>
+<td><code>gateType, orderIndex, assigneeIds: string[], dueDate?</code></td>
+<td>ReviewGate (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates/:gateId</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Approve or reject gate</td>
+<td><code>outcome: "approve"|"reject", outcomeComments?</code></td>
+<td>ReviewGate</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates/:gateId</code></td>
+<td><code>proposal:update_settings</code></td>
+<td>Delete gate</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="7.4 Findings" id="7-4-findings"><h3 id="74-findings">7.4 Findings</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/compliance/findings/:id</code></td>
+<td><code>compliance:waive_finding</code></td>
+<td>Waive or mark finding addressed</td>
+<td><code>status: "waived"|"addressed", waiverReason?</code></td>
+<td>Finding</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="8. Content Library" id="8-content-library"><h2 id="8-content-library">8. Content Library</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content</code></td>
+<td><code>content:read</code></td>
+<td>List / filter items</td>
+<td><code>status, q?, contentType?, bidType?, naicsCode?, tag?, page, pageSize</code></td>
+<td><code>ContentItem[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/content</code></td>
+<td><code>content:add</code></td>
+<td>Create item</td>
+<td><code>title, bodyHtml, contentType, tags?, naicsCodes?, bidTypes?, expiresAt?, sourceProposalId?</code></td>
+<td>ContentItem (201)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/content/bulk-import</code></td>
+<td><code>content:add</code></td>
+<td>Bulk import (max 200)</td>
+<td><code>items: ContentItem[]</code></td>
+<td><code>{ created, ids }</code> (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content/search</code></td>
+<td><code>content:read</code></td>
+<td>Semantic + full-text hybrid search</td>
+<td><code>q</code> + list filters</td>
+<td><code>ContentItem[], meta</code> (includes <code>mode: "semantic"|"fulltext"</code>)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content/pending</code></td>
+<td><code>content:approve</code></td>
+<td>Items awaiting approval</td>
+<td>—</td>
+<td><code>ContentItem[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content/:id</code></td>
+<td><code>content:read</code></td>
+<td>Get item detail</td>
+<td>—</td>
+<td>ContentItem</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/content/:id</code></td>
+<td><code>content:add</code></td>
+<td>Update item (auto-versions)</td>
+<td><code>title?, bodyHtml?, contentType?, tags?, naicsCodes?, bidTypes?, expiresAt?</code></td>
+<td>ContentItem</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content/:id/versions</code></td>
+<td><code>content:read</code></td>
+<td>Version history</td>
+<td>—</td>
+<td><code>ContentItemVersion[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/content/:id/restore/:versionId</code></td>
+<td><code>content:add</code></td>
+<td>Restore version</td>
+<td>—</td>
+<td>ContentItem</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/content/:id</code></td>
+<td><code>content:read</code></td>
+<td>Delete item</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/content/:id/review</code></td>
+<td><code>content:approve</code></td>
+<td>Approve or reject pending item</td>
+<td><code>decision: "approve"|"reject", rejectionReason?</code></td>
+<td>ContentItem</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/content/:id/use</code></td>
+<td><code>content:read</code></td>
+<td>Log item insertion into section</td>
+<td><code>sectionId?</code></td>
+<td><code>{ logged: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/content/tags</code></td>
+<td><code>content:read</code></td>
+<td>List all tags</td>
+<td>—</td>
+<td><code>Tag[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/content/tags</code></td>
+<td><code>content:manage_taxonomy</code></td>
+<td>Create tag</td>
+<td><code>name</code></td>
+<td>Tag (201)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/content/tags/:tagId</code></td>
+<td><code>content:manage_taxonomy</code></td>
+<td>Archive tag</td>
+<td>—</td>
+<td><code>{ archived: true }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="9. Templates" id="9-templates"><h2 id="9-templates">9. Templates</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/templates</code></td>
+<td><code>template:read</code></td>
+<td>List templates (admins see all; others see published only)</td>
+<td>—</td>
+<td><code>Template[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates</code></td>
+<td><code>template:create</code></td>
+<td>Create template</td>
+<td><code>name, bidType, agency?, state?, description?</code></td>
+<td>Template (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/templates/:id</code></td>
+<td><code>template:read</code></td>
+<td>Get with sections</td>
+<td>—</td>
+<td><code>Template + sections[]</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/templates/:id</code></td>
+<td><code>template:create</code></td>
+<td>Update (draft only)</td>
+<td><code>name?, bidType?, agency?, state?, description?</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/sections</code></td>
+<td><code>template:create</code></td>
+<td>Add section</td>
+<td><code>title, orderIndex, required, instructions?, pageLimit?, defaultContent?, criteriaRefs?, contentLibraryTags?, setAsideRequired?</code></td>
+<td>TemplateSection (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/templates/:id/sections/:sectionId</code></td>
+<td><code>template:create</code></td>
+<td>Update section</td>
+<td>same fields as create, all optional</td>
+<td>TemplateSection</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/templates/:id/sections/:sectionId</code></td>
+<td><code>template:create</code></td>
+<td>Delete section</td>
+<td>—</td>
+<td><code>{ deleted: true }</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/templates/:id/sections/reorder</code></td>
+<td><code>template:create</code></td>
+<td>Reorder sections</td>
+<td><code>order: [{ id, orderIndex }]</code></td>
+<td><code>{ reordered: true }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/publish</code></td>
+<td><code>template:publish</code></td>
+<td>Publish template</td>
+<td><code>changeLog?, version?</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/unpublish</code></td>
+<td><code>template:publish</code></td>
+<td>Revert to draft</td>
+<td>—</td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/templates/:id/versions</code></td>
+<td><code>template:read</code></td>
+<td>Version history</td>
+<td>—</td>
+<td><code>TemplateVersion[]</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/templates/:id/dynamic-fields</code></td>
+<td><code>template:create</code></td>
+<td>Set dynamic fields</td>
+<td><code>fields: [{ key, label, defaultValue? }]</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/templates/:id/commercial-risk-rules</code></td>
+<td><code>template:create</code></td>
+<td>Set commercial risk rules</td>
+<td><code>rules: [{ id, pattern, severity, message }]</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/templates/:id/analytics</code></td>
+<td><code>template:read</code></td>
+<td>Usage analytics</td>
+<td>—</td>
+<td><code>{ proposalCount, lastUsedAt }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/request-publish</code></td>
+<td><code>template:create</code></td>
+<td>Request publish approval (non-admin)</td>
+<td><code>note?</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/approve-publish</code></td>
+<td><code>template:publish</code></td>
+<td>Admin approves publish request</td>
+<td><code>changeLog?, version?</code></td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/templates/:id/reject-publish</code></td>
+<td><code>template:publish</code></td>
+<td>Admin rejects publish request</td>
+<td><code>reason?</code></td>
+<td>Template</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="10. CRM" id="10-crm"><h2 id="10-crm">10. CRM</h2>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="10.1 Accounts" id="10-1-accounts"><h3 id="101-accounts">10.1 Accounts</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/accounts</code></td>
+<td><code>crm:read</code></td>
+<td>List accounts (paginated)</td>
+<td><code>search?, industry?, page, pageSize</code></td>
+<td><code>Account[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/accounts</code></td>
+<td><code>crm:write</code></td>
+<td>Create account</td>
+<td><code>name, industry?, employeeCount?, annualRevenue?, website?, primaryLocation?, tagsJson?, customFields?</code></td>
+<td>Account (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/accounts/:id</code></td>
+<td><code>crm:read</code></td>
+<td>Get account</td>
+<td>—</td>
+<td>Account</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/crm/accounts/:id</code></td>
+<td><code>crm:write</code></td>
+<td>Update account</td>
+<td>same as create, all optional</td>
+<td>Account</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/crm/accounts/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Soft delete</td>
+<td>—</td>
+<td>Account</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/accounts/bulk</code></td>
+<td><code>crm:write</code></td>
+<td>Bulk import (max 500)</td>
+<td><code>accounts: Account[]</code></td>
+<td><code>{ created, errors }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/accounts/:id/org-chart</code></td>
+<td><code>crm:read</code></td>
+<td>Contact org-chart tree</td>
+<td>—</td>
+<td><code>{ accountId, accountName, totalContacts, tree: ContactNode[] }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="31" data-section-title="10.2 Contacts" id="10-2-contacts"><h3 id="102-contacts">10.2 Contacts</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/contacts</code></td>
+<td><code>crm:read</code></td>
+<td>List contacts (paginated)</td>
+<td><code>accountId?, search?, page, pageSize</code></td>
+<td><code>Contact[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/contacts</code></td>
+<td><code>crm:write</code></td>
+<td>Create contact</td>
+<td><code>accountId, firstName?, lastName?, email?, phone?, title?, department?, isPrimaryContact?, customFields?</code></td>
+<td>Contact (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/contacts/:id</code></td>
+<td><code>crm:read</code></td>
+<td>Get contact</td>
+<td>—</td>
+<td>Contact</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/crm/contacts/:id</code></td>
+<td><code>crm:write</code></td>
+<td>Update contact</td>
+<td><code>firstName?, lastName?, email?, phone?, title?, department?, isPrimaryContact?, reportsTo?, customFields?</code></td>
+<td>Contact</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/crm/contacts/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Soft delete</td>
+<td>—</td>
+<td>Contact</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="32" data-section-title="10.3 Interactions" id="10-3-interactions"><h3 id="103-interactions">10.3 Interactions</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/interactions</code></td>
+<td><code>crm:read</code></td>
+<td>List interaction records</td>
+<td><code>accountId?, contactId?, opportunityId?, type?, page, pageSize</code></td>
+<td><code>Interaction[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/interactions</code></td>
+<td><code>crm:write</code></td>
+<td>Log an interaction</td>
+<td><code>accountId, contactId?, opportunityId?, type, direction?, subject?, body?</code></td>
+<td>Interaction (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/interactions/:id</code></td>
+<td><code>crm:read</code></td>
+<td>Get interaction</td>
+<td>—</td>
+<td>Interaction</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="33" data-section-title="10.4 CRM Opportunities" id="10-4-crm-opportunities"><h3 id="104-crm-opportunities">10.4 CRM Opportunities</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/opportunities</code></td>
+<td><code>crm:read</code></td>
+<td>List CRM opportunities</td>
+<td><code>accountId?, contactId?, stage?, ownerId?, page, pageSize</code></td>
+<td><code>CrmOpportunity[], meta</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/opportunities</code></td>
+<td><code>crm:write</code></td>
+<td>Create CRM opportunity</td>
+<td><code>accountId, contactId?, name, stage?, amount?, probability?, expectedCloseDate?, ownerId, bidOpportunityId?, customFields?</code></td>
+<td>CrmOpportunity (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/opportunities/:id</code></td>
+<td><code>crm:read</code></td>
+<td>Get CRM opportunity</td>
+<td>—</td>
+<td>CrmOpportunity</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/crm/opportunities/:id</code></td>
+<td><code>crm:write</code></td>
+<td>Update</td>
+<td><code>contactId?, name?, stage?, amount?, probability?, expectedCloseDate?, ownerId?, bidOpportunityId?, reasonLost?, customFields?</code></td>
+<td>CrmOpportunity</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/opportunities/:id/move-stage</code></td>
+<td><code>crm:write</code></td>
+<td>Move pipeline stage</td>
+<td><code>stage</code></td>
+<td>CrmOpportunity</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/crm/opportunities/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Soft delete</td>
+<td>—</td>
+<td>CrmOpportunity</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="34" data-section-title="10.5 Webhooks" id="10-5-webhooks"><h3 id="105-webhooks">10.5 Webhooks</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/webhooks</code></td>
+<td><code>crm:admin</code></td>
+<td>List subscriptions</td>
+<td>—</td>
+<td><code>Subscription[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/webhooks</code></td>
+<td><code>crm:admin</code></td>
+<td>Register webhook</td>
+<td><code>url, events: string[], secret?</code></td>
+<td>Subscription (201) — <strong>secret shown once only</strong></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/crm/webhooks/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Get subscription</td>
+<td>—</td>
+<td>Subscription</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/crm/webhooks/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Update subscription</td>
+<td><code>url?, events?, active?, secret?</code></td>
+<td>Subscription</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/crm/webhooks/:id</code></td>
+<td><code>crm:admin</code></td>
+<td>Delete subscription</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/crm/webhooks/:id/test</code></td>
+<td><code>crm:admin</code></td>
+<td>Fire test delivery</td>
+<td>—</td>
+<td><code>{ fired: boolean }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="35" data-section-title="Webhook Delivery Headers" id="webhook-delivery-headers"><h4 id="webhook-delivery-headers">Webhook Delivery Headers</h4>
+<pre><code>Content-Type: application/json
+X-Pursuite-Event: &lt;event-name&gt;
+X-Pursuite-Sig: sha256=&lt;hmac-sha256-hex&gt;
+</code></pre>
+</section><section class="doc-section-page" data-section-index="36" data-section-title="Signature Verification" id="signature-verification"><h4 id="signature-verification">Signature Verification</h4>
+<pre><code class="language-js">// Node.js
+const crypto = require('crypto');
+function verify(secret, rawBody, sigHeader) {
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret).update(rawBody).digest('hex');
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sigHeader));
+}
+</code></pre>
+<pre><code class="language-python"># Python
+import hmac, hashlib
+def verify(secret, raw_body, sig_header):
+    expected = 'sha256=' + hmac.new(
+        secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, sig_header)
+</code></pre>
+</section><section class="doc-section-page" data-section-index="37" data-section-title="Supported Webhook Events" id="supported-webhook-events"><h4 id="supported-webhook-events">Supported Webhook Events</h4>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crm_account.created</code></td>
+<td>CRM account created</td>
+</tr>
+<tr>
+<td><code>crm_account.updated</code></td>
+<td>CRM account updated</td>
+</tr>
+<tr>
+<td><code>crm_account.deleted</code></td>
+<td>CRM account deleted</td>
+</tr>
+<tr>
+<td><code>crm_contact.created</code></td>
+<td>CRM contact created</td>
+</tr>
+<tr>
+<td><code>crm_contact.updated</code></td>
+<td>CRM contact updated</td>
+</tr>
+<tr>
+<td><code>crm_contact.deleted</code></td>
+<td>CRM contact deleted</td>
+</tr>
+<tr>
+<td><code>crm_opportunity.created</code></td>
+<td>Opportunity created</td>
+</tr>
+<tr>
+<td><code>crm_opportunity.updated</code></td>
+<td>Opportunity updated</td>
+</tr>
+<tr>
+<td><code>crm_opportunity.stage_moved</code></td>
+<td>Opportunity moved pipeline stage</td>
+</tr>
+<tr>
+<td><code>crm_interaction.created</code></td>
+<td>Email / call / note logged</td>
+</tr>
+<tr>
+<td><code>crm_health_alert</code></td>
+<td>Account health score dropped below threshold</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="38" data-section-title="11. Reports &amp; Analytics" id="11-reports-analytics"><h2 id="11-reports--analytics">11. Reports &amp; Analytics</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/pipeline</code></td>
+<td><code>report:read</code></td>
+<td>Pipeline summary</td>
+<td><code>totalOpportunities, winRate, avgDaysToClose, byStatus, byBidType, monthly</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/win-rate</code></td>
+<td><code>report:read</code></td>
+<td>12-month win rate by month</td>
+<td><code>[{ month, outcome, count }]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/proposals/:id/status</code></td>
+<td><code>proposal:read</code></td>
+<td>Per-proposal health</td>
+<td><code>{ proposal, completionPercent, sections }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/workload</code></td>
+<td><code>report:read</code></td>
+<td>Writer workload snapshot</td>
+<td><code>[{ ownerId, status, count }]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/productivity</code></td>
+<td><code>report:read</code></td>
+<td>Writer &amp; PM load</td>
+<td><code>{ writerSections, pmProposals }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/bid-no-bid</code></td>
+<td><code>report:read</code></td>
+<td>Bid/no-bid analytics</td>
+<td><code>{ totalSubmissions, pendingDecisions, decisions, distribution, winRateByTier, monthly }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/reports/win-loss</code></td>
+<td><code>debrief:read</code></td>
+<td>Win/loss trends (24 months)</td>
+<td><code>[{ outcome, count, totalValue, month }]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/reports/opportunities/:id/debrief</code></td>
+<td><code>debrief:write</code></td>
+<td>Submit win/loss debrief</td>
+<td><code>outcome: "win"|"loss"|"no_bid", contractValue?, awardDate?, competitorNames?, winThemes?, lossReasons?, customerFeedback?, internalNotes?, lessonsLearned?</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/win-themes/analytics</code></td>
+<td><code>reports:read</code></td>
+<td>Org-level win theme performance</td>
+<td><code>ThemeAnalytics[]</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="39" data-section-title="12. Import &amp; SAM.gov" id="12-import-sam-gov"><h2 id="12-import--samgov">12. Import &amp; SAM.gov</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/import/providers</code></td>
+<td><code>opportunity:read</code></td>
+<td>List available import providers</td>
+<td>—</td>
+<td><code>[{ name, id, isConfigured }]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/import/search</code></td>
+<td><code>opportunity:read</code></td>
+<td>Search an import provider</td>
+<td><code>providerId, q?, filters</code></td>
+<td><code>SearchResult[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/import/submit</code></td>
+<td><code>opportunity:create</code></td>
+<td>Import normalized opportunities</td>
+<td><code>items: [{ externalId, provider, title, agency?, naicsCode?, setAside?, solicitationNumber?, estimatedValue?, dueDate? }]</code></td>
+<td><code>{ imported, skipped, errors }, summary</code> (207)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/sam-gov/search</code></td>
+<td><code>opportunity:read</code></td>
+<td>Search SAM.gov directly</td>
+<td><code>keyword?, naicsCode?, setAside?, ptype?, postedFrom?, postedTo?, limit?, offset?</code></td>
+<td><code>SearchResult[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/sam-gov/import</code></td>
+<td><code>opportunity:create</code></td>
+<td>Import SAM.gov notices by ID</td>
+<td><code>noticeIds: string[]</code></td>
+<td><code>{ imported, skipped, errors }, summary</code> (207)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="40" data-section-title="13. Notifications" id="13-notifications"><h2 id="13-notifications">13. Notifications</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/notifications</code></td>
+<td><code>notification:read</code></td>
+<td>Unread notifications (max 50)</td>
+<td><code>Notification[]</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/notifications/all</code></td>
+<td><code>notification:read</code></td>
+<td>All notifications (max 100)</td>
+<td><code>Notification[]</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/notifications/:id/read</code></td>
+<td><code>notification:write</code></td>
+<td>Mark one notification read</td>
+<td><code>{ id }</code></td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/notifications/read-all</code></td>
+<td><code>notification:write</code></td>
+<td>Mark all notifications read</td>
+<td><code>{ ok: true }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="41" data-section-title="14. Email &amp; Calendar (Nylas)" id="14-email-calendar-nylas"><h2 id="14-email--calendar-nylas">14. Email &amp; Calendar (Nylas)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/nylas/auth-url</code></td>
+<td><code>crm:write</code></td>
+<td>Get Nylas OAuth URL</td>
+<td>—</td>
+<td><code>{ url }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/nylas/status</code></td>
+<td><code>crm:read</code></td>
+<td>Check email/calendar connection</td>
+<td>—</td>
+<td><code>{ connected, email?, provider? }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/nylas/disconnect</code></td>
+<td><code>crm:write</code></td>
+<td>Disconnect mailbox</td>
+<td>—</td>
+<td><code>{ disconnected: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/nylas/emails</code></td>
+<td><code>crm:read</code></td>
+<td>List synced email threads</td>
+<td><code>contactId?, accountId?, limit?</code></td>
+<td><code>EmailThread[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/nylas/emails/sync</code></td>
+<td><code>crm:write</code></td>
+<td>Sync recent emails</td>
+<td>—</td>
+<td><code>{ synced: number }</code> (202)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/nylas/emails/send</code></td>
+<td><code>crm:write</code></td>
+<td>Send email from connected mailbox</td>
+<td><code>to: string[], subject, html, contactId?, accountId?, opportunityId?</code></td>
+<td><code>{ sent: true }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/nylas/calendar</code></td>
+<td><code>crm:read</code></td>
+<td>List calendar events</td>
+<td><code>start?, end?, contactId?</code></td>
+<td><code>CalendarEvent[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/nylas/calendar/sync</code></td>
+<td><code>crm:write</code></td>
+<td>Sync next 30 days of calendar</td>
+<td>—</td>
+<td><code>{ synced: number }</code> (202)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="42" data-section-title="15. RFP Shredder (A1)" id="15-rfp-shredder-a1"><h2 id="15-rfp-shredder-a1">15. RFP Shredder (A1)</h2>
+<p>The RFP Shredder extracts requirements from an uploaded RFP PDF or DOCX using AI and produces a structured, editable requirement list. Confirming requirements unlocks the Compliance Matrix (A2) and Autonomous Pipeline (A3) for the proposal.</p>
+<blockquote>
+<p><strong>BUG-08 (v2.0):</strong> <code>GET /proposals/:id/rfp-document</code> previously returned 500 when no document had been uploaded. This is now a structured <strong>404</strong>.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="43" data-section-title="15.1 Document Upload &amp; Status" id="15-1-document-upload-status"><h3 id="151-document-upload--status">15.1 Document Upload &amp; Status</h3>
+<p>Current implementation supports PDF and DOCX uploads up to 50 MB. RFP endpoints use the dedicated <code>rfp:*</code> permission family: <code>rfp:upload</code>, <code>rfp:read</code>, <code>rfp:write</code>, and <code>rfp:confirm</code>. Both <code>GET /proposals/:proposalId/rfp-document</code> and <code>GET /rfp-documents/:id</code> return <code>requirements[]</code> with <code>reviewed_at</code> and <code>needs_review</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/rfp-upload</code></td>
+<td><code>rfp:upload</code></td>
+<td>Upload RFP PDF or DOCX (multipart or presigned flow, max 50 MB)</td>
+<td>Multipart <code>file</code> or JSON <code>file_name, file_size_bytes, mime_type</code></td>
+<td><code>{ rfp_document_id, shred_status?, upload_url?, upload_expires_at? }</code> (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/rfp-document</code></td>
+<td><code>rfp:read</code></td>
+<td>Get current RFP document and status; <strong>404</strong> when none uploaded</td>
+<td>-</td>
+<td><code>{ id, shred_status, requirements[] }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="44" data-section-title="shred_status values" id="shred-status-values"><h4 id="shred_status-values"><code>shred_status</code> values</h4>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uploaded</code></td>
+<td>File received; worker has not yet started</td>
+</tr>
+<tr>
+<td><code>pending</code></td>
+<td>Worker picked up; AI extraction in progress</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td>Requirements extracted; awaiting confirmation</td>
+</tr>
+<tr>
+<td><code>confirmed</code></td>
+<td>Requirements confirmed; A2/A3 unlocked</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td>Extraction failed; re-process to retry</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="45" data-section-title="15.2 Processing &amp; Confirmation" id="15-2-processing-confirmation"><h3 id="152-processing--confirmation">15.2 Processing &amp; Confirmation</h3>
+<p><code>POST /rfp-documents/:id/process</code> re-runs extraction using replace-on-success semantics: active requirements for the document remain visible if extraction fails, and are soft-deleted/replaced only inside the successful completion transaction. <code>POST /rfp-documents/:id/confirm</code> returns <code>409 LOW_CONFIDENCE_REVIEW_REQUIRED</code> when any active requirement below confidence <code>0.70</code> lacks <code>reviewed_at</code>; edit the row or send <code>PATCH /rfp-shredder-requirements/:id</code> with <code>{ "reviewed": true }</code> to clear the gate.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/rfp-documents/:id/confirm</code></td>
+<td><code>rfp:confirm</code></td>
+<td>Confirm requirements; locks the set and sets <code>rfp_confirmed_at</code>. Requires <code>completed</code> status and no unreviewed low-confidence rows.</td>
+<td>-</td>
+<td><code>{ rfp_document_id, shred_status: "confirmed" }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/rfp-documents/:id/process</code></td>
+<td><code>rfp:upload</code></td>
+<td>Re-queue AI extraction with replace-on-success semantics.</td>
+<td>-</td>
+<td><code>{ rfp_document_id, shred_status: "pending" }</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Role gate (NEG-19):</strong> only <code>admin</code> and <code>proposal_manager</code> may confirm requirements. <code>writer</code> returns <strong>403</strong>.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="46" data-section-title="15.3 Requirements CRUD" id="15-3-requirements-crud"><h3 id="153-requirements-crud">15.3 Requirements CRUD</h3>
+<p>Manual requirement writes require <code>rfp:write</code>. Manual rows are appended at <code>MAX(position)+1</code> over non-deleted requirements for the same <code>rfp_document_id</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/rfp-shredder-requirements</code></td>
+<td><code>rfp:write</code></td>
+<td>Add a requirement manually</td>
+<td><code>rfp_document_id, requirement_text, category?, is_mandatory?</code></td>
+<td>Requirement (201); <code>position</code> is <code>MAX(position)+1</code> over active rows</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/rfp-shredder-requirements/:id</code></td>
+<td><code>rfp:write</code></td>
+<td>Edit or mark reviewed</td>
+<td><code>requirement_text?, category?, is_mandatory?, reviewed?</code></td>
+<td>Updated requirement</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/rfp-shredder-requirements/:id</code></td>
+<td><code>rfp:write</code></td>
+<td>Soft-delete requirement (<code>deleted_at</code> set)</td>
+<td>-</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="47" data-section-title="Requirement Object" id="requirement-object"><h4 id="requirement-object">Requirement Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Requirement identifier</td>
+</tr>
+<tr>
+<td><code>proposal_id</code></td>
+<td>UUID</td>
+<td>Parent proposal</td>
+</tr>
+<tr>
+<td><code>rfp_document_id</code></td>
+<td>UUID</td>
+<td>Parent document</td>
+</tr>
+<tr>
+<td><code>requirement_text</code></td>
+<td>string</td>
+<td>The extracted or manually-entered requirement</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>string</td>
+<td>e.g. <code>"Technical"</code>, <code>"Management"</code>, <code>"Past Performance"</code></td>
+</tr>
+<tr>
+<td><code>is_mandatory</code></td>
+<td>boolean</td>
+<td>Whether compliance is mandatory</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td>number</td>
+<td>Display order</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td><code>"ai"|"manual"</code></td>
+<td>Origin</td>
+</tr>
+<tr>
+<td><code>deletedAt</code></td>
+<td>ISO timestamp | null</td>
+<td>Soft-delete timestamp</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="48" data-section-title="16. Compliance Matrix (A2)" id="16-compliance-matrix-a2"><h2 id="16-compliance-matrix-a2">16. Compliance Matrix (A2)</h2>
+<p>Automatically maps each confirmed RFP requirement to proposal sections. Requires <code>rfp_confirmed_at</code> to be set on the proposal (A1 must be confirmed first).</p>
+</section><section class="doc-section-page" data-section-index="49" data-section-title="16.1 Generation &amp; Retrieval" id="16-1-generation-retrieval"><h3 id="161-generation--retrieval">16.1 Generation &amp; Retrieval</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance-matrix/generate</code></td>
+<td><code>compliance_matrix:write</code></td>
+<td>Queue AI-powered matrix generation (async). Returns <strong>409</strong> if A1 not confirmed.</td>
+<td>—</td>
+<td><code>{ jobId, status: "queued" }</code> (202)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance-matrix</code></td>
+<td><code>compliance_matrix:read</code></td>
+<td>Get current matrix with all items and coverage summary</td>
+<td>—</td>
+<td><code>{ items: MatrixItem[], summary: { total, covered, partial, missing } }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="50" data-section-title="16.2 Item Management" id="16-2-item-management"><h3 id="162-item-management">16.2 Item Management</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/compliance-matrix-items/:itemId</code></td>
+<td><code>compliance_matrix:write</code></td>
+<td>Override item status or assign to a section</td>
+<td><code>coverageStatus?, humanStatus?, assignedSectionId?, notes?</code></td>
+<td>Updated MatrixItem</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="51" data-section-title="MatrixItem Object" id="matrixitem-object"><h4 id="matrixitem-object">MatrixItem Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Item identifier</td>
+</tr>
+<tr>
+<td><code>requirementId</code></td>
+<td>UUID</td>
+<td>Linked RFP Shredder requirement</td>
+</tr>
+<tr>
+<td><code>requirementText</code></td>
+<td>string</td>
+<td>Requirement text (denormalized for display)</td>
+</tr>
+<tr>
+<td><code>assignedSectionId</code></td>
+<td>UUID | null</td>
+<td>Proposal section handling this requirement</td>
+</tr>
+<tr>
+<td><code>coverageStatus</code></td>
+<td><code>"covered"|"partial"|"missing"</code></td>
+<td>AI-assessed coverage</td>
+</tr>
+<tr>
+<td><code>humanStatus</code></td>
+<td><code>"pending"|"verified"|"waived"</code></td>
+<td>Human review status</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>string | null</td>
+<td>Reviewer notes</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="52" data-section-title="16.3 Export" id="16-3-export"><h3 id="163-export">16.3 Export</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance-matrix/export</code></td>
+<td><code>compliance_matrix:write</code></td>
+<td>Queue DOCX or CSV export</td>
+<td><code>format: "docx"|"csv"</code></td>
+<td><code>{ exportId, status: "queued" }</code> (202)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/compliance-matrix-exports/:exportId</code></td>
+<td><code>compliance_matrix:read</code></td>
+<td>Poll export status; get download URL when ready</td>
+<td>—</td>
+<td><code>{ status, downloadUrl?, expiresAt? }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="53" data-section-title="17. Autonomous Pipeline (A3)" id="17-autonomous-pipeline-a3"><h2 id="17-autonomous-pipeline-a3">17. Autonomous Pipeline (A3)</h2>
+<p>Orchestrates the AI-assisted proposal drafting pipeline: RFP ingestion → requirement extraction → section-by-section AI drafting → compliance check → export. Human gates pause the pipeline for review at configurable checkpoints.</p>
+</section><section class="doc-section-page" data-section-index="54" data-section-title="17.1 Pipeline Runs" id="17-1-pipeline-runs"><h3 id="171-pipeline-runs">17.1 Pipeline Runs</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/pipeline-runs/latest</code></td>
+<td><code>pipeline:read</code></td>
+<td>Get the most recent run for this proposal · <strong>404</strong> if no run started</td>
+<td>—</td>
+<td><code>PipelineRun + steps[] + gates[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/pipeline-runs</code></td>
+<td><code>pipeline:write</code></td>
+<td>Start a new pipeline run</td>
+<td><code>config?: { tokenBudget?, steps?: string[] }</code></td>
+<td>PipelineRun (202)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/pipeline-runs/:runId</code></td>
+<td><code>pipeline:read</code></td>
+<td>Get run with all steps and human gates</td>
+<td>—</td>
+<td><code>PipelineRun + steps[] + gates[]</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/pipeline-runs/:runId</code></td>
+<td><code>pipeline:write</code></td>
+<td>Cancel a running pipeline</td>
+<td>—</td>
+<td><code>{ cancelled: true }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="55" data-section-title="PipelineRun Object" id="pipelinerun-object"><h4 id="pipelinerun-object">PipelineRun Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Run identifier</td>
+</tr>
+<tr>
+<td><code>proposalId</code></td>
+<td>UUID</td>
+<td>Parent proposal</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>"pending"|"running"|"waiting_gate"|"completed"|"failed"|"cancelled"</code></td>
+<td>Overall run status</td>
+</tr>
+<tr>
+<td><code>steps</code></td>
+<td><code>PipelineStep[]</code></td>
+<td>Ordered list of pipeline steps</td>
+</tr>
+<tr>
+<td><code>currentGate</code></td>
+<td>number | null</td>
+<td>Gate number currently blocking the run (null = not gated)</td>
+</tr>
+<tr>
+<td><code>tokenBudget</code></td>
+<td>number</td>
+<td>Max tokens allocated for AI calls in this run</td>
+</tr>
+<tr>
+<td><code>tokensUsed</code></td>
+<td>number</td>
+<td>Tokens consumed so far</td>
+</tr>
+<tr>
+<td><code>startedAt</code></td>
+<td>ISO timestamp</td>
+<td>When the run began</td>
+</tr>
+<tr>
+<td><code>completedAt</code></td>
+<td>ISO timestamp | null</td>
+<td>When the run finished</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="56" data-section-title="17.2 Human Gates" id="17-2-human-gates"><h3 id="172-human-gates">17.2 Human Gates</h3>
+<p>Human gates pause the pipeline and require explicit approve/reject before execution continues.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/pipeline-runs/:runId/gates/:gateNumber/approve</code></td>
+<td><code>pipeline:gate</code></td>
+<td>Approve the gate — pipeline resumes</td>
+<td><code>comments?</code></td>
+<td><code>{ approved: true, resuming: true }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/pipeline-runs/:runId/gates/:gateNumber/reject</code></td>
+<td><code>pipeline:gate</code></td>
+<td>Reject the gate — pipeline aborts</td>
+<td><code>reason?</code></td>
+<td><code>{ rejected: true, runStatus: "failed" }</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="57" data-section-title="18. Competitive Intel (A5)" id="18-competitive-intel-a5"><h2 id="18-competitive-intel-a5">18. Competitive Intel (A5)</h2>
+<p>Monitors configured intelligence feeds (SAM.gov award notices, procurement forecasts, competitor filings) and surfaces curated intel items with AI-generated digest summaries.</p>
+<p>All endpoints are registered under the prefix <code>/intel</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/intel/feeds</code></td>
+<td><code>intel:read</code></td>
+<td>List org's configured intel feeds</td>
+<td>—</td>
+<td><code>IntelFeed[]</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/intel/feeds</code></td>
+<td><code>intel:write</code></td>
+<td>Create or upsert an intel feed config</td>
+<td><code>feedType, name, config: { keywords?, naicsCodes?, agencies?, competitors? }</code></td>
+<td>IntelFeed (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/intel/feed</code></td>
+<td><code>intel:read</code></td>
+<td>Paginated intel items across all feeds</td>
+<td><code>feedType?, bookmarked?, from?, to?, limit?, offset?</code></td>
+<td><code>{ items: IntelItem[], total }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/intel/items/:itemId/bookmark</code></td>
+<td><code>intel:write</code></td>
+<td>Toggle bookmark on an intel item</td>
+<td>—</td>
+<td><code>{ bookmarked: boolean }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/intel/digest/latest</code></td>
+<td><code>intel:read</code></td>
+<td>Most recent AI-generated digest summary</td>
+<td>—</td>
+<td><code>{ digest: IntelDigest, itemCount }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="58" data-section-title="IntelItem Object" id="intelitem-object"><h4 id="intelitem-object">IntelItem Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Item identifier</td>
+</tr>
+<tr>
+<td><code>feedId</code></td>
+<td>UUID</td>
+<td>Source feed</td>
+</tr>
+<tr>
+<td><code>feedType</code></td>
+<td><code>"sam_award"|"forecast"|"competitor"|"news"</code></td>
+<td>Feed category</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>string</td>
+<td>Item headline</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>string</td>
+<td>AI-generated summary</td>
+</tr>
+<tr>
+<td><code>sourceUrl</code></td>
+<td>string | null</td>
+<td>Original source URL</td>
+</tr>
+<tr>
+<td><code>publishedAt</code></td>
+<td>ISO timestamp</td>
+<td>When the item was published</td>
+</tr>
+<tr>
+<td><code>bookmarked</code></td>
+<td>boolean</td>
+<td>Whether the requesting user bookmarked it</td>
+</tr>
+<tr>
+<td><code>relevanceScore</code></td>
+<td>number</td>
+<td>AI relevance score 0–1</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="59" data-section-title="19. Teaming Workspace (B7)" id="19-teaming-workspace-b7"><h2 id="19-teaming-workspace-b7">19. Teaming Workspace (B7)</h2>
+<p>Manages teaming arrangements for a proposal opportunity. Supports partner onboarding, work-share validation, document exchange, and a public partner portal for document uploads without a Pursuite account.</p>
+</section><section class="doc-section-page" data-section-index="60" data-section-title="19.1 Workspace" id="19-1-workspace"><h3 id="191-workspace">19.1 Workspace</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/opportunities/:opportunityId/teaming</code></td>
+<td><code>teaming:read</code></td>
+<td>Get workspace + partners + documents for the opportunity</td>
+<td>—</td>
+<td><code>{ workspace, partners[], documents[] }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/teaming-workspaces</code></td>
+<td><code>teaming:write</code></td>
+<td>Create a teaming workspace</td>
+<td><code>opportunityId, primeOrgName?, notes?</code></td>
+<td>TeamingWorkspace (201)</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="61" data-section-title="19.2 Partners" id="19-2-partners"><h3 id="192-partners">19.2 Partners</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/teaming-workspaces/:workspaceId/partners</code></td>
+<td><code>teaming:write</code></td>
+<td>Add a partner (work-share sum must stay ≤ 100%)</td>
+<td><code>orgName, role: "prime"|"sub"|"mentor"|"protege"?, workSharePercent?, contactEmail?, contactName?, notes?</code></td>
+<td>TeamingPartner (201)</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/teaming-workspace-partners/:partnerId</code></td>
+<td><code>teaming:write</code></td>
+<td>Update partner details / work-share</td>
+<td><code>orgName?, role?, workSharePercent?, status?, contactEmail?, contactName?, notes?</code></td>
+<td>TeamingPartner</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/teaming-workspace-partners/:partnerId/invite</code></td>
+<td><code>teaming:write</code></td>
+<td>Generate and send portal invite link to partner</td>
+<td><code>email?</code> (overrides stored contact email)</td>
+<td><code>{ inviteToken, inviteUrl, expiresAt }</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Work-share validation:</strong> the sum of all active partner <code>workSharePercent</code> values must not exceed 100. A 409 is returned if an add/update would exceed the limit.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="62" data-section-title="19.3 Documents" id="19-3-documents"><h3 id="193-documents">19.3 Documents</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/teaming-documents</code></td>
+<td><code>teaming:write</code></td>
+<td>Upload a teaming document (multipart, max 50 MB)</td>
+<td>Multipart <code>file</code>, <code>workspaceId</code>, <code>partnerId?</code>, <code>documentType?</code></td>
+<td>TeamingDocument (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/teaming-documents/:documentId/download</code></td>
+<td><code>teaming:read</code></td>
+<td>Get signed download URL (15-min TTL)</td>
+<td>—</td>
+<td><code>{ url, expiresAt, fileName }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="63" data-section-title="19.4 Partner Portal (Public — no auth required)" id="19-4-partner-portal-public-no-auth-required"><h3 id="194-partner-portal-public--no-auth-required">19.4 Partner Portal (Public — no auth required)</h3>
+<p>These endpoints allow teaming partners to interact with the workspace using only an invite token. No Pursuite account is required.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth</th>
+<th>Description</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/partner-portal/:inviteToken</code></td>
+<td>Public (invite token)</td>
+<td>Look up workspace and partner details by token</td>
+<td><code>{ workspace, partner, documents[] }</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/partner-portal/:inviteToken/documents</code></td>
+<td>Public (invite token)</td>
+<td>Partner uploads a document (multipart, max 50 MB)</td>
+<td><code>{ documentId, fileName, uploadedAt }</code> (201)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Invite tokens are single-use per document upload and expire 7 days after generation.</p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="64" data-section-title="20. Deltek ProPricer &amp; CPQ" id="20-deltek-propricer-cpq"><h2 id="20-deltek-propricer--cpq">20. Deltek ProPricer &amp; CPQ</h2>
+<p>Connects Pursuite to a Deltek ProPricer server via the <strong>ProPricer Bridge</strong> microservice — a .NET 8 sidecar that wraps the ProPricer 9.5 SDK (WebSocket/.NET protocol) and exposes a REST+JSON interface.</p>
+<p><strong>Architecture:</strong></p>
+<pre><code>Pursuite API  ──(REST + JSON + X-Bridge-Key)──▶  ProPricer Bridge (.NET 8)
+                                                           │
+                                               (ProPricer SDK / WebSocket)
+                                                           │
+                                                           ▼
+                                               ProPricer 9.5 App Server
+</code></pre>
+<p><strong>Security model:</strong> ProPricer credentials (username, password, license key) reside only in the bridge's <code>appsettings.json</code>. Pursuite stores only the bridge URL and an AES-256-GCM encrypted bridge API key. Neither credential is ever returned in API responses.</p>
+<p><strong>Mock mode:</strong> the bridge runs in <code>MockMode=true</code> by default, returning realistic canned data — no ProPricer license required for development or testing. Set <code>Bridge:MockMode=false</code> and supply SDK DLLs for real connectivity.</p>
+</section><section class="doc-section-page" data-section-index="65" data-section-title="20.1 Config" id="20-1-config"><h3 id="201-config">20.1 Config</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/config</code></td>
+<td><code>deltek:read</code></td>
+<td>Get org's ProPricer config (keys never returned)</td>
+<td>—</td>
+<td><code>{ id, orgId, propriceUrl, bridgeUrl, defaultCostPool, laborRateSource, isActive, lastSyncAt }</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/deltek/config</code></td>
+<td><code>deltek:write</code></td>
+<td>Create or update config (upsert by orgId)</td>
+<td><code>propriceUrl?, authToken?, bridgeUrl?, bridgeKey?, defaultCostPool?, laborRateSource?, isActive?</code></td>
+<td>Config object (token/key fields omitted)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/deltek/config</code></td>
+<td><code>deltek:write</code></td>
+<td>Remove config</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>bridgeKey</code> and <code>authToken</code> are write-only — always encrypted with AES-256-GCM before storage and never included in any GET response. To update, POST a new value; omit the field to leave the current value unchanged.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="66" data-section-title="20.2 Health Probe" id="20-2-health-probe"><h3 id="202-health-probe">20.2 Health Probe</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/health</code></td>
+<td><code>deltek:read</code></td>
+<td>Test bridge/ProPricer connectivity. Uses bridge when <code>bridgeUrl</code> is set; falls back to direct HTTP probe otherwise.</td>
+<td><code>{ reachable, proPricerReachable?, mockMode?, latencyMs, bridgeMode, lastSyncAt, reason? }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="67" data-section-title="Health response fields" id="health-response-fields"><h4 id="health-response-fields">Health response fields</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reachable</code></td>
+<td>boolean</td>
+<td>Bridge (or direct endpoint) is reachable</td>
+</tr>
+<tr>
+<td><code>proPricerReachable</code></td>
+<td>boolean</td>
+<td>ProPricer Application Server is reachable via the bridge (bridge mode only)</td>
+</tr>
+<tr>
+<td><code>mockMode</code></td>
+<td>boolean</td>
+<td>Bridge is running in mock mode (bridge mode only)</td>
+</tr>
+<tr>
+<td><code>latencyMs</code></td>
+<td>number | null</td>
+<td>Round-trip latency in ms</td>
+</tr>
+<tr>
+<td><code>bridgeMode</code></td>
+<td>boolean</td>
+<td><code>true</code> when using the bridge, <code>false</code> for legacy direct probe</td>
+</tr>
+<tr>
+<td><code>lastSyncAt</code></td>
+<td>ISO timestamp | null</td>
+<td>Timestamp of last successful probe or sync</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>string</td>
+<td>Error message when <code>reachable=false</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="68" data-section-title="20.3 Bridge — Sync (NEW in v2.0)" id="20-3-bridge-sync-new-in-v2-0"><h3 id="203-bridge--sync-new-in-v20">20.3 Bridge — Sync (NEW in v2.0)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/deltek/sync</code></td>
+<td><code>deltek:write</code></td>
+<td>Pull all resource rates from the bridge and upsert into <code>propricer_labor_rates</code>. Requires <code>bridgeUrl</code> to be configured. Timeout: 30 s.</td>
+<td>—</td>
+<td><code>{ upsertedRates, resourceRatesSynced, burdenTablesSynced, syncedAt }</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Returns <strong>400</strong> if no <code>bridgeUrl</code> is configured. Returns <strong>502</strong> if the bridge is unreachable or returns an error. A sync audit event (<code>deltek.sync_completed</code>) is written to the org audit log.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="69" data-section-title="20.4 Bridge — Proposals (NEW in v2.0)" id="20-4-bridge-proposals-new-in-v2-0"><h3 id="204-bridge--proposals-new-in-v20">20.4 Bridge — Proposals (NEW in v2.0)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/proposals</code></td>
+<td><code>deltek:read</code></td>
+<td>List proposals available in the ProPricer workspace via bridge.</td>
+<td>—</td>
+<td><code>{ data: ProposalSummary[], count }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/proposals/:name/:version</code></td>
+<td><code>deltek:read</code></td>
+<td>Get proposal detail with tasks and resource assignments. Returns <strong>404</strong> if not found in ProPricer.</td>
+<td>—</td>
+<td><code>{ data: ProposalDetail }</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="70" data-section-title="ProposalSummary Object" id="proposalsummary-object"><h4 id="proposalsummary-object">ProposalSummary Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>Proposal name as stored in ProPricer</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>string</td>
+<td>Proposal version</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string | null</td>
+<td>Proposal description</td>
+</tr>
+<tr>
+<td><code>totalCost</code></td>
+<td>number | null</td>
+<td>Total contract value</td>
+</tr>
+<tr>
+<td><code>currency</code></td>
+<td>string</td>
+<td>Currency code (e.g. <code>"USD"</code>)</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="71" data-section-title="ProposalDetail Object" id="proposaldetail-object"><h4 id="proposaldetail-object">ProposalDetail Object</h4>
+<p>Extends <code>ProposalSummary</code> with:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tasks</code></td>
+<td><code>ProposalTask[]</code></td>
+<td>Ordered list of tasks/CLINs</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>ProposalTask</code> contains:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>Task name (e.g. <code>"Base Year"</code>, <code>"Option Year 1"</code>)</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string | null</td>
+<td>Task description</td>
+</tr>
+<tr>
+<td><code>totalCost</code></td>
+<td>number | null</td>
+<td>Task total cost</td>
+</tr>
+<tr>
+<td><code>resourceAssignments</code></td>
+<td><code>ResourceAssignment[]</code></td>
+<td>Labor assignments</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>ResourceAssignment</code> contains:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>laborCategory</code></td>
+<td>string</td>
+<td>Labor category (LCAT) name</td>
+</tr>
+<tr>
+<td><code>hours</code></td>
+<td>number</td>
+<td>Hours assigned</td>
+</tr>
+<tr>
+<td><code>hourlyRate</code></td>
+<td>number</td>
+<td>Direct hourly rate</td>
+</tr>
+<tr>
+<td><code>totalCost</code></td>
+<td>number</td>
+<td><code>hours × hourlyRate</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="72" data-section-title="20.5 CLIN Exports" id="20-5-clin-exports"><h3 id="205-clin-exports">20.5 CLIN Exports</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/deltek/exports</code></td>
+<td><code>deltek:write</code></td>
+<td>Generate a CLIN export for a proposal</td>
+<td><code>proposalId, clinData: ClinEntry[], exportFormat?</code></td>
+<td>ClinExport (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/exports</code></td>
+<td><code>deltek:read</code></td>
+<td>List exports</td>
+<td><code>proposalId?, limit?, offset?</code></td>
+<td><code>{ data: ClinExport[], total }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/exports/:id</code></td>
+<td><code>deltek:read</code></td>
+<td>Get export with full CLIN data</td>
+<td>—</td>
+<td>ClinExport</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/deltek/exports/:id</code></td>
+<td><code>deltek:write</code></td>
+<td>Delete export record</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="73" data-section-title="ClinEntry Object" id="clinentry-object"><h4 id="clinentry-object">ClinEntry Object</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>clinNumber</code></td>
+<td>string</td>
+<td>CLIN identifier</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string</td>
+<td>CLIN description</td>
+</tr>
+<tr>
+<td><code>unitOfMeasure</code></td>
+<td>string</td>
+<td>e.g. <code>"LOT"</code>, <code>"HOUR"</code></td>
+</tr>
+<tr>
+<td><code>quantity</code></td>
+<td>number</td>
+<td>Unit quantity</td>
+</tr>
+<tr>
+<td><code>unitPrice</code></td>
+<td>number</td>
+<td>Price per unit</td>
+</tr>
+<tr>
+<td><code>totalPrice</code></td>
+<td>number</td>
+<td><code>quantity × unitPrice</code></td>
+</tr>
+<tr>
+<td><code>periodOfPerf</code></td>
+<td>string?</td>
+<td>Period of performance</td>
+</tr>
+<tr>
+<td><code>optionYear</code></td>
+<td>number?</td>
+<td><code>0</code> = base year; <code>1–4</code> = option years</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="74" data-section-title="20.6 Labor Rates" id="20-6-labor-rates"><h3 id="206-labor-rates">20.6 Labor Rates</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Permission</th>
+<th>Description</th>
+<th>Key Request Fields</th>
+<th>Key Response Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/deltek/labor-rates</code></td>
+<td><code>deltek:write</code></td>
+<td>Upsert a labor rate (unique on <code>orgId + laborCategory + rateYear</code>)</td>
+<td><code>laborCategory, rateYear, hourlyRate, overheadRate?, gaRate?, fringeRate?, feeRate?, source?, effectiveDate?</code></td>
+<td>LaborRate (201)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/labor-rates</code></td>
+<td><code>deltek:read</code></td>
+<td>List rates</td>
+<td><code>rateYear?, category?, limit?, offset?</code></td>
+<td><code>{ data: LaborRate[], total }</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/labor-rates/:id</code></td>
+<td><code>deltek:read</code></td>
+<td>Get single rate</td>
+<td>—</td>
+<td>LaborRate</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/deltek/labor-rates/:id/burdened-rate</code></td>
+<td><code>deltek:read</code></td>
+<td>Compute fully-burdened rate (CAS/FAR stacking)</td>
+<td>—</td>
+<td><code>{ id, laborCategory, rateYear, breakdown, wrapFactor }</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/deltek/labor-rates/:id</code></td>
+<td><code>deltek:write</code></td>
+<td>Delete rate</td>
+<td>—</td>
+<td>204 No Content</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="75" data-section-title="Burdened Rate Breakdown" id="burdened-rate-breakdown"><h4 id="burdened-rate-breakdown">Burdened Rate Breakdown</h4>
+<p>Formula: <code>base × (1 + fringe) × (1 + overhead) × (1 + G&amp;A) × (1 + fee)</code> — all indirect rates stored as percentages (e.g. <code>35.00</code> = 35%).</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseHourlyRate</code></td>
+<td>number</td>
+<td>Direct hourly rate</td>
+</tr>
+<tr>
+<td><code>fringeRate</code></td>
+<td>number</td>
+<td>Fringe %</td>
+</tr>
+<tr>
+<td><code>afterFringe</code></td>
+<td>number</td>
+<td>Rate after fringe applied</td>
+</tr>
+<tr>
+<td><code>overheadRate</code></td>
+<td>number</td>
+<td>Overhead %</td>
+</tr>
+<tr>
+<td><code>afterOverhead</code></td>
+<td>number</td>
+<td>Rate after overhead applied</td>
+</tr>
+<tr>
+<td><code>gaRate</code></td>
+<td>number</td>
+<td>G&amp;A %</td>
+</tr>
+<tr>
+<td><code>afterGa</code></td>
+<td>number</td>
+<td>Rate after G&amp;A applied</td>
+</tr>
+<tr>
+<td><code>feeRate</code></td>
+<td>number</td>
+<td>Fee/profit %</td>
+</tr>
+<tr>
+<td><code>fullyBurdenedRate</code></td>
+<td>number</td>
+<td>Final burdened hourly rate</td>
+</tr>
+<tr>
+<td><code>wrapFactor</code></td>
+<td>number | null</td>
+<td><code>fullyBurdenedRate ÷ base</code></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="76" data-section-title="21. Error Reference" id="21-error-reference"><h2 id="21-error-reference">21. Error Reference</h2>
+<table>
+<thead>
+<tr>
+<th>HTTP Status</th>
+<th>Meaning</th>
+<th>When It Occurs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>200</code></td>
+<td>OK</td>
+<td>Request succeeded</td>
+</tr>
+<tr>
+<td><code>201</code></td>
+<td>Created</td>
+<td>Resource created successfully</td>
+</tr>
+<tr>
+<td><code>202</code></td>
+<td>Accepted</td>
+<td>Async job queued (assembly, compliance scan, pipeline run, export)</td>
+</tr>
+<tr>
+<td><code>204</code></td>
+<td>No Content</td>
+<td>Delete or action succeeded with no body</td>
+</tr>
+<tr>
+<td><code>207</code></td>
+<td>Multi-Status</td>
+<td>Batch import with mixed results — check <code>errors[]</code> array</td>
+</tr>
+<tr>
+<td><code>400</code></td>
+<td>Bad Request</td>
+<td>Validation failed — check <code>details</code> for field-level errors; bridge not configured</td>
+</tr>
+<tr>
+<td><code>401</code></td>
+<td>Unauthorized</td>
+<td>Missing or expired access token</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>Forbidden</td>
+<td>Authenticated but role lacks required permission (e.g. writer cannot confirm RFP requirements)</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td>Not Found</td>
+<td>Resource does not exist or belongs to a different org; no RFP document uploaded (A1); proposal not found in ProPricer (bridge)</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td>Conflict</td>
+<td>Duplicate detected (e.g. solicitation number); A1 not confirmed before A2 generation</td>
+</tr>
+<tr>
+<td><code>413</code></td>
+<td>Payload Too Large</td>
+<td>File upload exceeds 50 MB limit</td>
+</tr>
+<tr>
+<td><code>415</code></td>
+<td>Unsupported Media Type</td>
+<td>Non-PDF file uploaded to rfp-upload endpoint</td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td>Unprocessable</td>
+<td>Semantic error (e.g. section has content, cannot delete; work-share sum would exceed 100%)</td>
+</tr>
+<tr>
+<td><code>423</code></td>
+<td>Locked</td>
+<td>Proposal section is locked by another user</td>
+</tr>
+<tr>
+<td><code>502</code></td>
+<td>Bad Gateway</td>
+<td>Bridge microservice unreachable or returned an error</td>
+</tr>
+<tr>
+<td><code>503</code></td>
+<td>Service Unavailable</td>
+<td>AI provider not configured or external service unreachable</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="77" data-section-title="22. Complete Integration Workflow" id="22-complete-integration-workflow"><h2 id="22-complete-integration-workflow">22. Complete Integration Workflow</h2>
+<p>Ordered sequence of all API calls required to take a third-party system from authentication through full proposal assembly, compliance sign-off, and bridge-synced pricing — no UI interaction required.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+<th>Expected Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>POST</code></td>
+<td><code>/auth/local</code></td>
+<td>Authenticate — store <code>accessToken</code> + <code>pursuite_refresh</code> cookie</td>
+<td><code>{ accessToken, expiresIn }</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>GET</code></td>
+<td><code>/admin/usage</code></td>
+<td>Verify admin access + check plan limits</td>
+<td><code>{ users, opportunities, proposals, storage }</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>GET</code></td>
+<td><code>/admin/ai/config</code></td>
+<td>Check existing AI provider config</td>
+<td>Config object or <code>null</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>PUT</code></td>
+<td><code>/admin/ai/config</code></td>
+<td>Save BYOK credentials (Anthropic / OpenAI / Azure)</td>
+<td><code>{ saved: true, provider }</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>POST</code></td>
+<td><code>/admin/ai/test</code></td>
+<td>Confirm provider connectivity before proceeding</td>
+<td><code>{ ok: true, latencyMs }</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>PUT</code></td>
+<td><code>/deltek/config</code></td>
+<td>Configure ProPricer bridge URL + encrypted API key</td>
+<td>Config object</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>GET</code></td>
+<td><code>/deltek/health</code></td>
+<td>Verify bridge is reachable</td>
+<td><code>{ reachable: true, bridgeMode: true }</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>POST</code></td>
+<td><code>/deltek/sync</code></td>
+<td>Pull labor rates from ProPricer into Pursuite</td>
+<td><code>{ upsertedRates, syncedAt }</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>POST</code></td>
+<td><code>/crm/webhooks</code></td>
+<td>Register webhook — <strong>store <code>id</code> and <code>secret</code> immediately</strong></td>
+<td>Subscription + secret</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>POST</code></td>
+<td><code>/crm/webhooks/:id/test</code></td>
+<td>Verify delivery + signature validation</td>
+<td><code>{ fired: true }</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>POST</code></td>
+<td><code>/opportunities</code></td>
+<td>Create the target opportunity</td>
+<td>Opportunity</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>POST</code></td>
+<td><code>/opportunities/:id/bid-no-bid</code></td>
+<td>Submit bid/no-bid scoring</td>
+<td>BidNoBidRecord + weightedTotal</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>PATCH</code></td>
+<td><code>/opportunities/:id/bid-no-bid/:recordId/decision</code></td>
+<td>Record executive go/no-go</td>
+<td>BidNoBidRecord</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>POST</code></td>
+<td><code>/proposals</code></td>
+<td>Create proposal linked to opportunity</td>
+<td>Proposal</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/rfp-upload</code></td>
+<td>Upload RFP PDF/DOCX (max 50 MB)</td>
+<td><code>{ rfp_document_id }</code> (201)</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/rfp-document</code></td>
+<td>Poll until <code>shred_status = "completed"</code></td>
+<td><code>{ shred_status, id }</code></td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>POST</code></td>
+<td><code>/rfp-documents/:id/confirm</code></td>
+<td>Confirm requirements — unlocks A2 + A3</td>
+<td><code>{ shred_status: "confirmed" }</code></td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance-matrix/generate</code></td>
+<td>Queue compliance matrix generation (A2)</td>
+<td><code>{ jobId, status: "queued" }</code> (202)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/pipeline-runs</code></td>
+<td>Start autonomous pipeline (A3)</td>
+<td>PipelineRun (202)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>GET</code></td>
+<td><code>/pipeline-runs/:runId</code></td>
+<td>Poll until <code>status = "completed"</code> or <code>"waiting_gate"</code></td>
+<td>PipelineRun</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>POST</code></td>
+<td><code>/pipeline-runs/:runId/gates/:n/approve</code></td>
+<td>Approve each human gate to continue</td>
+<td><code>{ approved: true }</code></td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/volumes</code></td>
+<td>Create volume(s) (if not created by pipeline)</td>
+<td>Volume</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections</code></td>
+<td>Add sections to each volume</td>
+<td>Section</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/team</code></td>
+<td>Assign writers and reviewers</td>
+<td>Member</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/win-themes</code></td>
+<td>Define win themes (up to 5)</td>
+<td>WinTheme</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>POST</code></td>
+<td><code>/ai/draft-section</code></td>
+<td>Stream AI draft per section (SSE)</td>
+<td><code>text/event-stream</code> chunks → <code>[DONE]</code></td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>PUT</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/content</code></td>
+<td>Save section content</td>
+<td>SectionVersion</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/comments</code></td>
+<td>Add review comments</td>
+<td>Comment</td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/sections/:sectionId/comments/:commentId/resolve</code></td>
+<td>Resolve comments</td>
+<td>Comment</td>
+</tr>
+<tr>
+<td>30</td>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance-matrix</code></td>
+<td>Verify matrix coverage</td>
+<td><code>{ summary: { covered, partial, missing } }</code></td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>PATCH</code></td>
+<td><code>/compliance-matrix-items/:itemId</code></td>
+<td>Override item status / assign to section</td>
+<td>MatrixItem</td>
+</tr>
+<tr>
+<td>32</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance/scan</code></td>
+<td>Trigger compliance scan</td>
+<td><code>{ scanId, status: "pending" }</code> (202)</td>
+</tr>
+<tr>
+<td>33</td>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/compliance/scans/:scanId</code></td>
+<td>Poll until <code>status</code> is complete</td>
+<td><code>{ scan, findings[], totalSections }</code></td>
+</tr>
+<tr>
+<td>34</td>
+<td><code>PATCH</code></td>
+<td><code>/compliance/findings/:id</code></td>
+<td>Waive or address each finding</td>
+<td>Finding</td>
+</tr>
+<tr>
+<td>35</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates</code></td>
+<td>Create Pink / Red Team review gates</td>
+<td>ReviewGate</td>
+</tr>
+<tr>
+<td>36</td>
+<td><code>PATCH</code></td>
+<td><code>/proposals/:proposalId/compliance/review-gates/:gateId</code></td>
+<td>Record gate outcome (approve / reject)</td>
+<td>ReviewGate</td>
+</tr>
+<tr>
+<td>37</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/sections/bulk-approve</code></td>
+<td>Bulk-approve all sections</td>
+<td><code>{ approvedCount }</code></td>
+</tr>
+<tr>
+<td>38</td>
+<td><code>POST</code></td>
+<td><code>/proposals/:proposalId/assemble</code></td>
+<td>Queue final document assembly</td>
+<td><code>{ assemblyStatus: "queued" }</code> (202)</td>
+</tr>
+<tr>
+<td>39</td>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/assembly-status</code></td>
+<td>Poll until <code>assemblyStatus</code> is complete</td>
+<td><code>{ assemblyStatus, updatedAt }</code></td>
+</tr>
+<tr>
+<td>40</td>
+<td><code>GET</code></td>
+<td><code>/proposals/:proposalId/exports/:exportId/download</code></td>
+<td>Retrieve signed download URL</td>
+<td><code>{ url, expiresIn, fileName, format }</code></td>
+</tr>
+<tr>
+<td>41</td>
+<td><code>POST</code></td>
+<td><code>/reports/opportunities/:id/debrief</code></td>
+<td>Submit win/loss debrief after award decision</td>
+<td>Debrief</td>
+</tr>
+<tr>
+<td>42</td>
+<td><code>POST</code></td>
+<td><code>/auth/refresh</code></td>
+<td>Renew <code>accessToken</code> before 8-hour expiry — <strong>schedule proactively throughout</strong></td>
+<td><code>{ accessToken, expiresIn }</code></td>
+</tr>
+</tbody>
+</table>
+</section></main>
+</div>
+
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

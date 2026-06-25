@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTI‑Solutions VBS — Employee Onboarding</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="site">
+<div class="product">TTI-Solutions VBS — Employee Onboarding</div>
+<div class="tagline">Infrastructure with Integrity</div>
+<div class="meta">TTI-Solutions (Thompson Telecom Infrastructure Solutions) · User &amp; Administrator Guide · Version 1.0 · 2026-06-10</div>
+</header>
+<div class="wrap">
+<nav aria-label="Table of contents" class="toc"><h2 class="toc-h">On this page</h2><ul>
+<li class="toc-l2"><a href="#1-introduction">1. Introduction</a></li>
+<li class="toc-l2"><a href="#2-before-you-begin">2. Before you begin</a></li>
+<li class="toc-l3"><a href="#access-and-signin">Access and sign‑in</a></li>
+<li class="toc-l3"><a href="#roles-at-a-glance">Roles at a glance</a></li>
+<li class="toc-l3"><a href="#the-verification-prompt-stepup">The verification prompt (step‑up)</a></li>
+<li class="toc-l2"><a href="#3-the-onboarding-lifecycle-at-a-glance">3. The onboarding lifecycle at a glance</a></li>
+<li class="toc-l2"><a href="#4-administrator-guide">4. Administrator guide</a></li>
+<li class="toc-l3"><a href="#41-create-an-onboarding-record">4.1 Create an onboarding record</a></li>
+<li class="toc-l3"><a href="#42-reading-the-board-and-a-record">4.2 Reading the board and a record</a></li>
+<li class="toc-l3"><a href="#43-working-the-task-checklist">4.3 Working the task checklist</a></li>
+<li class="toc-l3"><a href="#44-capturing-acknowledgments">4.4 Capturing acknowledgments</a></li>
+<li class="toc-l3"><a href="#45-managing-training">4.5 Managing training</a></li>
+<li class="toc-l3"><a href="#46-releasing-the-gates">4.6 Releasing the gates</a></li>
+<li class="toc-l3"><a href="#47-tracking-screening">4.7 Tracking screening</a></li>
+<li class="toc-l3"><a href="#48-issuing-and-recovering-assets">4.8 Issuing and recovering assets</a></li>
+<li class="toc-l3"><a href="#49-milestone-checkins-30-60-90">4.9 Milestone check‑ins (30 / 60 / 90)</a></li>
+<li class="toc-l3"><a href="#410-reminders-and-the-sweep">4.10 Reminders and the sweep</a></li>
+<li class="toc-l3"><a href="#411-completing-and-certifying-and-cancelling">4.11 Completing and certifying (and cancelling)</a></li>
+<li class="toc-l3"><a href="#412-reports-and-exports">4.12 Reports and exports</a></li>
+<li class="toc-l3"><a href="#413-administering-the-program-configuration">4.13 Administering the program configuration</a></li>
+<li class="toc-l2"><a href="#5-newhire-guide-selfservice">5. New‑hire guide (self‑service)</a></li>
+<li class="toc-l2"><a href="#6-roles-permissions-reference">6. Roles &amp; permissions reference</a></li>
+<li class="toc-l2"><a href="#7-statuses-badges-glossary">7. Statuses &amp; badges glossary</a></li>
+<li class="toc-l2"><a href="#8-common-messages-how-to-resolve-them">8. Common messages &amp; how to resolve them</a></li>
+<li class="toc-l2"><a href="#9-faq">9. FAQ</a></li>
+<li class="toc-l2"><a href="#appendix-a-coverage-reconciliation-map">Appendix A — Coverage &amp; reconciliation map</a></li>
+<li class="toc-l2"><a href="#appendix-b-policy-traceability">Appendix B — Policy traceability</a></li>
+<li class="toc-l2"><a href="#appendix-c-change-log">Appendix C — Change log</a></li>
+</ul></nav>
+<main id="main"><nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="ttisolutions-vbs-employee-onboarding">TTI‑Solutions VBS — Employee Onboarding</h1>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="User &amp; Administrator Guide" id="user-administrator-guide"><h2 id="user-administrator-guide">User &amp; Administrator Guide</h2>
+<p><strong>Company:</strong> TTI‑Solutions (Thompson Telecom Infrastructure Solutions)
+<strong>Tagline:</strong> <em>Infrastructure with Integrity</em>
+<strong>Guide version:</strong> 1.0  ·  <strong>Date:</strong> 2026‑06‑10
+<strong>Applies to:</strong> the Onboarding module in the TTIS Dashboard</p>
+<blockquote class="callout mode" role="note"><span aria-hidden="true" class="callout-icon">ⓘ</span><p><strong>Document mode — Auto (as‑built + as‑designed).</strong>
+Everything written in plain present tense describes the software <strong>as it works
+today</strong>. A small number of steps are marked with a <strong>PLANNED — not yet available
+in this release</strong> banner; those describe the intended experience and are clearly
+separated from working instructions. Appendix A lists the exact build status of
+every capability.</p></blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="1. Introduction" id="1-introduction"><h2 id="1-introduction">1. Introduction</h2>
+<p>The <strong>Onboarding</strong> module turns the <em>TTIS Employee Onboarding Policy v1.0</em> into a
+tracked, verifiable program inside the TTIS Dashboard. For every new hire it opens a
+single <strong>onboarding record</strong> that carries:</p>
+<ul>
+<li>a <strong>phase timeline</strong> — preboarding → day one → week 1 → 30 → 60 → 90 → complete;</li>
+<li>a policy‑derived <strong>task checklist</strong> (Attachment A), tailored to the hire;</li>
+<li>a versioned <strong>acknowledgment ledger</strong> (Attachment B) for handbook, conduct, IT
+  acceptable‑use and safety sign‑offs;</li>
+<li>a <strong>training roster</strong> (Attachment C) with completion records and passing scores;</li>
+<li>two hard <strong>access gates</strong> — CUI provisioning and time‑charging — that hold a person
+  out of sensitive systems until the right training is recorded;</li>
+<li><strong>screening</strong> status, <strong>asset</strong> issuance, <strong>milestone check‑ins</strong>, deadline
+  <strong>reminders</strong>, and a chain‑anchored <strong>completion certificate</strong>.</li>
+</ul>
+<p>The module <strong>does not store personal data.</strong> It records completion state, dates,
+identities and <em>pointers</em> to documents that live in the personnel file — never Social
+Security numbers, dates of birth, I‑9 images, bank details or screening results.</p>
+<p><strong>Who this guide is for.</strong> Two readers:</p>
+<ul>
+<li><strong>Administrators</strong> — HR, Hiring Managers, the CEO, IT/Systems and the Security
+  Officer, who create records, mark progress, release gates and certify completion.</li>
+<li><strong>New hires</strong>, who sign in to a self‑service view to see their own outstanding items.</li>
+</ul>
+<blockquote class="callout tip" role="note"><span aria-hidden="true" class="callout-icon">✓</span><p><strong>Tip.</strong> The module begins <em>after</em> a hire is authorized. It documents and gates the
+onboarding journey; it does not make hiring decisions.</p></blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="2. Before you begin" id="2-before-you-begin"><h2 id="2-before-you-begin">2. Before you begin</h2>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Access and sign‑in" id="access-and-sign-in"><h3 id="access-and-signin">Access and sign‑in</h3>
+<ol>
+<li>Open the TTIS Dashboard in your browser and sign in with your dashboard
+   username and password.</li>
+<li>In the left navigation, look for <strong>Onboarding</strong>. If you have onboarding access, it
+   is an active link. If your role does not include onboarding, the item appears dimmed
+   and is not clickable.</li>
+<li>Select <strong>Onboarding</strong> to open the board.</li>
+</ol>
+<p aria-label="Screenshot placeholder: Left navigation with the " class="screenshot" highlighted"="" item="" onboarding"="" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Left navigation with the "Onboarding" item highlighted</em></p>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Roles at a glance" id="roles-at-a-glance"><h3 id="roles-at-a-glance">Roles at a glance</h3>
+<table><caption class="sr-only">Roles at a glance — data table 1</caption>
+<thead>
+<tr>
+<th scope="col">If you are…</th>
+<th scope="col">You can…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CEO</strong></td>
+<td>Do everything: create, update, release gates, waive training, complete, cancel, and export.</td>
+</tr>
+<tr>
+<td><strong>Field Ops Manager</strong> (Hiring Manager)</td>
+<td>View, update, and approve records <strong>in your own division</strong> — work tasks, record check‑ins, and complete.</td>
+</tr>
+<tr>
+<td><strong>Finance</strong></td>
+<td>View records and <strong>export</strong> the compliance reports.</td>
+</tr>
+<tr>
+<td><strong>Field Crew</strong> (New Hire)</td>
+<td>View <strong>your own</strong> record only, and submit your own acknowledgments and tasks.</td>
+</tr>
+<tr>
+<td><strong>Business Development</strong></td>
+<td>No onboarding access.</td>
+</tr>
+<tr>
+<td><strong>Auditor</strong> (read‑only flag)</td>
+<td>View and export only — no changes.</td>
+</tr>
+</tbody>
+</table>
+<p>Section <a href="#6-roles--permissions-reference">6</a> gives the full table.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="The verification prompt (step‑up)" id="the-verification-prompt-step-up"><h3 id="the-verification-prompt-stepup">The verification prompt (step‑up)</h3>
+<p>Some actions are deliberately high‑assurance. When you <strong>release a gate</strong>, <strong>waive a
+training requirement</strong>, <strong>complete a record</strong>, or <strong>cancel a record</strong>, the system asks
+for a fresh <strong>step‑up verification</strong> — a one‑time multi‑factor (MFA) assertion — before
+it will proceed.</p>
+<ul>
+<li>If you have not enrolled in MFA, you are prompted to enroll first.</li>
+<li>If your last verification is stale, you are asked to verify again.</li>
+</ul>
+<p>You will see a message such as <strong>“A fresh step‑up (MFA) assertion is required for this
+high‑value action.”</strong> Complete the verification and retry the action. See section
+<a href="#8-common-messages--how-to-resolve-them">8</a>.</p>
+<blockquote class="callout note" role="note"><span aria-hidden="true" class="callout-icon">›</span><p><strong>Note.</strong> Reading the board, opening a record, marking ordinary tasks, recording
+training, capturing acknowledgments, and tracking screening do <strong>not</strong> require
+step‑up. Only gate release, waivers, completion and cancellation do.</p></blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="3. The onboarding lifecycle at a glance" id="3-the-onboarding-lifecycle-at-a-glance"><h2 id="3-the-onboarding-lifecycle-at-a-glance">3. The onboarding lifecycle at a glance</h2>
+<p>Every record moves through a sequence of <strong>phases</strong>, computed automatically from the
+hire’s <strong>start date</strong> — you never set the phase by hand. Open statutory items (for
+example, an overdue I‑9) hold the record back at the phase where they are due.</p>
+<pre><code>  PREBOARDING        DAY ONE        WEEK 1         DAY 30        DAY 60        DAY 90        COMPLETE
+  (before start)     (start date)   (+7 days)      (+30 days)    (+60 days)    (+90 days)
+       │                 │              │              │             │             │            │
+  packet sent       I‑9 §1 &amp; §2    role goals     benefits      60‑day        90‑day      certified
+  screening init    payroll        site safety    check‑in*     check‑in      check‑in    &amp; anchored
+  provisioning      accounts/MFA   credentialing
+  day‑one plan      PPE (field)
+</code></pre>
+<p>* The 30‑day check‑in is recorded during the day‑30 phase; check‑ins must be recorded
+in order (30, then 60, then 90).</p>
+<p>Alongside the phase, each record has an overall <strong>status</strong>:</p>
+<ul>
+<li><strong>preboarding</strong> → the record is open and the start date has not yet arrived;</li>
+<li><strong>active</strong> → the start date has arrived and onboarding is under way;</li>
+<li><strong>completed</strong> → every required item is done and the record is certified;</li>
+<li><strong>cancelled</strong> → the onboarding was stopped (for example, a no‑show or a rescinded
+  offer).</li>
+</ul>
+<p aria-label="Screenshot placeholder: Record detail header showing the status pill and " class="screenshot" phase:"="" pill"="" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail header showing the status pill and "phase:" pill</em></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="4. Administrator guide" id="4-administrator-guide"><h2 id="4-administrator-guide">4. Administrator guide</h2>
+<p>Each workflow below states <strong>who</strong> can perform it, <strong>when</strong> it happens in the
+lifecycle, and <strong>what you need first</strong>, then walks the steps and closes with <strong>what
+success looks like</strong>.</p>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="4.1 Create an onboarding record" id="4-1-create-an-onboarding-record"><h3 id="41-create-an-onboarding-record">4.1 Create an onboarding record</h3>
+<p><strong>Who:</strong> HR or the CEO (the <em>create</em> permission).
+<strong>When:</strong> as soon as a hire is authorized — ideally before the start date.
+<strong>Before you begin:</strong> the person must already exist as an authorized employee in HR
+(the record references that employee). Have the <strong>start date</strong>, <strong>division</strong>,
+<strong>position</strong>, and the per‑hire <strong>applicability flags</strong> ready.</p>
+<p>A record is created by submitting the new hire’s details to the onboarding service. On
+creation, the system instantiates a <strong>tailored checklist</strong> — only the tasks, courses,
+gates and screening processes that apply to this hire, based on the flags you set.</p>
+<p><strong>The applicability flags — what each one turns on</strong></p>
+<table><caption class="sr-only">4.1 Create an onboarding record — data table 2</caption>
+<thead>
+<tr>
+<th scope="col">Flag</th>
+<th scope="col">What it turns on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Field</strong> (<code>is_field</code>)</td>
+<td>Job‑site safety tasks (PPE issue, site briefing), the site‑specific safety acknowledgment, the Safety Orientation expectation before covered work, and the OSHA outreach module.</td>
+</tr>
+<tr>
+<td><strong>Time‑charging</strong> (<code>is_time_charging</code>)</td>
+<td>The <strong>DCAA‑Compliant Timekeeping</strong> course <strong>and</strong> the <strong>time‑charging access gate</strong> — the person cannot submit timecards until that gate is released.</td>
+</tr>
+<tr>
+<td><strong>CUI‑authorized</strong> (<code>is_cui_authorized</code>)</td>
+<td>The <strong>CUI Handling</strong> and <strong>CMMC / NIST SP 800‑171 Awareness</strong> courses <strong>and</strong> the <strong>CUI‑provisioning access gate</strong>.</td>
+</tr>
+<tr>
+<td><strong>E‑Verify required</strong> (<code>everify_required</code>)</td>
+<td>An E‑Verify case task and screening row. <em>This flag is off by default and only takes effect once the program is configured to enable E‑Verify.</em></td>
+</tr>
+<tr>
+<td><strong>Screening level</strong> (<code>none</code> / <code>standard</code> / <code>contract</code>)</td>
+<td><code>standard</code> (or <code>contract</code>) adds the background screening task and process; <code>contract</code> additionally adds the HSPD‑12 / PIV credentialing task and process.</td>
+</tr>
+<tr>
+<td><strong>Labor‑standards coverage</strong> (<code>none</code> / <code>sca</code> / <code>dba</code> / <code>both</code>)</td>
+<td>The SCA / DBA Labor‑Standards Orientation course and the wage‑determination communication task.</td>
+</tr>
+<tr>
+<td><strong>Division</strong></td>
+<td>Determines which managers can see and work the record.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Steps</strong></p>
+<ol>
+<li>Provide the hire’s <strong>employee identifier</strong> (for example, <code>EMP‑1024</code>), <strong>start date</strong>
+   (in <code>YYYY‑MM‑DD</code> form), and optionally the <strong>login user</strong>, <strong>division</strong> and
+   <strong>position title</strong>.</li>
+<li>Set the <strong>applicability flags</strong> above to match the role.</li>
+<li>Submit. The system confirms the employee exists, then opens the record in
+   <strong>preboarding</strong> and builds the checklist.</li>
+</ol>
+<p aria-label="Screenshot placeholder: Create‑record form with the applicability flags" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Create‑record form with the applicability flags</em></p>
+<p><strong>What success looks like:</strong> a new record appears on the <strong>Onboarding</strong> board in
+<strong>preboarding</strong>, pre‑loaded with exactly the tasks, courses, gates and screening rows
+that apply to the flags you set. Each item already carries a <strong>due date</strong> computed from
+the start date.</p>
+<blockquote class="callout note" role="note"><span aria-hidden="true" class="callout-icon">›</span><p><strong>Auto‑creation on hire.</strong> When an authorized hire is recorded in HR <strong>with an
+onboarding directive attached</strong>, the system opens the onboarding record
+automatically using the same flags — you do not have to create it by hand. A hire
+recorded <em>without</em> that directive creates no record, so nothing is ever created by
+surprise.</p>
+<p><strong>One open record per person.</strong> If the employee already has an open (preboarding or
+active) record, the system refuses to create a second one and tells you which record
+is already open.</p></blockquote>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="4.2 Reading the board and a record" id="4-2-reading-the-board-and-a-record"><h3 id="42-reading-the-board-and-a-record">4.2 Reading the board and a record</h3>
+<p><strong>Who:</strong> anyone with onboarding view access (managers see their division; new hires see
+only their own record).
+<strong>When:</strong> any time.</p>
+<p><strong>The board</strong> (left nav → <strong>Onboarding</strong>) lists active records. The page title is
+<strong>Onboarding</strong>, and the subtitle reads <em>“Policy‑tracked onboarding per TTIS Employee
+Onboarding Policy v1.0.”</em> By default it shows active records only; select <strong>show
+completed</strong> to include finished ones.</p>
+<p>Each row shows:</p>
+<table><caption class="sr-only">4.2 Reading the board and a record — data table 3</caption>
+<thead>
+<tr>
+<th scope="col">Column</th>
+<th scope="col">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Employee</strong></td>
+<td>The new hire (and position, if set). Select it to open the record.</td>
+</tr>
+<tr>
+<td><strong>Division</strong></td>
+<td>The owning division.</td>
+</tr>
+<tr>
+<td><strong>Start date</strong></td>
+<td>The hire’s start date.</td>
+</tr>
+<tr>
+<td><strong>Phase</strong></td>
+<td>The current phase chip (for example, <em>day one</em>, <em>week 1</em>).</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>preboarding / active / completed / cancelled.</td>
+</tr>
+<tr>
+<td><strong>Open tasks</strong></td>
+<td>Count of tasks not yet finished.</td>
+</tr>
+<tr>
+<td><strong>Overdue</strong></td>
+<td>Overdue task count. If any overdue task is <strong>statutory</strong>, the badge reads, for example, <strong>“2 overdue (1 statutory)”</strong> in the alert style.</td>
+</tr>
+<tr>
+<td><strong>Acks outstanding</strong></td>
+<td>Required acknowledgments not yet signed.</td>
+</tr>
+<tr>
+<td><strong>Next due</strong></td>
+<td>The date of the next item due.</td>
+</tr>
+</tbody>
+</table>
+<p aria-label="Screenshot placeholder: Onboarding board with phase chips and an overdue/statutory badge" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Onboarding board with phase chips and an overdue/statutory badge</em></p>
+<p><strong>Opening a record.</strong> Select an employee to open the <strong>record detail</strong> page, titled
+<strong>“Onboarding — <code>EMP‑1024</code>.”</strong> The header shows the position, division, start date,
+status and phase, plus the record identifier and the program <strong>template version</strong>. When
+the record is complete, the header also shows the start of the completion hash.</p>
+<p>The detail page reads top to bottom as the onboarding story:</p>
+<ol>
+<li><strong>Task checklist (Attachment A)</strong> — tasks grouped by phase.</li>
+<li><strong>Acknowledgments (Attachment B)</strong> — outstanding documents and the signed ledger.</li>
+<li><strong>Training roster (Attachment C)</strong> — required courses and their status.</li>
+<li><strong>Access gates (§9 / §11)</strong> — held or released, with preconditions.</li>
+<li><strong>Screening (§6 / §8)</strong> — background, credentialing and related processes.</li>
+<li><strong>Issued assets (§14)</strong> — equipment and its recovery status.</li>
+<li><strong>Milestone check‑ins (§5.4)</strong> — the 30/60/90 record.</li>
+<li><strong>Completion certificate (§17)</strong> — appears once the record is certified complete.</li>
+</ol>
+<p><strong>What success looks like:</strong> you can see, at a glance, what phase the hire is in, what is
+overdue, what is statutory, and what is next.</p>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="4.3 Working the task checklist" id="4-3-working-the-task-checklist"><h3 id="43-working-the-task-checklist">4.3 Working the task checklist</h3>
+<p><strong>Who:</strong> HR, the hiring manager (in division), or the CEO. A new hire can submit their
+<strong>own</strong> tasks (see section <a href="#5-new-hire-guide-self-service">5</a>).
+<strong>When:</strong> throughout the program.
+<strong>Before you begin:</strong> open the record and find the task in the <strong>Task checklist
+(Attachment A)</strong> section. Each task shows its <strong>owner</strong>, <strong>policy</strong> reference, <strong>due</strong>
+date, <strong>status</strong>, and any <strong>evidence</strong> pointer.</p>
+<p><strong>Marking progress.</strong> A task moves through <strong>pending → in progress → complete</strong> (and may
+be <strong>blocked</strong> when something it depends on is not ready). To record progress, update the
+task’s status:</p>
+<ol>
+<li>Set the task to <strong>in progress</strong> when work starts (optional).</li>
+<li>Set it to <strong>complete</strong> when it is done.</li>
+</ol>
+<p><strong>Evidence pointers.</strong> Some tasks require an <strong>evidence pointer</strong> before they can be
+completed — an opaque reference into the personnel file (for example, a document
+locator), never the document itself. If a task requires evidence and none is on file,
+completion is refused with <strong>“task ‘…’ requires a doc_ref evidence pointer.”</strong> Add the
+pointer, then complete the task.</p>
+<p><strong>Dependencies.</strong> A task may depend on a screening being <strong>cleared</strong> (for example,
+HSPD‑12 / PIV credentialing depends on the credentialing screening). If you try to
+complete it before the screening clears, you see <strong>“task ‘…’ requires screening ‘…’ to be
+cleared.”</strong> Clear the screening first (section <a href="#47-tracking-screening">4.7</a>).</p>
+<p><strong>Statutory tasks cannot be waived.</strong> The two <strong>I‑9</strong> tasks — <em>Form I‑9 Section 1</em> (by
+day one) and <em>Form I‑9 Section 2 employer verification</em> — are marked <strong>statutory</strong>. They
+can never be skipped or waived, and they drive priority reminders. An overdue statutory
+task holds the record’s phase back until it is completed. When you complete a statutory
+task, the system records a tamper‑evident audit anchor on it automatically.</p>
+<blockquote class="callout planned" role="note"><span aria-hidden="true" class="callout-icon">⚠</span><span class="callout-label">Planned — not yet available.</span><p><strong>PLANNED — not yet available in this release.</strong>
+A manual “waive this task” action for ordinary (non‑statutory) tasks is planned.
+Today, a task becomes <strong>waived</strong> only automatically — when you change an applicability
+flag so the task no longer applies (see section <a href="#41-create-an-onboarding-record">4.1</a>
+and the note below). There is no button to waive an individual task by hand yet.</p></blockquote>
+<p><strong>What success looks like:</strong> the task’s status chip changes to <strong>complete</strong>, its
+completion time is stamped, and the board’s <strong>Open tasks</strong> / <strong>Overdue</strong> counts drop.</p>
+<blockquote class="callout note" role="note"><span aria-hidden="true" class="callout-icon">›</span><p><strong>Changing a flag re‑tailors the checklist.</strong> If you update an applicability flag on
+the record, the system adds any newly applicable tasks and automatically marks
+now‑inapplicable <strong>open</strong> tasks as <strong>waived</strong>, with a reason recorded (“flag change…:
+no longer applicable”). Statutory tasks are never auto‑waived.</p></blockquote>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="4.4 Capturing acknowledgments" id="4-4-capturing-acknowledgments"><h3 id="44-capturing-acknowledgments">4.4 Capturing acknowledgments</h3>
+<p><strong>Who:</strong> the new hire (signing their own record) <strong>or</strong> HR/the hiring manager recording
+on the hire’s behalf.
+<strong>When:</strong> typically day one through week one.
+<strong>Before you begin:</strong> open the record. The <strong>Acknowledgments (Attachment B)</strong> section
+lists any <strong>Outstanding</strong> documents as warning chips, or states <em>“All required
+acknowledgments are signed.”</em></p>
+<p>The required set comes from the program configuration and always includes the
+<strong>Employee Handbook</strong>, <strong>Standards of Conduct / Code of Business Ethics</strong>, <strong>IT
+Acceptable Use Policy</strong>, and <strong>Workplace Safety Policies</strong>. Field personnel additionally
+have a <strong>Site‑Specific Safety Acknowledgment</strong>.</p>
+<p><strong>Recording an acknowledgment</strong></p>
+<ol>
+<li>Identify the outstanding document in the <strong>Acknowledgments</strong> section.</li>
+<li>Record the acknowledgment for that document. The new hire may sign their own; HR may
+   record it <strong>on the hire’s behalf</strong>.</li>
+<li>The signature is captured at the document’s <strong>current version</strong> and is immediately
+   anchored in the audit trail.</li>
+</ol>
+<p>When HR records on someone’s behalf, the ledger shows <strong>On behalf = yes</strong>, so it is
+always visible who actually signed.</p>
+<p><strong>Re‑issued documents.</strong> Acknowledgments are tracked per document <strong>version</strong>. If a
+document is re‑issued (its version changes), the new version becomes outstanding again
+and must be acknowledged afresh — a previously signed older version does not satisfy it.</p>
+<p><strong>What success looks like:</strong> the document moves out of <strong>Outstanding</strong> and appears in the
+signed <strong>ledger</strong> with its version, who signed, whether it was on someone’s behalf, the
+time, and a chain hash. Signing the same document version twice is refused with <strong>“‘…’
+v… already acknowledged on this record.”</strong></p>
+<p aria-label="Screenshot placeholder: Record detail — Acknowledgments section, outstanding chips and ledger" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Acknowledgments section, outstanding chips and ledger</em></p>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="4.5 Managing training" id="4-5-managing-training"><h3 id="45-managing-training">4.5 Managing training</h3>
+<p><strong>Who:</strong> HR, the hiring manager (in division), or the CEO.
+<strong>When:</strong> courses carry due dates relative to the start date; most fall in the first
+weeks.
+<strong>Before you begin:</strong> open the record and find the <strong>Training roster (Attachment C)</strong>
+section, which lists each required course, its <strong>policy</strong> reference, the <strong>basis</strong> on
+which it applies (for example, <em>all</em>, <em>time‑charging</em>, <em>cui_authorized</em>, <em>field</em>), its
+<strong>due</strong> date, <strong>status</strong>, and <strong>score</strong>.</p>
+<p><strong>Recording a completion</strong></p>
+<ol>
+<li>Find the course in the roster.</li>
+<li>Set its status to <strong>completed</strong>. If the course has a <strong>passing score</strong> configured,
+   provide a <strong>score</strong>.</li>
+<li>Optionally attach an <strong>evidence pointer</strong> (a training/certificate locator).</li>
+</ol>
+<p>If a passing score is configured and the score you provide is missing or below the
+minimum, completion is refused with <strong>“course ‘…’ requires score ≥ N.”</strong> Record a passing
+score to complete.</p>
+<p><strong>Mandatory courses by flag</strong></p>
+<table><caption class="sr-only">4.5 Managing training — data table 4</caption>
+<thead>
+<tr>
+<th scope="col">Course</th>
+<th scope="col">Applies to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business Ethics &amp; Conduct; Mandatory Disclosure Rule; Anti‑Kickback Act Awareness</td>
+<td>All hires</td>
+</tr>
+<tr>
+<td>Cybersecurity Awareness &amp; Acceptable Use</td>
+<td>All hires</td>
+</tr>
+<tr>
+<td>EEO &amp; Anti‑Harassment Orientation</td>
+<td>All hires</td>
+</tr>
+<tr>
+<td>Safety Orientation</td>
+<td>All hires (field: before covered work)</td>
+</tr>
+<tr>
+<td><strong>DCAA‑Compliant Timekeeping</strong></td>
+<td>Time‑charging hires — <strong>gates timecards</strong></td>
+</tr>
+<tr>
+<td><strong>CUI Handling</strong>; <strong>CMMC / NIST SP 800‑171 Awareness</strong></td>
+<td>CUI‑authorized hires — <strong>gate CUI provisioning</strong></td>
+</tr>
+<tr>
+<td>OSHA Outreach Module</td>
+<td>Field hires</td>
+</tr>
+<tr>
+<td>SCA / DBA Labor‑Standards Orientation</td>
+<td>Hires with labor‑standards coverage</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Waiving a course.</strong> A course may be waived only through the governed <strong>waive</strong> action,
+which requires the <em>approve</em> permission and <strong>step‑up verification</strong>, and records a
+written reason. The <strong>hard‑gate courses can never be waived</strong>: DCAA‑Compliant Timekeeping
+for time‑charging hires, and CUI Handling / CMMC‑NIST Awareness for CUI‑authorized hires.
+Attempting to waive one is refused with <strong>“course ‘…’ gates §9/§11 access and cannot be
+waived.”</strong></p>
+<p><strong>What success looks like:</strong> the course status chip reads <strong>completed</strong> (or <strong>waived</strong>),
+the completion is anchored, and any access gate that depends on it can now be released
+(section <a href="#46-releasing-the-gates">4.6</a>).</p>
+<p aria-label="Screenshot placeholder: Record detail — Training roster with statuses and scores" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Training roster with statuses and scores</em></p>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="4.6 Releasing the gates" id="4-6-releasing-the-gates"><h3 id="46-releasing-the-gates">4.6 Releasing the gates</h3>
+<p><strong>Who:</strong> the CEO or an approver with onboarding <em>approve</em> (in division).
+<strong>When:</strong> after the gate’s precondition courses are completed.
+<strong>Before you begin:</strong> open the record’s <strong>Access gates (§9 / §11)</strong> section. Each gate
+shows its <strong>type</strong>, its <strong>precondition</strong> courses, its <strong>status</strong> (held or released), and
+who released it.</p>
+<p>The module enforces two hard gates. Their real‑world consequence is the point:</p>
+<ul>
+<li>
+<p><strong>Time‑charging gate</strong> — created for time‑charging hires. <strong>Until it is released, the
+  person cannot submit a timecard.</strong> If they try, timecard submission is refused with
+  the message that <em>DCAA timekeeping training must be completed and the time‑charging
+  access gate released before submitting timecards.</em> Its precondition is <strong>DCAA‑Compliant
+  Timekeeping</strong> completed.</p>
+</li>
+<li>
+<p><strong>CUI‑provisioning gate</strong> — created for CUI‑authorized hires. Its preconditions are
+  <strong>CMMC / NIST SP 800‑171 Awareness</strong> and <strong>CUI Handling</strong>, both completed with passing
+  scores. Releasing it records that the person is cleared for CUI‑authorized provisioning.</p>
+</li>
+</ul>
+<p><strong>Releasing a gate</strong></p>
+<ol>
+<li>Confirm the precondition courses are <strong>completed</strong> (with passing scores where
+   required).</li>
+<li>Choose <strong>release</strong> on the gate.</li>
+<li>Complete the <strong>step‑up verification</strong> when prompted.</li>
+</ol>
+<p>The system checks the preconditions at the moment of release, all in one step. If any
+precondition course is not completed with a passing score, the release is refused and the
+message lists exactly which courses are missing (<strong>“courses not completed with a passing
+score: […]”</strong>). The gate stays <strong>held</strong>.</p>
+<p>When release succeeds, the gate flips to <strong>released</strong>, records who released it and when,
+and writes a tamper‑evident audit anchor.</p>
+<p action="" and="" aria-label="Screenshot placeholder: Record detail — Access gates section, " class="screenshot" preconditions"="" release"="" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Access gates section, "Release" action and preconditions</em></p>
+<blockquote class="callout planned" role="note"><span aria-hidden="true" class="callout-icon">⚠</span><span class="callout-label">Planned — not yet available.</span><p><strong>PLANNED — not yet available in this release.</strong>
+Releasing the <strong>time‑charging</strong> gate has immediate, enforced effect today: a held gate
+blocks timecard submission. The <strong>CUI‑provisioning</strong> gate is fully tracked and released
+the same way, but the list of specific sensitive systems it will hold a person out of
+is still being finalized, so its downstream blocking is not yet switched on. Release it
+as part of onboarding regardless — the completion check requires it.</p></blockquote>
+<p><strong>What success looks like:</strong> the gate status reads <strong>released</strong>; for the time‑charging
+gate, the person can now submit timecards.</p>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="4.7 Tracking screening" id="4-7-tracking-screening"><h3 id="47-tracking-screening">4.7 Tracking screening</h3>
+<p><strong>Who:</strong> HR or the Security Officer function (in practice, HR or the CEO), in division.
+<strong>When:</strong> background screening usually starts in preboarding; credentialing in week one.
+<strong>Before you begin:</strong> open the record’s <strong>Screening (§6 / §8)</strong> section. It lists each
+screening <strong>type</strong> (for example, <em>background</em>, <em>hspd12 piv</em>, <em>everify case</em>), its
+<strong>status</strong>, a <strong>case reference</strong> pointer where relevant, and when it was initiated.</p>
+<p>A screening process moves through <strong>not required → initiated → in progress → cleared</strong>
+(or <strong>denied</strong>). Update its status as the external process advances. Only a <strong>pointer</strong>
+(such as a case number) is stored — never the screening result content, which stays in
+the personnel file.</p>
+<p><strong>Why “cleared” matters.</strong> Some tasks declare a dependency on a screening being cleared
+(for example, HSPD‑12 / PIV credentialing depends on the credentialing screening). While
+that screening is anything other than <strong>cleared</strong>, the dependent task is <strong>blocked</strong> and
+cannot be completed. Moving a screening to <strong>cleared</strong> unblocks its dependent work;
+moving it to <strong>cleared</strong> or <strong>denied</strong> is anchored in the audit trail.</p>
+<p><strong>What success looks like:</strong> the screening status reflects reality, and any dependent
+tasks can proceed once it is <strong>cleared</strong>.</p>
+<p aria-label="Screenshot placeholder: Record detail — Screening section with statuses and case references" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Screening section with statuses and case references</em></p>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="4.8 Issuing and recovering assets" id="4-8-issuing-and-recovering-assets"><h3 id="48-issuing-and-recovering-assets">4.8 Issuing and recovering assets</h3>
+<p><strong>Who:</strong> HR, IT, or the hiring manager (in division).
+<strong>When:</strong> typically day one onward.
+<strong>Before you begin:</strong> open the record. Issued equipment appears in the <strong>Issued assets
+(§14)</strong> section with its <strong>tag</strong>, <strong>type</strong>, <strong>status</strong>, <strong>responsibility
+acknowledgment</strong>, and <strong>issue</strong> time.</p>
+<p><strong>Issuing equipment</strong></p>
+<ol>
+<li>Record the <strong>asset tag</strong> and <strong>asset type</strong> for the equipment.</li>
+<li>Issue it to the new hire. The issuance is audit‑logged.</li>
+<li>Capture the new hire’s <strong>responsibility acknowledgment</strong> when they accept the
+   equipment.</li>
+</ol>
+<p>An asset moves through <strong>issued → returned</strong> (or <strong>lost</strong>), or to <strong>recovery due</strong> when
+the person separates. You can record the responsibility acknowledgment and the
+return/loss status from the asset.</p>
+<p><strong>Automatic recovery at separation.</strong> When HR terminates or offboards an employee, the
+system <strong>automatically flags that person’s still‑issued assets as “recovery due”</strong> and
+raises a recovery notification — so the policy’s “assets recovered at separation”
+obligation surfaces on its own, without anyone remembering to check.</p>
+<p><strong>What success looks like:</strong> issued equipment is on the record with a responsibility
+acknowledgment; at separation, open assets switch to <strong>recovery due</strong> automatically.</p>
+<p aria-label="Screenshot placeholder: Record detail — Issued assets section" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Issued assets section</em></p>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="4.9 Milestone check‑ins (30 / 60 / 90)" id="4-9-milestone-check-ins-30-60-90"><h3 id="49-milestone-checkins-30-60-90">4.9 Milestone check‑ins (30 / 60 / 90)</h3>
+<p><strong>Who:</strong> the hiring manager (in division) or the CEO (the <em>approve</em> permission).
+<strong>When:</strong> at the 30‑, 60‑, and 90‑day milestones.
+<strong>Before you begin:</strong> open the record’s <strong>Milestone check‑ins (§5.4)</strong> section. Until any
+are recorded it reads <em>“No check‑ins recorded yet (30/60/90‑day).”</em></p>
+<p><strong>Recording a check‑in</strong></p>
+<ol>
+<li>Choose the milestone — <strong>day 30</strong>, <strong>day 60</strong>, or <strong>day 90</strong>.</li>
+<li>Optionally attach a <strong>summary pointer</strong> (a reference to where the check‑in notes are
+   kept — never the notes themselves).</li>
+<li>Record it. The check‑in is anchored in the audit trail automatically.</li>
+</ol>
+<p><strong>Sequence rule.</strong> Check‑ins must be recorded <strong>in order</strong>. You cannot record the
+<strong>90‑day</strong> before the <strong>30‑</strong> and <strong>60‑day</strong> exist; attempting it is refused with <strong>“day_90
+requires [‘day_30’, ‘day_60’] to be recorded first.”</strong> Recording the same milestone twice
+is refused as already recorded.</p>
+<p><strong>What success looks like:</strong> the milestone appears in the check‑ins table with who
+conducted it, when, and a chain hash.</p>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="4.10 Reminders and the sweep" id="4-10-reminders-and-the-sweep"><h3 id="410-reminders-and-the-sweep">4.10 Reminders and the sweep</h3>
+<p><strong>Who:</strong> the CEO or a service account (the <em>trigger</em> permission) runs the sweep; everyone
+benefits from the reminders.
+<strong>When:</strong> on a regular cadence (for example, daily).
+<strong>Before you begin:</strong> nothing — the sweep reads open items and sends notifications.</p>
+<p>The module does not run its own background timer. Instead, an administrator (or an
+automated trigger) runs a <strong>reminder sweep</strong> that:</p>
+<ol>
+<li>finds open tasks and courses whose due date is <strong>within three days</strong> or <strong>past</strong>;</li>
+<li>sends a notification for each — <strong>higher‑priority</strong> for statutory items (the I‑9
+   deadlines), routine priority for everything else;</li>
+<li>marks each item so the <strong>same reminder is never sent twice</strong> for the same stage
+   (approaching vs. overdue).</li>
+</ol>
+<p>Notifications carry only the <strong>record identifier</strong>, the <strong>employee identifier</strong>, and the
+<strong>item code</strong> — no names and no personal data.</p>
+<p><strong>Running a sweep</strong></p>
+<ol>
+<li>Trigger the <strong>sweep</strong> action.</li>
+<li>The system returns a small summary — how many records it scanned and how many
+   reminders it sent.</li>
+</ol>
+<p><strong>Re‑running is safe.</strong> Running the sweep again the same day sends <strong>nothing twice</strong>:
+items already reminded at their current stage are skipped, and a repeated trigger simply
+replays the previous result.</p>
+<blockquote class="callout planned" role="note"><span aria-hidden="true" class="callout-icon">⚠</span><span class="callout-label">Planned — not yet available.</span><p><strong>PLANNED — not yet available in this release.</strong>
+The sweep’s <strong>automatic schedule</strong> (for example, a daily cloud or server timer) is a
+deployment‑time setup step that depends on where the system is hosted. The sweep action
+itself is fully available now and can be run on demand or wired to any external
+scheduler.</p></blockquote>
+<p><strong>What success looks like:</strong> owners receive timely reminders for approaching and overdue
+items, and statutory deadlines get the higher‑priority path.</p>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="4.11 Completing and certifying (and cancelling)" id="4-11-completing-and-certifying-and-cancelling"><h3 id="411-completing-and-certifying-and-cancelling">4.11 Completing and certifying (and cancelling)</h3>
+<p><strong>Who:</strong> the CEO or an approver (in division).
+<strong>When:</strong> once every required item is done.
+<strong>Before you begin:</strong> open the record and confirm nothing is outstanding.</p>
+<p><strong>Completing a record.</strong> When you choose <strong>complete</strong>, the system verifies — before it
+will certify — that <strong>all</strong> of the following are true:</p>
+<ul>
+<li>every task is finished (none pending, in progress, or blocked);</li>
+<li>every required acknowledgment is signed at its current version;</li>
+<li>every required course is completed or waived;</li>
+<li>every access gate is released;</li>
+<li>all three milestone check‑ins (30/60/90) are recorded.</li>
+</ul>
+<p>If anything is still open, completion is refused with <strong>“record has open required items”</strong>
+and a breakdown of the counts (open tasks, incomplete training, gates held, outstanding
+acknowledgments, missing check‑ins). Resolve those, then retry.</p>
+<p><strong>Steps</strong></p>
+<ol>
+<li>Choose <strong>complete</strong> on the record.</li>
+<li>Complete the <strong>step‑up verification</strong> when prompted.</li>
+<li>The record moves to <strong>completed</strong>, its phase becomes <strong>complete</strong>, and a verifiable
+   <strong>completion certificate</strong> is anchored.</li>
+</ol>
+<p><strong>What success looks like:</strong> the record’s status reads <strong>completed</strong>; the <strong>Completion
+certificate (§17)</strong> section appears, stating <em>“Onboarding certified complete … —
+chain‑anchored and verifiable,”</em> and shows the completion hash. The certificate is the
+record itself plus its chain hash — verifiable at any time.</p>
+<p aria-label="Screenshot placeholder: Record detail — Completion certificate section with completion hash" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: Record detail — Completion certificate section with completion hash</em></p>
+<p><strong>Cancelling a record (the alternate ending).</strong> If a hire does not start (no‑show or
+rescinded offer), choose <strong>cancel</strong>, provide a <strong>reason</strong> (required), and complete the
+<strong>step‑up verification</strong>. The record moves to <strong>cancelled</strong> and the cancellation is
+anchored. Completed and cancelled records are terminal — no further changes are accepted.</p>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="4.12 Reports and exports" id="4-12-reports-and-exports"><h3 id="412-reports-and-exports">4.12 Reports and exports</h3>
+<p><strong>Who:</strong> the CEO or Finance (the <em>export</em> permission); auditors may export read‑only.
+<strong>When:</strong> any time — for compliance review, audit, or records.
+<strong>Before you begin:</strong> decide the scope — a single record, a division, or firm‑wide.</p>
+<p>The module generates the policy’s <strong>Attachment A/B/C</strong> as spreadsheet (CSV) exports, plus
+the printable certified record:</p>
+<table><caption class="sr-only">4.12 Reports and exports — data table 5</caption>
+<thead>
+<tr>
+<th scope="col">Export</th>
+<th scope="col">Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Checklist</strong> (Attachment A)</td>
+<td>Tasks across records: codes, titles, phase, owner, policy, statutory flag, status, due and completion dates.</td>
+</tr>
+<tr>
+<td><strong>Acknowledgments</strong> (Attachment B)</td>
+<td>Signed acknowledgments: document, version, who signed, on‑behalf flag, time, and chain hash.</td>
+</tr>
+<tr>
+<td><strong>Training</strong> (Attachment C)</td>
+<td>Course completion log: course, policy, status, score, passing score, completion time, and chain hash.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Steps</strong></p>
+<ol>
+<li>Choose the export — <strong>checklist</strong>, <strong>acks</strong>, or <strong>training</strong>.</li>
+<li>Optionally scope it to a single record or a division.</li>
+<li>The file downloads (named <code>onboarding_checklist.csv</code>, <code>onboarding_acks.csv</code>, or
+   <code>onboarding_training.csv</code>).</li>
+</ol>
+<p>Every export contains identifiers, codes, dates, statuses and hashes — <strong>no names and no
+personal data</strong> — by construction.</p>
+<p><strong>The printable certified record.</strong> The record‑detail page, with the completion
+certificate and hash displayed, serves as the printable certified record. Use your
+browser’s print function to produce a clean copy.</p>
+<p><strong>What success looks like:</strong> you have a CSV (or printed record) suitable for compliance
+review and audit, free of personal data.</p>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="4.13 Administering the program configuration" id="4-13-administering-the-program-configuration"><h3 id="413-administering-the-program-configuration">4.13 Administering the program configuration</h3>
+<p><strong>Who:</strong> a privileged administrator (the program configuration is maintained alongside
+the system, typically by the CEO/IT).
+<strong>When:</strong> when policy content changes — new course, re‑issued document, changed due
+window, new clause reference.</p>
+<p>The shape of the program — <strong>which</strong> tasks, courses, acknowledgment documents and gates
+exist, their <strong>due‑day offsets</strong>, the <strong>reminder window</strong>, and the <strong>clause references</strong>
+— lives in a single program configuration. Adjusting it changes what new records look
+like, without touching the software.</p>
+<p>What the configuration controls:</p>
+<ul>
+<li><strong>Acknowledgment documents</strong> — their titles and <strong>current version strings</strong>. Re‑issuing
+  a document means bumping its version here; that reopens the acknowledgment for hires.</li>
+<li><strong>Training courses</strong> — codes, titles, the flag each applies to, due‑day offsets, and
+  passing scores (several passing scores are still pending HR confirmation).</li>
+<li><strong>Tasks</strong> — the Attachment A checklist: code, title, phase, owner role, policy
+  reference, whether it is statutory, due‑day offset, and any screening dependency.</li>
+<li><strong>Screening processes</strong>, <strong>access gates</strong> and their precondition courses.</li>
+<li><strong>Phase offsets</strong> (the day counts for week 1 / 30 / 60 / 90).</li>
+<li><strong>Reminders</strong> — the three‑day approach window and the priority tiers.</li>
+<li><strong>Clause references</strong> and <strong>retention</strong> keys (kept as data; several await counsel
+  confirmation).</li>
+<li><strong>E‑Verify</strong> — disabled until a contract clause requires it.</li>
+</ul>
+<p><strong>Two rules to remember</strong></p>
+<ol>
+<li><strong>Records keep their original shape.</strong> Each record stamps the <strong>template version</strong> in
+   force when it was created. Changing the configuration later does <strong>not</strong> reshape
+   existing records — they keep the tasks and courses they were created with. The header
+   of every record shows its template version.</li>
+<li><strong>Clause citations are never lost.</strong> Clause references are seeded once; a confirmed
+   citation entered later is never overwritten by a redeploy.</li>
+</ol>
+<p><strong>What success looks like:</strong> new records reflect the updated program; existing records
+are unchanged and clearly stamped with the version they were built from.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="5. New‑hire guide (self‑service)" id="5-new-hire-guide-self-service"><h2 id="5-newhire-guide-selfservice">5. New‑hire guide (self‑service)</h2>
+<p>Welcome to TTI‑Solutions. This short walkthrough shows you how to see your own onboarding
+progress.</p>
+<p><strong>You can see only your own record.</strong> The onboarding view is private to you — you cannot
+see anyone else’s onboarding.</p>
+<ol>
+<li><strong>Sign in</strong> to the TTIS Dashboard with the username and password provided to you.</li>
+<li>In the left navigation, select <strong>Onboarding</strong>. You are taken straight to <strong>your own
+   record</strong> (there is a “my onboarding” shortcut that finds your record for you).</li>
+<li><strong>Read your outstanding items.</strong> Your record shows:
+   - <strong>Task checklist</strong> — what is expected of you and by when (your tasks are marked with
+     you as the owner);
+   - <strong>Acknowledgments</strong> — any documents still <strong>outstanding</strong> appear as chips at the top
+     of that section;
+   - <strong>Training roster</strong> — your required courses and whether each is completed.</li>
+<li><strong>Check your phase and status</strong> in the header — for example, <em>day one</em> or <em>week 1</em>.</li>
+</ol>
+<p aria-label="Screenshot placeholder: New‑hire self‑view — own record with outstanding acknowledgments" class="screenshot" role="img"><span aria-hidden="true">🖼</span> <em>Screenshot: New‑hire self‑view — own record with outstanding acknowledgments</em></p>
+<p><strong>Signing your acknowledgments and marking your tasks.</strong> You are permitted to <strong>submit
+your own</strong> acknowledgments and complete your <strong>own</strong> tasks (the ones that list you as the
+owner). When you sign a document, your signature is recorded against that document’s
+current version and time‑stamped.</p>
+<blockquote class="callout planned" role="note"><span aria-hidden="true" class="callout-icon">⚠</span><span class="callout-label">Planned — not yet available.</span><p><strong>PLANNED — not yet available in this release.</strong>
+Signing acknowledgments and marking your tasks <strong>directly on the self‑service page</strong>
+(in‑page buttons) is planned. In this release the self‑service page is for <strong>reviewing</strong>
+your outstanding items. Until in‑page actions ship, your HR coordinator can record your
+acknowledgments and task completions for you — and when they do, the ledger shows it was
+done <strong>on your behalf</strong>, so there is always a clear record.</p></blockquote>
+<p><strong>What success looks like:</strong> you know exactly what you still owe — which documents to
+sign, which tasks to finish, and which training to complete — and you can watch those
+items clear as onboarding progresses.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="6. Roles &amp; permissions reference" id="6-roles-permissions-reference"><h2 id="6-roles-permissions-reference">6. Roles &amp; permissions reference</h2>
+<p>“Division‑scoped” means a Field Ops Manager can act only on records in <strong>their own
+division</strong>. “Own‑record only” means a Field Crew member can see and act on <strong>only their
+own</strong> onboarding.</p>
+<table><caption class="sr-only">6. Roles &amp; permissions reference — data table 6</caption>
+<thead>
+<tr>
+<th scope="col">Action</th>
+<th scope="col">CEO</th>
+<th scope="col">Field Ops Manager</th>
+<th scope="col">Finance</th>
+<th scope="col">Field Crew (New Hire)</th>
+<th scope="col">Business Dev</th>
+<th scope="col">Auditor flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View the board / a record</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>✓</td>
+<td>✓ (own record only)</td>
+<td>—</td>
+<td>✓ (view only)</td>
+</tr>
+<tr>
+<td>Create a record</td>
+<td>✓</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Update a record / flags</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Work tasks</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>—</td>
+<td>Submit own tasks</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Capture acknowledgments</td>
+<td>✓</td>
+<td>✓ (on behalf)</td>
+<td>—</td>
+<td>Sign own</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Record / waive training</td>
+<td>✓</td>
+<td>✓ update (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Release a gate</td>
+<td>✓</td>
+<td>✓ approve (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Track screening</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Issue / recover assets</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Record check‑ins</td>
+<td>✓</td>
+<td>✓ (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Complete / cancel</td>
+<td>✓</td>
+<td>✓ approve (own division)</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Run the reminder sweep</td>
+<td>✓</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Export reports</td>
+<td>✓</td>
+<td>—</td>
+<td>✓</td>
+<td>—</td>
+<td>—</td>
+<td>✓ (view/export only)</td>
+</tr>
+</tbody>
+</table>
+<p>Notes:</p>
+<ul>
+<li><strong>The CEO can do everything</strong>, including all the HR, IT and Security‑Officer duties —
+  the system currently maps those policy roles to the CEO and the division managers
+  rather than to separate HR/IT accounts.</li>
+<li><strong>Waivers, gate releases, completion and cancellation</strong> additionally require <strong>step‑up
+  verification</strong> (section <a href="#2-before-you-begin">2</a>).</li>
+<li><strong>Auditors</strong> (a read‑only flag on an account) may view and export but are denied every
+  change.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="7. Statuses &amp; badges glossary" id="7-statuses-badges-glossary"><h2 id="7-statuses-badges-glossary">7. Statuses &amp; badges glossary</h2>
+<p><strong>Record status</strong></p>
+<table><caption class="sr-only">7. Statuses &amp; badges glossary — data table 7</caption>
+<thead>
+<tr>
+<th scope="col">Status</th>
+<th scope="col">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>preboarding</strong></td>
+<td>Open; the start date has not yet arrived.</td>
+</tr>
+<tr>
+<td><strong>active</strong></td>
+<td>The start date has arrived; onboarding is under way.</td>
+</tr>
+<tr>
+<td><strong>completed</strong></td>
+<td>Every required item is done and the record is certified.</td>
+</tr>
+<tr>
+<td><strong>cancelled</strong></td>
+<td>Onboarding was stopped (no‑show, rescinded offer); terminal.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Phase</strong> (shown as the <em>phase</em> chip): <strong>preboarding → day one → week 1 → day 30 → day 60
+→ day 90 → complete.</strong> The phase is computed from the start date and is held back by any
+open statutory task.</p>
+<p><strong>Task status</strong></p>
+<table><caption class="sr-only">7. Statuses &amp; badges glossary — data table 8</caption>
+<thead>
+<tr>
+<th scope="col">Status</th>
+<th scope="col">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>pending</strong></td>
+<td>Not started.</td>
+</tr>
+<tr>
+<td><strong>in progress</strong></td>
+<td>Started, not finished.</td>
+</tr>
+<tr>
+<td><strong>complete</strong></td>
+<td>Finished.</td>
+</tr>
+<tr>
+<td><strong>blocked</strong></td>
+<td>Waiting on a dependency (for example, a screening to clear).</td>
+</tr>
+<tr>
+<td><strong>waived</strong></td>
+<td>No longer required — set automatically when a flag change makes the task inapplicable (never for statutory tasks).</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>statutory</strong> badge marks the non‑waivable I‑9 tasks. On the board, an overdue badge
+may read, for example, <strong>“2 overdue (1 statutory)”</strong>.</p>
+<p><strong>Training status:</strong> <strong>assigned → in progress → completed</strong>, or <strong>waived</strong>.</p>
+<p><strong>Gate status:</strong> <strong>held</strong> (preconditions not yet cleared / not released) or <strong>released</strong>.</p>
+<p><strong>Screening status:</strong> <strong>not required</strong>, <strong>initiated</strong>, <strong>in progress</strong>, <strong>cleared</strong>, or
+<strong>denied</strong>.</p>
+<p><strong>Asset status:</strong> <strong>issued</strong>, <strong>recovery due</strong> (flagged at separation), <strong>returned</strong>, or
+<strong>lost</strong>.</p>
+<p><strong>Acks outstanding / Open tasks / Overdue / Next due</strong> — board counters summarizing the
+record’s open items.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="8. Common messages &amp; how to resolve them" id="8-common-messages-how-to-resolve-them"><h2 id="8-common-messages-how-to-resolve-them">8. Common messages &amp; how to resolve them</h2>
+<table><caption class="sr-only">8. Common messages &amp; how to resolve them — data table 9</caption>
+<thead>
+<tr>
+<th scope="col">What you see</th>
+<th scope="col">What it means</th>
+<th scope="col">What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>“A fresh step‑up (MFA) assertion is required for this high‑value action.”</strong></td>
+<td>This action (gate release, waiver, completion, cancellation) needs fresh verification.</td>
+<td>Complete the multi‑factor verification, then retry.</td>
+</tr>
+<tr>
+<td><strong>“MFA enrollment required before this high‑value action.”</strong></td>
+<td>You have not enrolled in multi‑factor verification.</td>
+<td>Enroll in MFA, then retry.</td>
+</tr>
+<tr>
+<td>A <strong>version conflict</strong> (the record changed since you loaded it).</td>
+<td>Someone updated the record after you opened it; your view is out of date.</td>
+<td>Reload the record and retry your change.</td>
+</tr>
+<tr>
+<td>You are asked for a record version you didn’t supply.</td>
+<td>A change was attempted without the record’s current version.</td>
+<td>Reopen the record so the current version is loaded, then retry.</td>
+</tr>
+<tr>
+<td><strong>“waiving a task requires the waive endpoint”</strong> (when trying to set a task to <em>waived</em>).</td>
+<td>Tasks are not waived by changing their status; statutory tasks can never be waived.</td>
+<td>Don’t waive statutory tasks. For non‑statutory tasks, change the applicable flag so the task no longer applies (it is then auto‑waived).</td>
+</tr>
+<tr>
+<td><strong>“task ‘…’ requires a doc_ref evidence pointer.”</strong></td>
+<td>The task needs an evidence pointer before it can be completed.</td>
+<td>Add the evidence pointer (a personnel‑file locator), then complete.</td>
+</tr>
+<tr>
+<td><strong>“task ‘…’ requires screening ‘…’ to be cleared.”</strong></td>
+<td>The task depends on a screening that is not yet cleared.</td>
+<td>Move the screening to <strong>cleared</strong>, then complete the task.</td>
+</tr>
+<tr>
+<td><strong>“course ‘…’ requires score ≥ N.”</strong></td>
+<td>The course has a minimum passing score and the score is missing or too low.</td>
+<td>Record a passing score to complete the course.</td>
+</tr>
+<tr>
+<td><strong>“course ‘…’ gates §9/§11 access and cannot be waived.”</strong></td>
+<td>This is a hard‑gate course (DCAA timekeeping, or CUI/CMMC‑NIST).</td>
+<td>It cannot be waived — the course must be completed.</td>
+</tr>
+<tr>
+<td><strong>“courses not completed with a passing score: […]”</strong></td>
+<td>A gate release was attempted before its precondition courses were finished.</td>
+<td>Complete the listed courses (with passing scores), then release the gate.</td>
+</tr>
+<tr>
+<td><strong>“DCAA timekeeping training must be completed and the time‑charging access gate released before submitting timecards.”</strong></td>
+<td>The person’s time‑charging gate is still held.</td>
+<td>Complete DCAA timekeeping and release the time‑charging gate, then submit the timecard.</td>
+</tr>
+<tr>
+<td><strong>“day_90 requires [‘day_30’, ‘day_60’] to be recorded first.”</strong></td>
+<td>Check‑ins must be recorded in order.</td>
+<td>Record the 30‑ and 60‑day check‑ins first.</td>
+</tr>
+<tr>
+<td><strong>“‘…’ v… already acknowledged on this record.”</strong></td>
+<td>That document version is already signed.</td>
+<td>No action needed — it is already done.</td>
+</tr>
+<tr>
+<td><strong>“record has open required items: …”</strong></td>
+<td>Completion was attempted while items are still open.</td>
+<td>Clear the listed open tasks, training, gates, acknowledgments and check‑ins, then complete.</td>
+</tr>
+<tr>
+<td><strong>“employee ‘…’ already has an open onboarding record (…).”</strong></td>
+<td>The person already has an open record.</td>
+<td>Use the existing record instead of creating a second one.</td>
+</tr>
+<tr>
+<td><strong>“Forbidden: not your onboarding record.”</strong> / <strong>“you may only submit your own onboarding tasks.”</strong></td>
+<td>A new hire tried to view or act on someone else’s record or task.</td>
+<td>You may only work your own record and your own tasks.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="9. FAQ" id="9-faq"><h2 id="9-faq">9. FAQ</h2>
+<p><strong>Does the module store Social Security numbers, I‑9 images, or screening results?</strong>
+No. It stores completion state, dates, identities and <em>pointers</em> to documents that live
+in the personnel file. Notifications and exports contain no names and no personal data.</p>
+<p><strong>Who sets the phase?</strong> No one — the phase is computed from the start date. An open
+statutory item (like an overdue I‑9) holds the phase back until it is resolved.</p>
+<p><strong>Why can’t this person submit a timecard?</strong> Because their <strong>time‑charging gate</strong> is still
+held — DCAA timekeeping training must be completed and the gate released first.</p>
+<p><strong>Can the I‑9 tasks be skipped?</strong> No. They are statutory and can never be waived; they
+also drive higher‑priority reminders.</p>
+<p><strong>A document was re‑issued. Do people need to re‑sign?</strong> Yes. Acknowledgments are tracked
+per version; a new version reopens the requirement.</p>
+<p><strong>Is it safe to run the reminder sweep twice?</strong> Yes. It never sends the same reminder
+twice for the same stage, and a repeated run simply replays the previous result.</p>
+<p><strong>What is the “completion certificate”?</strong> It is the record itself plus its tamper‑evident
+chain hash, shown on the record once it is certified complete and available as a printable
+page and CSV exports.</p>
+<p><strong>Can a new hire see other people’s onboarding?</strong> No — the self‑service view is strictly
+limited to their own record.</p>
+<p><strong>What happens to issued equipment when someone leaves?</strong> When HR terminates or offboards
+the employee, their still‑issued assets are automatically flagged <strong>recovery due</strong> and a
+notification is raised.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="Appendix A — Coverage &amp; reconciliation map" id="appendix-a-coverage-reconciliation-map"><h2 id="appendix-a-coverage-reconciliation-map">Appendix A — Coverage &amp; reconciliation map</h2>
+<p><em>Administrator / internal reference.</em> Build status of every capability in the Product
+Design Specification (R‑OB‑01), verified against the source code. <strong>IMPLEMENTED</strong> = works
+today; <strong>PARTIAL</strong> = present with a noted limit; <strong>PLANNED</strong> = specified, not yet built.</p>
+<table><caption class="sr-only">Appendix A — Coverage &amp; reconciliation map — data table 10</caption>
+<thead>
+<tr>
+<th scope="col">Capability (PDS)</th>
+<th scope="col">Status</th>
+<th scope="col">Where it lives (citation)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR‑1 Record lifecycle &amp; phase timeline</td>
+<td>IMPLEMENTED</td>
+<td><code>dashboard/onboarding.py</code> <code>create_record</code>, <code>_compute_phase</code>, <code>_refresh_phase</code> (lines 413–448, 531–585)</td>
+</tr>
+<tr>
+<td>FR‑1 Auto‑create on authorized hire</td>
+<td>IMPLEMENTED</td>
+<td><code>tools/hr_db.py:187–202</code> (opt‑in <code>onboarding</code> directive on <code>hire</code>/<code>onboard</code>)</td>
+</tr>
+<tr>
+<td>FR‑2 Conditional resolution + flag re‑resolution</td>
+<td>IMPLEMENTED</td>
+<td><code>_applies</code>, <code>_instantiate_children</code>, <code>update_record</code> (311–336, 453–522, 712–847)</td>
+</tr>
+<tr>
+<td>FR‑3 Task checklist FSM, evidence, dependency</td>
+<td>IMPLEMENTED</td>
+<td><code>update_task</code> (852–933)</td>
+</tr>
+<tr>
+<td>FR‑3 Statutory I‑9 non‑waivable + strict anchor</td>
+<td>IMPLEMENTED</td>
+<td><code>update_task</code> statutory branch (872–924); config <code>statutory: true</code> on <code>i9_section1</code>, <code>i9_verification</code></td>
+</tr>
+<tr>
+<td>FR‑3 <strong>Manual per‑task waiver endpoint</strong></td>
+<td><strong>PLANNED</strong></td>
+<td>No <code>POST /onboarding/tasks/{id}/waive</code> route exists; tasks auto‑waive only on flag re‑resolution (<code>update_record</code> 788–800). PDS §10 lists the endpoint.</td>
+</tr>
+<tr>
+<td>FR‑4 Acknowledgment ledger (versioned, on‑behalf, strict)</td>
+<td>IMPLEMENTED</td>
+<td><code>record_ack</code> (947–994); duplicate → <code>OnboardingConflict</code></td>
+</tr>
+<tr>
+<td>FR‑5 Training roster, passing score, waiver</td>
+<td>IMPLEMENTED</td>
+<td><code>update_training</code>, <code>waive_training</code> (999–1153)</td>
+</tr>
+<tr>
+<td>FR‑5 Hard‑gate courses unwaivable</td>
+<td>IMPLEMENTED</td>
+<td><code>_hard_gate_courses</code> + <code>waive_training</code> (1016–1133)</td>
+</tr>
+<tr>
+<td>FR‑6 CUI / time‑charging gates, transactional release</td>
+<td>IMPLEMENTED</td>
+<td><code>release_gate</code> (1168–1234)</td>
+</tr>
+<tr>
+<td>FR‑6 Time‑charging keystone enforcement (blocks timecards)</td>
+<td>IMPLEMENTED</td>
+<td><code>held_gate_types</code> (1237–1257); <code>abac.gate_keystone_denied</code> + <code>GATE_GUARDED={"timecard":"time_charging"}</code> (<code>abac.py:183, 255–265</code>); enforced at <code>main.py:1029–1040</code></td>
+</tr>
+<tr>
+<td>FR‑6 CUI‑provisioning keystone (downstream resource blocking)</td>
+<td><strong>PARTIAL / PLANNED</strong></td>
+<td>Gate is created/released; no resource mapped to <code>cui_provisioning</code> in <code>GATE_GUARDED</code> yet (config pending OQ‑10, <code>abac.py:181–183</code>)</td>
+</tr>
+<tr>
+<td>FR‑7 Screening status tracking + dependency block</td>
+<td>IMPLEMENTED</td>
+<td><code>update_screening</code> (1275–1325); dependency in <code>update_task</code> (887–895)</td>
+</tr>
+<tr>
+<td>FR‑8 Asset issuance + responsibility ack</td>
+<td>IMPLEMENTED</td>
+<td><code>issue_asset</code>, <code>update_asset</code> (1433–1496)</td>
+</tr>
+<tr>
+<td>FR‑8 Separation recovery hook</td>
+<td>IMPLEMENTED</td>
+<td><code>flag_assets_for_recovery</code> (1499–1529); HR hook <code>tools/hr_db.py:171–178</code></td>
+</tr>
+<tr>
+<td>FR‑9 Milestone check‑ins, sequence rule</td>
+<td>IMPLEMENTED</td>
+<td><code>record_checkin</code> (1538–1581)</td>
+</tr>
+<tr>
+<td>FR‑10 Completion verification + certificate</td>
+<td>IMPLEMENTED</td>
+<td><code>_completion_gaps</code>, <code>complete_record</code> (1586–1648)</td>
+</tr>
+<tr>
+<td>FR‑10 Cancellation (no‑show path)</td>
+<td>IMPLEMENTED</td>
+<td><code>cancel_record</code> (1651–1673)</td>
+</tr>
+<tr>
+<td>FR‑11 Idempotent reminder sweep</td>
+<td>IMPLEMENTED</td>
+<td><code>run_onboarding_sweep</code> (1330–1411); endpoint <code>main.py:2511</code></td>
+</tr>
+<tr>
+<td>FR‑11 External scheduler wiring</td>
+<td><strong>PLANNED</strong></td>
+<td>Endpoint exists; the cron/Cloud Scheduler trigger is a deployment step (OQ‑1/OQ‑3) — no in‑repo scheduler</td>
+</tr>
+<tr>
+<td>FR‑12 CSV exports (checklist/acks/training)</td>
+<td>IMPLEMENTED</td>
+<td><code>export_csv</code> (1697–1745); endpoint <code>main.py:2661</code></td>
+</tr>
+<tr>
+<td>FR‑12 Printable certified record</td>
+<td>IMPLEMENTED</td>
+<td><code>onboarding_detail.html</code> completion section (197–207)</td>
+</tr>
+<tr>
+<td>API contract (404/409/400/422, OCC, step‑up)</td>
+<td>IMPLEMENTED</td>
+<td><code>main.py:2199–2209</code> mapping; <code>_enforce_step_up</code> (498–513) → <strong>403</strong> step‑up (PDS said 401; <strong>code wins</strong>)</td>
+</tr>
+<tr>
+<td>ABAC <code>onboarding</code> resource + division scoping</td>
+<td>IMPLEMENTED</td>
+<td><code>abac.py:119, 148, 164, 174–175</code></td>
+</tr>
+<tr>
+<td>Web board / record detail / self‑view</td>
+<td>IMPLEMENTED</td>
+<td><code>web.py:395–483</code>; <code>onboarding.html</code>, <code>onboarding_detail.html</code>; nav <code>base.html:37–40</code></td>
+</tr>
+<tr>
+<td><strong>In‑page actions</strong> (sign / mark / release on the page)</td>
+<td><strong>PLANNED</strong></td>
+<td>Templates are read‑only display; all mutations are via the onboarding service. HTMX is loaded but unused for these.</td>
+</tr>
+<tr>
+<td>Accessibility (semantic tables, captions, <code>scope</code>)</td>
+<td>IMPLEMENTED</td>
+<td><code>onboarding*.html</code> use <code>&lt;th scope&gt;</code>, <code>&lt;caption class="sr-only"&gt;</code>, <code>aria-labelledby</code></td>
+</tr>
+<tr>
+<td>P4 NEXUS chat tools (T28/T29)</td>
+<td><strong>PLANNED</strong></td>
+<td>Deferred per PDS §10; no tools registered</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mode used:</strong> <em>auto</em>. The guide body documents IMPLEMENTED capabilities in present tense
+and marks PARTIAL/PLANNED items with a banner.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="Appendix B — Policy traceability" id="appendix-b-policy-traceability"><h2 id="appendix-b-policy-traceability">Appendix B — Policy traceability</h2>
+<p>Workflow → policy section, from the PDS §5.3 traceability table.</p>
+<table><caption class="sr-only">Appendix B — Policy traceability — data table 11</caption>
+<thead>
+<tr>
+<th scope="col">Policy §</th>
+<th scope="col">Onboarding capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§3 definitions, §5 phases</td>
+<td>Record lifecycle and phase timeline (4.1, 4.2, 3)</td>
+</tr>
+<tr>
+<td>§5.1 Pre‑boarding</td>
+<td>Preboarding tasks — packet, screening init, provisioning prep, day‑one plan (4.3)</td>
+</tr>
+<tr>
+<td>§5.2 Day 1 / §5.3 Week 1</td>
+<td>Day‑one and week‑one tasks; acknowledgments (4.3, 4.4)</td>
+</tr>
+<tr>
+<td>§5.4 30/60/90</td>
+<td>Milestone check‑ins; reminders (4.9, 4.10)</td>
+</tr>
+<tr>
+<td>§6 I‑9</td>
+<td>Statutory I‑9 §1 and §2 tasks — non‑waivable, priority reminders (4.3)</td>
+</tr>
+<tr>
+<td>§6 E‑Verify</td>
+<td>E‑Verify case task/screening — off until configured (4.1)</td>
+</tr>
+<tr>
+<td>§7 acknowledgments</td>
+<td>Versioned acknowledgment ledger (4.4)</td>
+</tr>
+<tr>
+<td>§8 screening / HSPD‑12</td>
+<td>Screening processes; dependent‑task blocking (4.7)</td>
+</tr>
+<tr>
+<td>§9 GovCon training</td>
+<td>Ethics, mandatory disclosure, anti‑kickback courses (4.5)</td>
+</tr>
+<tr>
+<td>§9 DCAA timekeeping</td>
+<td>DCAA course + time‑charging gate; blocks timecards (4.5, 4.6)</td>
+</tr>
+<tr>
+<td>§10 SCA / DBA</td>
+<td>Labor‑standards orientation + wage‑determination task (4.1, 4.5)</td>
+</tr>
+<tr>
+<td>§11 AUP / MFA</td>
+<td>IT Acceptable‑Use acknowledgment; provisioning/MFA tasks (4.4, 4.3)</td>
+</tr>
+<tr>
+<td>§11 CUI / CMMC training gate</td>
+<td>CUI Handling + CMMC‑NIST courses; CUI‑provisioning gate (4.5, 4.6)</td>
+</tr>
+<tr>
+<td>§12 EEO / VEVRAA / 503</td>
+<td>EEO &amp; Anti‑Harassment Orientation (4.5)</td>
+</tr>
+<tr>
+<td>§13 safety</td>
+<td>Safety Orientation / OSHA; PPE and site tasks; field flag (4.3, 4.5)</td>
+</tr>
+<tr>
+<td>§14 provisioning / assets</td>
+<td>Least‑privilege provisioning tasks; asset issuance + recovery (4.3, 4.8)</td>
+</tr>
+<tr>
+<td>§15 benefits</td>
+<td>Benefits‑enrollment task (4.3)</td>
+</tr>
+<tr>
+<td>§16 records / retention</td>
+<td>Pointers‑only design; retention kept as configuration (1, 4.13)</td>
+</tr>
+<tr>
+<td>§17 compliance / audit</td>
+<td>Chain‑anchored sign‑offs; completion certificate; exports (4.11, 4.12)</td>
+</tr>
+<tr>
+<td>§20 attachments A/B/C</td>
+<td>Checklist / acknowledgment / training views and CSV exports (4.2, 4.12)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Policy references are carried as citations only; this guide is product documentation,
+not legal advice. Several program values (passing scores, retention periods, document
+titles/versions, clause citations, E‑Verify applicability) await HR/legal confirmation
+and are maintained in the program configuration.</em></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="Appendix C — Change log" id="appendix-c-change-log"><h2 id="appendix-c-change-log">Appendix C — Change log</h2>
+<table><caption class="sr-only">Appendix C — Change log — data table 12</caption>
+<thead>
+<tr>
+<th scope="col">Version</th>
+<th scope="col">Date</th>
+<th scope="col">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026‑06‑10</td>
+<td>First release. Documents the Onboarding module as built through P1–P3 (records, tasks, acknowledgments, training, gates, screening, assets, check‑ins, completion, cancellation, reminders, exports, web board/detail/self‑view) plus the auto‑create‑on‑hire and separation hooks. PLANNED items: manual per‑task waiver, in‑page self‑service actions, CUI‑gate downstream enforcement, the sweep’s automatic schedule, and NEXUS chat tools.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<p><em>TTI‑Solutions — Infrastructure with Integrity.</em></p>
+</section></main>
+</div>
+<footer class="site">TTI-Solutions — <span class="tag">Infrastructure with Integrity</span> · Guide v1.0 · 2026-06-10</footer>
+
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

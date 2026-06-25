@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TSG Platform AWS Deployment Build</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.55; margin: 32px; color: #172033; max-width: 980px; }
+    h1, h2 { color: #0f2f57; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    pre { background: #f5f7fb; border: 1px solid #d8deea; border-radius: 8px; padding: 14px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #d8deea; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #edf2f8; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>TSG Platform AWS Deployment Build</h1>
+  <p>This guide describes the AWS deployment package for running TSG Platform as a production container on AWS App Runner with PostgreSQL and AWS Secrets Manager.</p>
+  <p>The package is produced by <code>scripts/build_aws_deployment.ps1</code> and includes the Docker app, AWS CloudFormation template, example parameters, and paired Markdown/HTML documentation.</p>
+
+  <h2>Included files</h2>
+  <ul>
+    <li><code>deploy/aws/cloudformation-app-runner.yml</code></li>
+    <li><code>deploy/aws/app-runner-parameters.example.json</code></li>
+    <li><code>Dockerfile</code></li>
+    <li><code>docker-compose.prod.yml</code></li>
+    <li>Application source under <code>api</code>, <code>core</code>, <code>database</code>, <code>seed_data</code>, and <code>scripts</code></li>
+    <li><code>.env.production.example</code></li>
+    <li>Deployment documentation in Markdown and HTML</li>
+    <li><code>aws-manifest.json</code></li>
+  </ul>
+
+  <h2>Build the AWS package</h2>
+  <pre>powershell -ExecutionPolicy Bypass -File scripts\build_aws_deployment.ps1</pre>
+  <p>The default output is:</p>
+  <pre>dist\aws\TSG-Platform-AWS-0.2.0-rc.1.zip
+dist\aws\TSG-Platform-AWS-0.2.0-rc.1.zip.sha256</pre>
+  <p>To also build the Docker image locally:</p>
+  <pre>powershell -ExecutionPolicy Bypass -File scripts\build_aws_deployment.ps1 -BuildImage</pre>
+
+  <h2>Container image flow</h2>
+  <pre>aws ecr create-repository --repository-name tsg-platform</pre>
+  <pre>aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com</pre>
+  <pre>docker build --tag tsg-platform:0.2.0-rc.1 .
+docker tag tsg-platform:0.2.0-rc.1 123456789012.dkr.ecr.us-east-1.amazonaws.com/tsg-platform:0.2.0-rc.1
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/tsg-platform:0.2.0-rc.1</pre>
+  <p>Use the pushed image URI as the CloudFormation <code>ImageIdentifier</code> parameter.</p>
+
+  <h2>Required secrets</h2>
+  <table>
+    <tr><th>Secret</th><th>Value</th></tr>
+    <tr><td><code>DATABASE_URL</code></td><td>PostgreSQL connection string</td></tr>
+    <tr><td><code>TSG_AUTH_SECRET</code></td><td>Random secret, at least 32 characters</td></tr>
+    <tr><td><code>TSG_LICENSE_SIGNING_SECRET</code></td><td>Random secret, at least 32 characters</td></tr>
+    <tr><td><code>TSG_CLIENT_API_SECRET</code></td><td>Random secret, at least 32 characters</td></tr>
+    <tr><td><code>STRIPE_WEBHOOK_SECRET</code></td><td>Real Stripe webhook signing secret beginning with <code>whsec_</code></td></tr>
+    <tr><td><code>SMTP_PASSWORD</code></td><td>SMTP account password</td></tr>
+  </table>
+  <pre>aws secretsmanager create-secret --name tsg-platform/auth-secret --secret-string "REPLACE_WITH_32_PLUS_RANDOM_CHARS"</pre>
+  <p>The CloudFormation template receives secret ARNs, not raw secret values.</p>
+
+  <h2>Database</h2>
+  <p>The application requires PostgreSQL for production:</p>
+  <pre>TSG_ENV=production
+TSG_DB_BACKEND=postgres</pre>
+  <p>Use Amazon RDS for PostgreSQL or another managed PostgreSQL endpoint. If the database is private, create an App Runner VPC connector and pass its ARN as <code>VpcConnectorArn</code>. If <code>VpcConnectorArn</code> is empty, App Runner uses default public egress.</p>
+  <pre>postgresql://tsg_user:STRONG_PASSWORD@database-hostname:5432/tsg_platform</pre>
+
+  <h2>Deploy CloudFormation</h2>
+  <p>Copy and edit <code>deploy/aws/app-runner-parameters.example.json</code>, then create the stack:</p>
+  <pre>aws cloudformation create-stack `
+  --stack-name tsg-platform-prod `
+  --template-body file://deploy/aws/cloudformation-app-runner.yml `
+  --capabilities CAPABILITY_IAM `
+  --parameters file://deploy/aws/app-runner-parameters.example.json</pre>
+  <p>For subsequent template or parameter changes, use <code>aws cloudformation update-stack</code> with the same template and parameters, or use <code>aws cloudformation deploy</code> with inline <code>ParameterKey=ParameterValue</code> overrides.</p>
+
+  <h2>Production configuration enforced by the app</h2>
+  <ul>
+    <li><code>TSG_AUTH_SECRET</code>, <code>TSG_LICENSE_SIGNING_SECRET</code>, and <code>TSG_CLIENT_API_SECRET</code> are non-placeholder secrets of at least 32 characters.</li>
+    <li><code>TSG_DB_BACKEND=postgres</code>.</li>
+    <li><code>DATABASE_URL</code> is present.</li>
+    <li><code>STRIPE_WEBHOOK_SECRET</code> is a real Stripe signing secret.</li>
+    <li><code>TSG_SECURE_COOKIES=true</code>.</li>
+    <li><code>TSG_ALLOWED_HOSTS</code> contains explicit hostnames and does not include <code>*</code>.</li>
+  </ul>
+
+  <h2>Verify deployment</h2>
+  <pre>curl https://license.example.com/health
+curl https://license.example.com/ready</pre>
+  <p>Expected readiness response:</p>
+  <pre>{
+  "status": "ready",
+  "checks": {
+    "database": "ok"
+  }
+}</pre>
+  <p>Run smoke checks for admin login, customer portal routing, product activation, update checks, Stripe webhook signature validation, and SMTP password setup email delivery.</p>
+
+  <h2>Release evidence</h2>
+  <ul>
+    <li>ECR image URI and digest</li>
+    <li>CloudFormation stack ID</li>
+    <li>App Runner service URL and service ARN</li>
+    <li>RDS endpoint and database name</li>
+    <li>Secrets Manager ARNs</li>
+    <li><code>/health</code> response</li>
+    <li><code>/ready</code> response</li>
+    <li>Smoke-test timestamp and operator name</li>
+    <li>DNS and TLS configuration</li>
+  </ul>
+</body>
+</html>

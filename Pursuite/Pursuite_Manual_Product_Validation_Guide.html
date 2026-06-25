@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite Manual Product Validation Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+.doc-nav{max-width:920px; margin:-18px auto 24px; padding:0 24px;}
+.doc-nav-inner{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 16px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+.doc-nav a{display:inline-block; margin:.15rem .8rem .15rem 0; font-size:.92rem; font-weight:600;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .doc-nav{display:none}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+  .doc-nav{padding:0 12px}
+}
+.doc-footer{max-width:920px; margin:24px auto 0; padding:0 24px 48px; color:var(--muted); font-size:.9rem;}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite Manual Product Validation Guide</h1>
+    <p>Manual validation dataset, workflow, and acceptance checks.</p>
+  </div>
+</header>
+<nav class="doc-nav" aria-label="Document navigation">
+  <div class="doc-nav-inner">
+    <a href="#introduction">Introduction</a><a href="#prerequisites">Prerequisites</a><a href="#installation">Installation</a><a href="#configuration">Configuration</a><a href="#troubleshooting">Troubleshooting</a><a href="#validation-checklist-results">Validation</a>
+  </div>
+</nav>
+<div class="wrap">
+  <main>
+    <section aria-label="Document content">
+      <article>
+<h1 id="pursuite-manual-product-validation-guide">Pursuite Manual Product Validation Guide</h1>
+<p>Version: 1.0<br>
+Scenario: DHS ICE Zero Trust Help Desk Modernization<br>
+Seed location: <code>app/test-data/manual-validation</code></p>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This guide gives a manual tester a realistic GovCon dataset and a step-by-step workflow to confirm that Pursuite is working as defined across the major product surfaces:</p>
+<ul>
+<li>Login, tenant isolation, roles, and dashboard visibility</li>
+<li>CRM accounts, contacts, interactions, pipeline, and opportunity records</li>
+<li>Proposal workspace, volumes, sections, comments, versions, and win themes</li>
+<li>RFP Shredder output, document chunk corpus, compliance matrix, and traceability</li>
+<li>Content Library, pricing/quotes, pWin, competitive intel, and capture intel</li>
+<li>AI/RAG Q&amp;A, drafting context, abstention, citation grounding, and tenant-leakage checks</li>
+<li>Color review, autonomous pipeline state, teaming workspace, templates, workflows, and restricted pricing volume access</li>
+</ul>
+<p>The dataset is intentionally small but connected. One scenario threads through the system so a tester can verify whether each feature is pulling the correct tenant-scoped evidence.</p>
+<h2 id="2-files">2. Files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app/test-data/manual-validation/manual_validation_seed.sql</code></td>
+<td>Loads the manual validation tenant, users, pursuit, proposal, RAG corpora, and workflow state.</td>
+</tr>
+<tr>
+<td><code>app/test-data/manual-validation/manual_validation_cleanup.sql</code></td>
+<td>Removes the validation tenant and seeded global test row so the seed can be rerun.</td>
+</tr>
+<tr>
+<td><code>app/test-data/manual-validation/manual_validation_smoke_checks.sql</code></td>
+<td>Quick SQL checks after seed injection.</td>
+</tr>
+<tr>
+<td><code>app/test-data/manual-validation/manual_validation_cases.json</code></td>
+<td>Source-of-truth facts, IDs, prompts, expected results, and canary strings.</td>
+</tr>
+<tr>
+<td><code>app/test-data/manual-validation/70CTD026R0001_Base_RFP.txt</code></td>
+<td>Human-readable base RFP fixture.</td>
+</tr>
+<tr>
+<td><code>app/test-data/manual-validation/70CTD026R0001_Amendment_0001.txt</code></td>
+<td>Human-readable amendment fixture.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-prerequisites">3. Prerequisites</h2>
+<ol>
+<li>Use a local or disposable Pursuite database. Do not inject this data into a production tenant.</li>
+<li>Ensure all normal app migrations have run.</li>
+<li>Confirm Postgres is pgvector-backed. The standard standalone/production compose file should use <code>pgvector/pgvector:pg16</code>.</li>
+<li>Confirm Redis is running if you want to log in through local auth.</li>
+<li>Have either <code>psql</code> available on the host or use <code>docker compose exec postgres psql</code>.</li>
+<li>Optional but recommended: configure an AI provider in Admin &gt; AI Settings for positive AI generation checks. Without an AI provider, seeded UI/data checks and Q&amp;A abstention can still be validated, but grounded positive answers will return <code>503 AI Not Configured</code>.</li>
+</ol>
+<h2 id="4-inject-the-dataset">4. Inject The Dataset</h2>
+<p>From the repository root (<code>H:\Projects\Pursuite\app</code>):</p>
+<pre><code class="language-powershell">psql &quot;$env:DATABASE_URL&quot; -f &quot;test-data/manual-validation/manual_validation_cleanup.sql&quot;
+psql &quot;$env:DATABASE_URL&quot; -f &quot;test-data/manual-validation/manual_validation_seed.sql&quot;
+psql &quot;$env:DATABASE_URL&quot; -f &quot;test-data/manual-validation/manual_validation_smoke_checks.sql&quot;
+</code></pre>
+<p>If you are using the standalone compose stack with host Postgres on port <code>5432</code>, set a database URL like this:</p>
+<pre><code class="language-powershell">$env:DATABASE_URL = &quot;postgres://pursuite:&lt;POSTGRES_PASSWORD&gt;@localhost:5432/pursuite&quot;
+</code></pre>
+<p>If you are using the local-test overlay from this repo, host Postgres is usually on port <code>5433</code>:</p>
+<pre><code class="language-powershell">$env:DATABASE_URL = &quot;postgres://pursuite:&lt;POSTGRES_PASSWORD&gt;@localhost:5433/pursuite&quot;
+</code></pre>
+<p>If you prefer running inside the container:</p>
+<pre><code class="language-powershell">docker compose -f docker-compose.production.yml --env-file .env.production exec -T postgres psql -U pursuite -d pursuite -f /path/in/container/manual_validation_seed.sql
+</code></pre>
+<p>After the SQL load, set a local admin password. Local auth is admin-only and stores its password hash in Redis, so SQL alone cannot create the login password.</p>
+<pre><code class="language-powershell">Set-Location H:\Projects\Pursuite\app\apps\api
+npm.cmd run reset-local-pw -- --email validation.admin@pursuite.local --org manual-validation --password &quot;PursuiteManual!2026&quot;
+</code></pre>
+<p>Login values:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Org slug</td>
+<td><code>manual-validation</code></td>
+</tr>
+<tr>
+<td>Admin email</td>
+<td><code>validation.admin@pursuite.local</code></td>
+</tr>
+<tr>
+<td>Password</td>
+<td><code>PursuiteManual!2026</code> unless you chose a different value</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-smoke-check-expected-results">5. Smoke Check Expected Results</h2>
+<p>Run:</p>
+<pre><code class="language-powershell">psql &quot;$env:DATABASE_URL&quot; -f &quot;test-data/manual-validation/manual_validation_smoke_checks.sql&quot;
+</code></pre>
+<p>Expected highlights:</p>
+<ul>
+<li>Two orgs exist: <code>manual-validation</code> and <code>manual-canary</code>.</li>
+<li>The primary org has five users.</li>
+<li>One primary opportunity exists: <code>DHS ICE Zero Trust Help Desk Modernization</code>.</li>
+<li>One primary proposal exists: <code>ICE Zero Trust Help Desk Proposal</code>.</li>
+<li>Five sections exist.</li>
+<li>Six primary RFP requirements exist.</li>
+<li>Eight primary document chunks exist.</li>
+<li>Four primary approved content library items exist.</li>
+<li>Five compliance matrix items exist.</li>
+<li><code>canary_rows_visible_when_filtered_to_alpha = 0</code>.</li>
+<li><code>canary_rows_in_canary_tenant = 1</code>.</li>
+</ul>
+<p>If the canary check fails, stop testing and investigate tenant scoping before continuing.</p>
+<h2 id="6-core-manual-workflow">6. Core Manual Workflow</h2>
+<h3 id="61-login-and-navigation">6.1 Login And Navigation</h3>
+<ol>
+<li>Open the app URL, usually <code>http://localhost</code>.</li>
+<li>Select local/admin login.</li>
+<li>Use org slug <code>manual-validation</code>.</li>
+<li>Log in as <code>validation.admin@pursuite.local</code>.</li>
+</ol>
+<p>Expected:</p>
+<ul>
+<li>Login succeeds.</li>
+<li>The user is Jordan Lee.</li>
+<li>Admin-level navigation is visible.</li>
+<li>No data from <code>manual-canary</code> appears anywhere.</li>
+</ul>
+<h3 id="62-dashboard">6.2 Dashboard</h3>
+<p>Open Home/Dashboard.</p>
+<p>Expected:</p>
+<ul>
+<li><code>Manual Validation Dashboard</code> is available for the proposal manager/admin.</li>
+<li>Widgets include pipeline funnel, proposal status, and writer workload.</li>
+<li>The proposal status widget references <code>ICE Zero Trust Help Desk Proposal</code>.</li>
+</ul>
+<h3 id="63-crm-accounts-and-contacts">6.3 CRM Accounts And Contacts</h3>
+<p>Open Contacts &gt; Accounts.</p>
+<p>Expected:</p>
+<ul>
+<li>Account <code>DHS ICE OCIO</code> appears.</li>
+<li>Primary contact is Dana Morris.</li>
+<li>Contact Eli Santos appears as Program Manager.</li>
+<li>Recent interactions mention transition risk, automation proof points, and DFARS 252.204-7012.</li>
+<li>Health score is <code>82</code> / <code>A-</code>.</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Account details, contact hierarchy, interaction history, and health score all render without cross-tenant data.</li>
+</ul>
+<h3 id="64-pipeline-opportunity">6.4 Pipeline Opportunity</h3>
+<p>Open Contacts &gt; Pipeline or Opportunities.</p>
+<p>Expected primary opportunity:</p>
+<ul>
+<li>Name: <code>DHS ICE Zero Trust Help Desk Modernization</code></li>
+<li>Agency: <code>DHS ICE</code></li>
+<li>Solicitation: <code>70CTD026R0001</code></li>
+<li>NAICS: <code>541512</code></li>
+<li>Set-aside: <code>sdvosb</code></li>
+<li>Status: <code>active</code></li>
+<li>Due date: July 15, 2026</li>
+<li>Estimated value: <code>$18,500,000</code></li>
+</ul>
+<p>Also expected:</p>
+<ul>
+<li>A second qualifying opportunity exists: <code>GSA Cloud Records Management BPA</code>.</li>
+<li>Bid/no-bid record for the DHS ICE opportunity is approved with weighted total <code>81.95</code>.</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Filtering/search finds the ICE pursuit.</li>
+<li>Opportunity detail shows the correct solicitation and status.</li>
+<li>Bid/no-bid data is present and decision is <code>approve</code>.</li>
+</ul>
+<h3 id="65-proposal-workspace">6.5 Proposal Workspace</h3>
+<p>Open Contacts &gt; Proposals or the proposal workspace for <code>ICE Zero Trust Help Desk Proposal</code>.</p>
+<p>Expected:</p>
+<ul>
+<li>Proposal number: <code>P-VALID-001</code></li>
+<li>Classification: <code>CUI</code></li>
+<li>Page limit: <code>30</code></li>
+<li>RFP confirmed: yes</li>
+<li>Two volumes:
+<ul>
+<li><code>Volume I - Technical</code></li>
+<li><code>Volume II - Price</code></li>
+</ul>
+</li>
+<li>Five sections:
+<ul>
+<li>Executive Summary</li>
+<li>Technical Approach</li>
+<li>Management and Transition Plan</li>
+<li>Past Performance</li>
+<li>Price Narrative</li>
+</ul>
+</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Section list renders in order.</li>
+<li>Technical Approach has a saved version containing <code>DFARS 252.204-7012</code>.</li>
+<li>Past Performance has a saved version containing <code>12,000 users</code>.</li>
+<li>Price Narrative has a saved version containing <code>CLIN 0001AA</code>, <code>$92.50</code>, and <code>$1,250,000</code>.</li>
+<li>A comment exists on Technical Approach asking for explicit 72-hour incident reporting language.</li>
+</ul>
+<h3 id="66-rfp-shredder">6.6 RFP Shredder</h3>
+<p>Open the proposal's RFP/Shredder panel.</p>
+<p>Expected document:</p>
+<ul>
+<li>Latest document: <code>70CTD026R0001_Amendment_0001.txt</code></li>
+<li>Base document: <code>70CTD026R0001_Base_RFP.txt</code></li>
+<li>Status: <code>confirmed</code></li>
+<li>Data classification: <code>CUI</code></li>
+</ul>
+<p>Expected requirements:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Expected evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Page limit</td>
+<td>Technical volume not exceeding <code>30 pages</code></td>
+</tr>
+<tr>
+<td>FAR</td>
+<td><code>FAR 52.219-14</code> limitations on subcontracting</td>
+</tr>
+<tr>
+<td>DFARS</td>
+<td><code>DFARS 252.204-7012</code> cyber incident reporting</td>
+</tr>
+<tr>
+<td>CLIN</td>
+<td><code>CLIN 0001AA</code> total <code>$1,250,000</code></td>
+</tr>
+<tr>
+<td>Past performance</td>
+<td>Zero trust identity modernization for at least <code>10,000 users</code></td>
+</tr>
+<tr>
+<td>Amendment</td>
+<td>Due date changed to <code>July 15, 2026 at 5:00 PM Eastern</code></td>
+</tr>
+</tbody>
+</table>
+<p>Pass criteria:</p>
+<ul>
+<li>Requirements are visible, reviewed, and not blocked by low-confidence review gating.</li>
+<li>Requirement categories render correctly: <code>format</code>, <code>certification</code>, <code>clin</code>, <code>evaluation_factor</code>, <code>deadline</code>.</li>
+<li>Base and amendment lineage is understandable.</li>
+</ul>
+<h3 id="67-compliance-matrix-and-traceability">6.7 Compliance Matrix And Traceability</h3>
+<p>Open Resources &gt; Compliance or the proposal's compliance matrix.</p>
+<p>Expected:</p>
+<ul>
+<li>Five matrix rows.</li>
+<li>Coverage statuses:
+<ul>
+<li><code>addressed</code>: page limit, CLIN, past performance</li>
+<li><code>partial</code>: FAR 52.219-14 and DFARS 252.204-7012</li>
+</ul>
+</li>
+<li>Past performance row has a human override marker.</li>
+</ul>
+<p>Traceability expected:</p>
+<ul>
+<li>Requirement coverage is not 100 percent because only some graph edges were seeded.</li>
+<li>DFARS 252.204-7012 traces to Technical Approach as partial coverage.</li>
+<li>L/M matrix includes <code>L.4.1 -&gt; M.3.1</code>.</li>
+</ul>
+<p>API spot checks:</p>
+<pre><code class="language-powershell">$base = &quot;http://localhost&quot;
+$proposalId = &quot;40000000-0000-4000-8000-000000000001&quot;
+Invoke-RestMethod &quot;$base/api/v1/proposals/$proposalId/compliance-matrix&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/$proposalId/traceability&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/$proposalId/lm-matrix&quot; -Headers $headers
+</code></pre>
+<p>Pass criteria:</p>
+<ul>
+<li>Matrix rows match the seeded requirements.</li>
+<li>Human override is visible.</li>
+<li>Traceability shows covered and orphan counts instead of crashing.</li>
+</ul>
+<h3 id="68-content-library">6.8 Content Library</h3>
+<p>Open Resources &gt; Content Library.</p>
+<p>Expected approved items:</p>
+<ul>
+<li><code>Cloud Help Desk Modernization Capability Statement</code></li>
+<li><code>DFARS 252.204-7012 Cyber Incident Reporting Boilerplate</code></li>
+<li><code>DHS Zero Trust Identity Modernization Past Performance</code></li>
+<li><code>Executive Overview - Apex Mission Solutions</code></li>
+</ul>
+<p>Search checks:</p>
+<table>
+<thead>
+<tr>
+<th>Search</th>
+<th>Expected top material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>zero trust help desk</code></td>
+<td>Cloud Help Desk and DHS Past Performance</td>
+</tr>
+<tr>
+<td><code>DFARS 252.204-7012</code></td>
+<td>DFARS boilerplate</td>
+</tr>
+<tr>
+<td><code>12,000 users</code></td>
+<td>DHS Past Performance</td>
+</tr>
+</tbody>
+</table>
+<p>Pass criteria:</p>
+<ul>
+<li>Only approved primary-tenant content appears.</li>
+<li>No result contains <code>CANARY</code>.</li>
+</ul>
+<h3 id="69-pricing-and-quote">6.9 Pricing And Quote</h3>
+<p>Open Quoting &gt; Catalog and Quoting &gt; Quotes.</p>
+<p>Expected catalog items:</p>
+<ul>
+<li><code>LCAT-HDA-II</code> Help Desk Analyst II</li>
+<li><code>LCAT-AUTO-ENG</code> Automation Engineer</li>
+</ul>
+<p>Expected quote:</p>
+<ul>
+<li><code>ICE Help Desk FFP Quote</code></li>
+<li>Contract type: <code>FFP</code></li>
+<li>Linked to the primary opportunity and proposal</li>
+<li>CLIN <code>0001AA</code>: total <code>$1,250,000</code></li>
+<li>CLIN <code>0002AA</code>: total <code>$1,330,000</code></li>
+</ul>
+<p>Open proposal pricing volume.</p>
+<p>Expected:</p>
+<ul>
+<li><code>ICE Price Volume</code></li>
+<li>Status: <code>in_review</code></li>
+<li>DCAA compliant: true</li>
+<li>Restricted access: true</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Quote totals and CLIN line items render.</li>
+<li>Pricing volume is visible to admin/proposal manager.</li>
+<li>Restricted access behavior is enforced for lower-privilege users if you test with additional accounts/SSO.</li>
+</ul>
+<h3 id="610-pwin-and-capture-intel">6.10 pWin And Capture Intel</h3>
+<p>Open pWin / Capture Intel surfaces.</p>
+<p>Expected pWin:</p>
+<ul>
+<li>Score: <code>72</code></li>
+<li>Confidence: <code>84</code></li>
+<li>Agency intel for <code>DHS ICE</code> / <code>541512</code></li>
+<li>Recommendations mention pricing competitiveness and incumbent strength.</li>
+</ul>
+<p>Expected capture intel:</p>
+<ul>
+<li>Incumbent: <code>Legacy Systems Integrators</code></li>
+<li>Competitor weakness: weak automation proof</li>
+<li>Risk flags mention underpricing transition labor and missing explicit cyber reporting timing.</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>pWin score history shows an earlier <code>68</code> and current <code>72</code>.</li>
+<li>Capture intel is linked to the primary opportunity.</li>
+<li>Agency intel can be searched by <code>DHS ICE</code> or <code>541512</code>.</li>
+</ul>
+<h3 id="611-competitive-intel">6.11 Competitive Intel</h3>
+<p>Open Resources &gt; Intel.</p>
+<p>Expected intel items:</p>
+<ul>
+<li><code>Incumbent help desk award shows weak automation proof</code></li>
+<li><code>DHS ICE buying pattern favors mission fit and transition risk</code></li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Filtering/searching for <code>DHS ICE</code>, <code>transition risk</code>, or <code>automation</code> finds the seeded items.</li>
+<li>No <code>CANARY</code> rows appear.</li>
+</ul>
+<h3 id="612-color-review">6.12 Color Review</h3>
+<p>Open Color Reviews for the proposal.</p>
+<p>Expected:</p>
+<ul>
+<li>Review type: <code>red</code></li>
+<li>Status: <code>in_progress</code></li>
+<li>Overall score: <code>78</code></li>
+<li>One major compliance comment on Technical Approach</li>
+<li>Action item: <code>Add 72-hour cyber incident reporting language</code></li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Participants, section-linked comments, and action items render.</li>
+<li>Comment can be resolved or edited according to role permissions.</li>
+</ul>
+<h3 id="613-autonomous-pipeline">6.13 Autonomous Pipeline</h3>
+<p>Open the proposal's autonomous pipeline/latest run panel.</p>
+<p>Expected:</p>
+<ul>
+<li>Latest run ID: <code>a9000000-0000-4000-8000-000000000001</code></li>
+<li>Status: <code>paused_at_gate</code></li>
+<li>Current step: <code>human_gate</code></li>
+<li>Token budget: <code>150000</code></li>
+<li>Tokens used: <code>38210</code></li>
+<li>Steps:
+<ul>
+<li><code>outline_generation</code>: completed</li>
+<li><code>draft_generation</code>: completed</li>
+<li><code>human_gate</code>: awaiting human</li>
+</ul>
+</li>
+<li>Gate 1: <code>draft_review</code>, pending</li>
+</ul>
+<p>API spot check:</p>
+<pre><code class="language-powershell">$proposalId = &quot;40000000-0000-4000-8000-000000000001&quot;
+Invoke-RestMethod &quot;http://localhost/api/v1/proposals/$proposalId/pipeline-runs/latest&quot; -Headers $headers
+</code></pre>
+<p>Pass criteria:</p>
+<ul>
+<li>Pipeline state displays as paused at a human gate.</li>
+<li>Approve/reject action is available only to authorized roles.</li>
+</ul>
+<h3 id="614-teaming-workspace">6.14 Teaming Workspace</h3>
+<p>Open Teaming Workspace for the ICE opportunity.</p>
+<p>Expected:</p>
+<ul>
+<li>Workspace: <code>ICE Teaming Workspace</code></li>
+<li>Partner: <code>Valor Cyber Partners</code></li>
+<li>Workshare: <code>18%</code></li>
+<li>NDA status: <code>signed</code></li>
+<li>Partner document: <code>Valor_Cyber_Capability_Statement.pdf</code></li>
+<li>Portal invite token exists.</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Partner and document metadata render.</li>
+<li>Invite/portal actions do not leak internal-only documents beyond visibility flags.</li>
+</ul>
+<h3 id="615-templates">6.15 Templates</h3>
+<p>Open Resources &gt; Templates.</p>
+<p>Expected:</p>
+<ul>
+<li>Template: <code>Federal IT Services Proposal Template</code></li>
+<li>Status: <code>published</code></li>
+<li>Two template volumes</li>
+<li>Technical Approach section has content tags <code>help-desk</code> and <code>zero-trust</code></li>
+<li>Price Narrative section exists in Volume II</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Template can be viewed.</li>
+<li>Published status is clear.</li>
+<li>Dynamic fields include <code>agency</code> and <code>solicitation</code>.</li>
+</ul>
+<h3 id="616-workflows">6.16 Workflows</h3>
+<p>Open Settings &gt; Workflows.</p>
+<p>Expected:</p>
+<ul>
+<li>Workflow: <code>Notify PM when compliance scan completes</code></li>
+<li>Trigger type: <code>compliance_scan_complete</code></li>
+<li>Active: true</li>
+<li>One completed run</li>
+</ul>
+<p>Pass criteria:</p>
+<ul>
+<li>Workflow can be viewed and tested.</li>
+<li>Run history shows the seeded completed notification action.</li>
+</ul>
+<h2 id="7-ai-and-rag-validation">7. AI And RAG Validation</h2>
+<p>The strongest RAG checks are listed in <code>manual_validation_cases.json</code>. Use these in the UI chat/Q&amp;A surface or direct API calls.</p>
+<h3 id="71-get-a-token-for-api-checks">7.1 Get A Token For API Checks</h3>
+<pre><code class="language-powershell">$base = &quot;http://localhost&quot;
+$loginBody = @{
+  email = &quot;validation.admin@pursuite.local&quot;
+  password = &quot;PursuiteManual!2026&quot;
+  orgSlug = &quot;manual-validation&quot;
+} | ConvertTo-Json
+
+$login = Invoke-RestMethod -Method Post -Uri &quot;$base/api/v1/auth/local&quot; -ContentType &quot;application/json&quot; -Body $loginBody
+$token = $login.data.accessToken
+$headers = @{ Authorization = &quot;Bearer $token&quot; }
+</code></pre>
+<h3 id="72-provider-check">7.2 Provider Check</h3>
+<pre><code class="language-powershell">Invoke-RestMethod &quot;$base/api/v1/ai/provider&quot; -Headers $headers
+</code></pre>
+<p>Expected:</p>
+<ul>
+<li>If configured: provider name and tool capability.</li>
+<li>If not configured: <code>provider = not_configured</code>. Positive grounded answer checks will return <code>503</code>; abstention can still be checked.</li>
+</ul>
+<h3 id="73-qa-abstention-check">7.3 Q&amp;A Abstention Check</h3>
+<p>This test should pass even without an AI provider because the route hard-abstains before provider selection when sources are absent.</p>
+<pre><code class="language-powershell">$body = @{
+  question = &quot;What is the guaranteed award fee for this RFP?&quot;
+  proposalId = &quot;40000000-0000-4000-8000-000000000001&quot;
+} | ConvertTo-Json
+
+Invoke-RestMethod -Method Post -Uri &quot;$base/api/v1/ai/ask&quot; -Headers $headers -ContentType &quot;application/json&quot; -Body $body
+</code></pre>
+<p>Expected:</p>
+<ul>
+<li><code>abstained = true</code></li>
+<li>Answer says the information was not found in source.</li>
+<li>No citations.</li>
+</ul>
+<h3 id="74-positive-qa-checks">7.4 Positive Q&amp;A Checks</h3>
+<p>Requires an AI provider.</p>
+<p>Ask:</p>
+<ol>
+<li><code>What did Amendment 0001 change about the proposal due date?</code></li>
+<li><code>What is the technical volume page limit and which NAICS code applies?</code></li>
+<li><code>What is the CLIN 0001AA total and Help Desk Analyst rate?</code></li>
+<li><code>Find DHS zero trust identity modernization proof for at least 10,000 users.</code></li>
+<li><code>Summarize the DHS ICE buying pattern and incumbent weakness.</code></li>
+<li><code>Trace DFARS 252.204-7012 to the draft section that covers it.</code></li>
+</ol>
+<p>Expected:</p>
+<ul>
+<li>Answers cite retrieved sources.</li>
+<li>Due date answer includes July 15, 2026 and 5:00 PM Eastern.</li>
+<li>Page limit answer includes 30 pages.</li>
+<li>Pricing answer includes CLIN 0001AA, $1,250,000, and $92.50.</li>
+<li>Past-performance answer includes DHS, zero trust identity modernization, and 12,000 users.</li>
+<li>Competitive-intel answer includes transition risk and weak automation proof.</li>
+<li>No answer contains <code>CANARY</code>, <code>Canary Tenant Systems</code>, or <code>manual-canary</code>.</li>
+</ul>
+<h3 id="75-ai-drafting-check">7.5 AI Drafting Check</h3>
+<p>Requires an AI provider.</p>
+<p>Use the Technical Approach section:</p>
+<pre><code class="language-powershell">$body = @{
+  sectionTitle = &quot;Technical Approach&quot;
+  sectionContext = &quot;Address ITIL service desk operations, zero trust integration, automation, transition risk, and DFARS 252.204-7012.&quot;
+  proposalId = &quot;40000000-0000-4000-8000-000000000001&quot;
+  sectionId = &quot;42000000-0000-4000-8000-000000000002&quot;
+  sectionType = &quot;technical_approach&quot;
+  tone = &quot;technical&quot;
+  wordCount = 250
+} | ConvertTo-Json
+
+Invoke-WebRequest -Method Post -Uri &quot;$base/api/v1/ai/draft-section&quot; -Headers $headers -ContentType &quot;application/json&quot; -Body $body
+</code></pre>
+<p>Expected:</p>
+<ul>
+<li>SSE stream starts.</li>
+<li>A grounding event is emitted.</li>
+<li>Draft references seeded context such as ITIL, zero trust, transition risk, and DFARS 252.204-7012.</li>
+<li>Faithfulness event appears near the end.</li>
+<li>Unsupported identifiers are flagged if the provider fabricates identifiers not present in sources.</li>
+</ul>
+<h2 id="8-tenant-isolation-canary-test">8. Tenant Isolation Canary Test</h2>
+<p>The seed creates another org, <code>manual-canary</code>, with a perfect-match content item and RFP chunk containing:</p>
+<p><code>CANARY TENANT ONLY. Perfect match for CLIN 0001AA, FAR 52.219-14, DFARS 252.204-7012, DHS ICE zero trust help desk pricing.</code></p>
+<p>While logged into <code>manual-validation</code>, search and ask about:</p>
+<ul>
+<li><code>CANARY</code></li>
+<li><code>CLIN 0001AA FAR 52.219-14 DFARS 252.204-7012 DHS ICE zero trust help desk pricing</code></li>
+</ul>
+<p>Expected:</p>
+<ul>
+<li>No primary-tenant UI/API result contains <code>CANARY</code>.</li>
+<li>If the canary appears, treat it as a high-severity tenant isolation failure.</li>
+</ul>
+<h2 id="9-direct-api-spot-checks">9. Direct API Spot Checks</h2>
+<p>After login, these calls should return seeded data.</p>
+<pre><code class="language-powershell">Invoke-RestMethod &quot;$base/api/v1/opportunities?search=Zero%20Trust&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/40000000-0000-4000-8000-000000000001&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/rfp-documents/50000000-0000-4000-8000-000000000002&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/40000000-0000-4000-8000-000000000001/compliance-matrix&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/40000000-0000-4000-8000-000000000001/traceability&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/cpq/quotes/81000000-0000-4000-8000-000000000001&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/pwin/scores/30000000-0000-4000-8000-000000000001&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/intel?query=DHS%20ICE&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/proposals/40000000-0000-4000-8000-000000000001/pipeline-runs/latest&quot; -Headers $headers
+Invoke-RestMethod &quot;$base/api/v1/teaming-workspaces/30000000-0000-4000-8000-000000000001&quot; -Headers $headers
+</code></pre>
+<p>If an endpoint path has changed in the UI since this guide was generated, prefer the UI network request path as the current source of truth and keep the expected seeded records/facts unchanged.</p>
+<h2 id="10-passfail-summary-checklist">10. Pass/Fail Summary Checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Pass criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td>Admin local login works for <code>manual-validation</code>.</td>
+</tr>
+<tr>
+<td>Tenant isolation</td>
+<td>No <code>CANARY</code> data appears for primary tenant.</td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td>Manual dashboard widgets render.</td>
+</tr>
+<tr>
+<td>CRM</td>
+<td>DHS ICE account, contacts, interactions, and health score render.</td>
+</tr>
+<tr>
+<td>Pipeline</td>
+<td>ICE opportunity shows correct agency, NAICS, due date, status, and bid decision.</td>
+</tr>
+<tr>
+<td>Proposal workspace</td>
+<td>Volumes, sections, versions, comments, and win themes render.</td>
+</tr>
+<tr>
+<td>RFP Shredder</td>
+<td>Confirmed base/amendment documents and six requirements render.</td>
+</tr>
+<tr>
+<td>Compliance matrix</td>
+<td>Five matrix rows with expected coverage statuses render.</td>
+</tr>
+<tr>
+<td>Traceability</td>
+<td>Graph-backed coverage/orphan report works.</td>
+</tr>
+<tr>
+<td>Content Library</td>
+<td>Approved content is searchable and tenant-scoped.</td>
+</tr>
+<tr>
+<td>Pricing</td>
+<td>Catalog, quote, CLIN totals, and restricted price volume render.</td>
+</tr>
+<tr>
+<td>pWin</td>
+<td>Score, history, agency intel, and recommendations render.</td>
+</tr>
+<tr>
+<td>Intel</td>
+<td>Agency/incumbent intel renders and is searchable.</td>
+</tr>
+<tr>
+<td>Color review</td>
+<td>Red review, comments, participants, and action item render.</td>
+</tr>
+<tr>
+<td>Pipeline automation</td>
+<td>Latest pipeline run is paused at draft-review human gate.</td>
+</tr>
+<tr>
+<td>Teaming</td>
+<td>Valor Cyber partner, NDA, workshare, and document metadata render.</td>
+</tr>
+<tr>
+<td>Templates</td>
+<td>Published federal IT services template renders with dynamic fields.</td>
+</tr>
+<tr>
+<td>Workflows</td>
+<td>Compliance-scan workflow and completed run render.</td>
+</tr>
+<tr>
+<td>RAG abstention</td>
+<td>Unsupported fact question abstains.</td>
+</tr>
+<tr>
+<td>Positive RAG</td>
+<td>With provider configured, seeded facts are answered with citations.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-reset">11. Reset</h2>
+<p>To reset:</p>
+<pre><code class="language-powershell">psql &quot;$env:DATABASE_URL&quot; -f &quot;test-data/manual-validation/manual_validation_cleanup.sql&quot;
+</code></pre>
+<p>Then rerun the seed and smoke checks.</p>
+<h2 id="12-notes-and-known-boundaries">12. Notes And Known Boundaries</h2>
+<ul>
+<li>This seed does not create real files in storage. It inserts file metadata and source text fixtures. Upload/download tests should still be performed with real uploads.</li>
+<li>The SQL does not populate vector embeddings. Sparse and exact-match retrieval paths are intentionally covered by the text and identifier data. To test dense vector recall, configure embeddings and run the app's reindex/embedding flows after seeding.</li>
+<li>Positive AI answer/drafting checks require a configured AI provider. Without one, use the UI/data checks and abstention test.</li>
+<li>Local auth is admin-only. Non-admin seeded users are present for role and workspace data, but they cannot use <code>/auth/local</code> unless SSO or another login path is configured.</li>
+<li>The canary tenant is intentionally similar to the primary tenant. It exists to catch tenant leakage.</li>
+</ul>
+
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <p>Generated from Pursuite_Manual_Product_Validation_Guide.md. Review all Information Not Yet Available items before publication.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocGuard AI Quick Start</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1>DocGuard AI Quick Start</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Status: Production release approved</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Install" id="install"><h2>Install</h2>
+<p>Use the approved installer:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<p>The installer supports non-admin installation and installs DocGuard AI for the current user when elevation is not available.</p>
+<p>For portable validation, launch:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe
+</code></pre>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Recommended Desktop Workflow" id="recommended-desktop-workflow"><h2>Recommended Desktop Workflow</h2>
+<p>1. Open DocGuard AI.</p>
+<p>2. Select a source file or folder.</p>
+<p>3. Choose a profile: <code>Standard</code>, <code>Aggressive</code>, or <code>Paranoid</code>.</p>
+<p>4. Keep <code>Backup</code> enabled for normal work.</p>
+<p>5. Use <code>Dry Run</code> for previews.</p>
+<p>6. Click <code>Scan</code>.</p>
+<p>7. Review Dashboard, File Review, Findings, and Risk Map.</p>
+<p>8. Click <code>Run Cleanroom</code> when ready to clean, verify, report, and record activity.</p>
+<p>9. Review Reports and Activity before sharing cleaned output.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="Dashboard Drill-Downs" id="dashboard-drill-downs"><h2>Dashboard Drill-Downs</h2>
+<p>Dashboard cards open the matching detail page:</p>
+<p>| Card | Opens |</p>
+<p>|---|---|</p>
+<p>| Files Scanned | File Review |</p>
+<p>| Open Findings | Findings |</p>
+<p>| Highest Risk | Risk Map |</p>
+<p>| Cleaned Files | Reports |</p>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="CLI Quick Commands" id="cli-quick-commands"><h2>CLI Quick Commands</h2>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+sanitize scan "C:\Path\To\Source" --profile aggressive --summary
+sanitize run "C:\Path\To\Source" --profile aggressive --html-report auto
+sanitize history --last 10
+</code></pre>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Writing Assistant" id="writing-assistant"><h2>Writing Assistant</h2>
+<p>Writing Assistant is included in the Core package.</p>
+<pre><code>
+sanitize analyze-text --text "Paste text here." --heatmap
+sanitize rewrite --text "Paste text here." --style executive
+</code></pre>
+</section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

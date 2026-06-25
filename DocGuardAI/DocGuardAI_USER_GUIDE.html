@@ -1,0 +1,402 @@
+﻿<!doctype html><html><head><meta charset="utf-8"><title>USER_GUIDE</title><style>body{font-family:Segoe UI,Arial,sans-serif;line-height:1.55;margin:32px;max-width:1060px;color:#0b2136}h1,h2,h3{color:#0b2136}code,pre{background:#f3f6f9;border:1px solid #d8dee6;border-radius:6px}code{padding:1px 4px}pre{padding:12px;overflow:auto}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #d8dee6;padding:8px;text-align:left}th{background:#f3f6f9}blockquote{border-left:4px solid #008c7f;padding-left:12px;color:#526579}</style></head><body>
+<h1>DocGuard AI User Guide</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Audience: end users, reviewers, analysts, records teams, and document owners  </p>
+<p>Purpose: step-by-step guidance for scanning, cleaning, verifying, reporting, and using the Writing Assistant</p>
+<h2>Current Release Update</h2>
+<p>DocGuard AI RC1 U6.1 is production-release approved. The current desktop experience uses the approved workflow navigation:</p>
+<p>1. Dashboard</p>
+<p>2. File Review</p>
+<p>3. Findings</p>
+<p>4. Writing Assistant</p>
+<p>5. Risk Map</p>
+<p>6. Cleanroom</p>
+<p>7. Reports</p>
+<p>8. Activity</p>
+<p>9. Extensions</p>
+<p>10. Settings</p>
+<p>The latest UI fixes include:</p>
+<ul>
+<li>Dashboard card drill-downs now open populated detail pages.</li>
+<li>The risk distribution bar has improved spacing for low-count severity segments.</li>
+<li>Selected findings remain readable while highlighted.</li>
+<li>Corrupted display characters were removed from the dashboard and navigation surfaces.</li>
+<li>Writing Assistant is included in Core and is not a separately licensed Professional feature.</li>
+</ul>
+<p>Use <code>Run Cleanroom</code> for the end-to-end workflow that generates Reports and Activity.</p>
+<h2>1. What DocGuard AI Does</h2>
+<p>DocGuard AI helps you inspect and clean documents before sharing, filing, publishing, or releasing them. It runs locally on your workstation and helps identify metadata, comments, image data, document structure issues, PDF artifacts, and other findings that may need review.</p>
+<p>DocGuard AI also includes a core Writing Assistant for heuristic writing analysis, sentence heatmaps, and rewrite assistance.</p>
+<h2>2. Before You Start</h2>
+<p>Before running a cleanup workflow:</p>
+<p>1. Confirm you are working on the correct file or folder.</p>
+<p>2. Confirm you have permission to inspect and clean the content.</p>
+<p>3. Make a copy of important files if your team requires a separate working copy.</p>
+<p>4. Keep <code>Backup</code> enabled unless your administrator tells you otherwise.</p>
+<p>5. Use <code>Dry Run</code> first when working with critical or unfamiliar files.</p>
+<p>6. Plan to review the verification result before sharing cleaned output.</p>
+<h2>3. Launch DocGuard AI</h2>
+<p>1. Open the Start menu, desktop shortcut, or portable folder.</p>
+<p>2. Launch <code>DocGuardAI.exe</code>.</p>
+<p>3. Confirm the window title shows <code>DocGuard AI v1.2.0 RC1 U6.1</code>.</p>
+<p>4. Confirm the left sidebar is visible.</p>
+<p>The main workflow across the top is:</p>
+<p>1. Source</p>
+<p>2. Scan</p>
+<p>3. Review</p>
+<p>4. Clean</p>
+<p>5. Verify</p>
+<p>6. Report</p>
+<p>Work through the sidebar in this order for the clearest experience:</p>
+<p>1. Dashboard</p>
+<p>2. File Review</p>
+<p>3. Findings</p>
+<p>4. Writing Assistant, if needed</p>
+<p>5. Risk Map</p>
+<p>6. Cleanroom</p>
+<p>7. Reports</p>
+<p>8. Activity</p>
+<p>9. Extensions</p>
+<p>10. Settings</p>
+<h2>4. Choose A Source</h2>
+<p>1. Click <code>Browse</code>.</p>
+<p>2. Select a folder or file.</p>
+<p>3. Confirm the selected path appears in the Source field.</p>
+<p>4. Leave <code>Recursive</code> enabled if you want subfolders included.</p>
+<p>5. Clear <code>Recursive</code> if you only want the selected folder level.</p>
+<p>Choose a single file when you need to inspect one document. Choose a folder when preparing a group of files for delivery or review.</p>
+<h2>5. Understand Supported Files</h2>
+<p>Core supported file families include:</p>
+<ul>
+<li>TXT</li>
+<li>Markdown</li>
+<li>HTML</li>
+<li>DOCX</li>
+<li>PDF</li>
+<li>PPTX</li>
+<li>XLSX and XLSM</li>
+<li>JPEG</li>
+<li>PNG</li>
+<li>TIFF</li>
+<li>WEBP</li>
+</ul>
+<p>Enabled module packs add inspection support for email, CAD, and media formats. Some of those formats are inspection-first and may provide remediation guidance rather than direct cleaning.</p>
+<h2>6. Select A Profile</h2>
+<p>Use the Profile selector before scanning or cleaning.</p>
+<p>| Profile | Use This When |</p>
+<p>|---|---|</p>
+<p>| <code>standard</code> | You want conservative cleanup for routine metadata reduction. |</p>
+<p>| <code>aggressive</code> | You are preparing files for normal release or external sharing. |</p>
+<p>| <code>paranoid</code> | You need the strongest cleanup and have time to verify output carefully. |</p>
+<p>Recommended first choice: <code>aggressive</code>.</p>
+<p>Use <code>paranoid</code> carefully. It can apply stronger document handling where supported, so review output before sending or filing cleaned documents.</p>
+<h2>7. Set Safety Controls</h2>
+<p>Review the safety controls before running a workflow.</p>
+<p>| Control | Recommended Setting | Meaning |</p>
+<p>|---|---|---|</p>
+<p>| <code>Backup</code> | On | Creates backups before supported file changes. |</p>
+<p>| <code>Recursive</code> | On for folders | Includes subfolders. |</p>
+<p>| <code>Dry Run</code> | On for preview, off for actual cleaning | Shows what would happen without modifying files. |</p>
+<p>| <code>Typography</code> | Optional | Normalizes selected typography markers where supported. |</p>
+<p>| <code>Remove EXIF</code> | On | Removes image EXIF metadata where supported. |</p>
+<p>Recommended first pass:</p>
+<p>1. Turn <code>Backup</code> on.</p>
+<p>2. Turn <code>Recursive</code> on if scanning a folder.</p>
+<p>3. Turn <code>Dry Run</code> on for the first review.</p>
+<p>4. Select <code>aggressive</code>.</p>
+<p>5. Click <code>Scan</code>.</p>
+<h2>8. Run A Scan</h2>
+<p>Use Scan when you want to inspect before changing anything.</p>
+<p>1. Select a source.</p>
+<p>2. Select a profile.</p>
+<p>3. Set safety controls.</p>
+<p>4. Click <code>Scan</code>.</p>
+<p>5. Wait for progress to complete.</p>
+<p>6. Review the Dashboard metrics.</p>
+<p>7. Open File Review and Findings for details.</p>
+<p>After scanning, DocGuard AI populates:</p>
+<ul>
+<li>Dashboard cards</li>
+<li>Risk distribution</li>
+<li>Top risk files</li>
+<li>File Review tree</li>
+<li>Findings table</li>
+<li>Risk Map</li>
+<li>Recent activity</li>
+</ul>
+<h2>9. Review The Dashboard</h2>
+<p>The Dashboard page summarizes the current source and latest run.</p>
+<p>Review:</p>
+<ul>
+<li>Files scanned</li>
+<li>Files cleaned</li>
+<li>Total findings</li>
+<li>Findings removed</li>
+<li>Highest risk</li>
+<li>Verification failures</li>
+<li>Risk distribution</li>
+<li>Top risk files</li>
+<li>Pipeline verification</li>
+<li>Recent activity</li>
+</ul>
+<p>If <code>Verification Failures</code> is greater than zero after a full pipeline, review Reports and File Review before using the output.</p>
+<h2>10. Review Details In File Review</h2>
+<p>1. Open <code>File Review</code>.</p>
+<p>2. Expand the file tree.</p>
+<p>3. Select a file to view file-level details.</p>
+<p>4. Select a category to view category details.</p>
+<p>5. Select an individual finding to view the finding detail and remediation guidance.</p>
+<p>Use File Review when you need to answer:</p>
+<ul>
+<li>Which file caused the risk?</li>
+<li>Which category was detected?</li>
+<li>What does the finding mean?</li>
+<li>What remediation is recommended?</li>
+<li>Is the file clean or does it have residual findings?</li>
+</ul>
+<h2>11. Review Findings</h2>
+<p>1. Open <code>Findings</code>.</p>
+<p>2. Review high-risk rows first.</p>
+<p>3. Check file path, category, severity, score, finding name, and remediation.</p>
+<p>4. Decide whether to clean, document residual risk, or remove the file from the release set.</p>
+<p>Findings can include:</p>
+<ul>
+<li>metadata</li>
+<li>comments</li>
+<li>EXIF</li>
+<li>document structure</li>
+<li>PDF metadata</li>
+<li>PDF structure</li>
+<li>image metadata</li>
+<li>image structure</li>
+<li>errors</li>
+</ul>
+<h2>12. Use The Risk Map</h2>
+<p>1. Open <code>Risk Map</code>.</p>
+<p>2. Review files by risk band.</p>
+<p>3. Prioritize high-risk files.</p>
+<p>4. Return to File Review or Findings for detail.</p>
+<p>The heatmap is useful when scanning a large folder and deciding where to spend review time.</p>
+<h2>13. Clean Files</h2>
+<p>Use Clean when you are ready to modify supported files.</p>
+<p>1. Confirm the source path is correct.</p>
+<p>2. Confirm <code>Backup</code> is on.</p>
+<p>3. Turn off <code>Dry Run</code> if you want actual changes.</p>
+<p>4. Select the profile.</p>
+<p>5. Click <code>Clean</code>.</p>
+<p>6. Wait for completion.</p>
+<p>7. Review the Dashboard, Reports, and Activity.</p>
+<p>If <code>Dry Run</code> is on, DocGuard AI previews the operation without changing files.</p>
+<h2>14. Run Cleanroom</h2>
+<p>Use <code>Run Cleanroom</code> for the recommended end-to-end workflow.</p>
+<p>1. Select a source.</p>
+<p>2. Select a profile.</p>
+<p>3. Confirm safety controls.</p>
+<p>4. Click <code>Run Cleanroom</code>.</p>
+<p>5. Wait for the run to complete.</p>
+<p>6. Review <code>Pipeline Verification</code>.</p>
+<p>7. Open Reports.</p>
+<p>8. Review Activity.</p>
+<p>The full pipeline performs:</p>
+<pre><code>
+scan -&gt; clean -&gt; post-clean scan -&gt; verify -&gt; report -&gt; Activity
+</code></pre>
+<p>Use this workflow when preparing a final release package or controlled document set.</p>
+<h2>15. Understand Verification</h2>
+<p>Verification compares findings before and after cleaning.</p>
+<p>If verification passes:</p>
+<ul>
+<li>cleaned files have no score-bearing residual findings in the verification result</li>
+<li>reports and Activity are updated</li>
+<li>the workflow can move to final review</li>
+</ul>
+<p>If verification fails:</p>
+<p>1. Open File Review.</p>
+<p>2. Review the file with residual findings.</p>
+<p>3. Open Reports.</p>
+<p>4. Review the post-clean scan report.</p>
+<p>5. Decide whether to retry with a stronger profile, perform manual remediation, or document residual risk.</p>
+<p>Do not distribute files until verification failures are understood.</p>
+<h2>16. Open Reports</h2>
+<p>1. Open <code>Reports</code>.</p>
+<p>2. Click <code>Refresh Reports</code> if needed.</p>
+<p>3. Select a report.</p>
+<p>4. Review the report in the viewer.</p>
+<p>Full pipeline runs can generate:</p>
+<ul>
+<li>pre-clean scan report</li>
+<li>clean report</li>
+<li>post-clean scan report</li>
+</ul>
+<p>Reports are local files. Treat them as sensitive if they contain paths or finding details.</p>
+<h2>17. Review Activity</h2>
+<p>1. Open <code>Activity</code>.</p>
+<p>2. Click <code>Refresh Activity</code>.</p>
+<p>3. Review timestamp, mode, profile, scanned files, cleaned files, findings, removed findings, and highest risk.</p>
+<p>Use Activity to confirm that a workflow completed and to review prior runs.</p>
+<h2>18. Use Cleanroom</h2>
+<p>The Cleanroom page provides a simple way to run the selected source through the pipeline.</p>
+<p>1. Select a source.</p>
+<p>2. Open <code>Cleanroom</code>.</p>
+<p>3. Click <code>Run Current Source</code>.</p>
+<p>4. Wait for completion.</p>
+<p>5. Review Reports and Activity.</p>
+<p>Cleanroom uses the same general order as the full pipeline and is useful when processing known source folders.</p>
+<h2>19. Use The Writing Assistant</h2>
+<p>The Writing Assistant is part of the core DocGuard AI package.</p>
+<p>To analyze text:</p>
+<p>1. Open <code>Writing Assistant</code>.</p>
+<p>2. Paste text into the editor.</p>
+<p>3. Review the live analysis.</p>
+<p>4. Review Findings and Statistics tabs.</p>
+<p>5. Review sentence heatmap output.</p>
+<p>To rewrite text:</p>
+<p>1. Paste text into the editor.</p>
+<p>2. Select a style.</p>
+<p>3. Click <code>Rewrite</code>.</p>
+<p>4. Review the suggested rewrite.</p>
+<p>5. Review changed words and applied changes.</p>
+<p>6. Use <code>Replace Original</code> only after reviewing the rewritten text.</p>
+<p>7. Use <code>Copy</code> to copy the rewrite.</p>
+<p>Available styles:</p>
+<ul>
+<li><code>natural</code></li>
+<li><code>humanize</code></li>
+<li><code>executive</code></li>
+<li><code>technical</code></li>
+<li><code>academic</code></li>
+<li><code>government</code></li>
+</ul>
+<p>Important: Writing Assistant output is heuristic and rule-based. It does not prove authorship, guarantee compliance, or replace human review.</p>
+<h2>20. Use Extensions</h2>
+<p>Open <code>Extensions</code> to view enabled Extensions.</p>
+<p>Core Extensions include:</p>
+<ul>
+<li>Document Sanitizer</li>
+<li>Office Sanitizer</li>
+<li>PDF Sanitizer</li>
+<li>Image Sanitizer</li>
+<li>Writing Assistant</li>
+</ul>
+<p>Additional entries can include:</p>
+<ul>
+<li>Word Add-in</li>
+<li>Outlook Add-in</li>
+<li>Browser Extension</li>
+<li>CAD Pack</li>
+<li>Email Pack</li>
+<li>Media Pack</li>
+</ul>
+<p>Some Extensions are inspection-first. If a report says manual remediation is required, follow your team process.</p>
+<h2>21. Use Settings And License Status</h2>
+<p>Open <code>Settings</code> to view product and license details.</p>
+<p>Use the menu:</p>
+<pre><code>
+Tools -&gt; License Status
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>your administrator asks for license status</li>
+<li>activation state looks unexpected</li>
+<li>you need to confirm whether DocGuard AI is in trial or activated mode</li>
+</ul>
+<p>Do not send full product keys in screenshots or support requests.</p>
+<h2>22. Use Activity And Reports</h2>
+<p>Open <code>Activity</code> when you need a run-by-run summary. Open <code>Reports</code> when you need detailed evidence for review, audit, or release decisions.</p>
+<p>Activity and Reports can help answer:</p>
+<ul>
+<li>Did the run start?</li>
+<li>Which stage is running?</li>
+<li>Were reports generated?</li>
+<li>Did verification pass or fail?</li>
+<li>Was a file skipped or unsupported?</li>
+</ul>
+<p>If you contact support, include the relevant Activity row, report path, or a screenshot of the issue.</p>
+<h2>23. Command Line Basics</h2>
+<p>Administrators may ask you to run command-line checks.</p>
+<p>Scan:</p>
+<pre><code>
+sanitize scan &quot;C:\Path\To\FileOrFolder&quot; --profile aggressive --summary
+</code></pre>
+<p>Clean:</p>
+<pre><code>
+sanitize clean &quot;C:\Path\To\FileOrFolder&quot; --profile aggressive --html-report auto
+</code></pre>
+<p>Run Cleanroom:</p>
+<pre><code>
+sanitize run &quot;C:\Path\To\FileOrFolder&quot; --profile aggressive
+</code></pre>
+<p>View Activity:</p>
+<pre><code>
+sanitize history --last 20
+</code></pre>
+<p>List Extensions:</p>
+<pre><code>
+sanitize plugins
+</code></pre>
+<p>Writing Assistant:</p>
+<pre><code>
+sanitize analyze-text --text &quot;Paste text here&quot; --heatmap
+sanitize rewrite --text &quot;Paste text here&quot; --style executive
+</code></pre>
+<h2>24. Recommended End-To-End Workflow</h2>
+<p>For a document release set:</p>
+<p>1. Create or identify the working copy of the files.</p>
+<p>2. Launch DocGuard AI.</p>
+<p>3. Click <code>Browse</code>.</p>
+<p>4. Select the source folder.</p>
+<p>5. Select <code>aggressive</code>.</p>
+<p>6. Enable <code>Backup</code>.</p>
+<p>7. Enable <code>Recursive</code> if needed.</p>
+<p>8. Enable <code>Dry Run</code>.</p>
+<p>9. Click <code>Scan</code>.</p>
+<p>10. Review Dashboard.</p>
+<p>11. Review File Review and Findings.</p>
+<p>12. If results are expected, turn off <code>Dry Run</code>.</p>
+<p>13. Click <code>Run Cleanroom</code>.</p>
+<p>14. Review Pipeline Verification.</p>
+<p>15. Open Reports.</p>
+<p>16. Review the post-clean scan report.</p>
+<p>17. Open Activity and confirm the run is recorded.</p>
+<p>18. Retain reports according to your team policy.</p>
+<p>19. Use the cleaned files only after verification has been reviewed.</p>
+<h2>25. Best Practices</h2>
+<ul>
+<li>Use a working copy for important documents.</li>
+<li>Keep backups enabled.</li>
+<li>Start with Scan before Clean.</li>
+<li>Use Dry Run on unfamiliar file sets.</li>
+<li>Review high-risk findings first.</li>
+<li>Do not ignore verification failures.</li>
+<li>Keep reports with the related case or release record.</li>
+<li>Treat reports as sensitive.</li>
+<li>Ask an administrator before using <code>paranoid</code> on important documents.</li>
+<li>Review Writing Assistant output before using it.</li>
+</ul>
+<h2>26. Troubleshooting</h2>
+<p>| Issue | What To Do |</p>
+<p>|---|---|</p>
+<p>| No source selected | Click <code>Browse</code> and choose a file or folder. |</p>
+<p>| Scan finds nothing | Confirm file type is supported and <code>Recursive</code> is set correctly. |</p>
+<p>| Reports page is empty | Run <code>Run Cleanroom</code> or <code>Cleanroom</code> first. |</p>
+<p>| Activity is empty | Run a scan, clean, or full pipeline first. |</p>
+<p>| Clean did not change files | Check <code>Dry Run</code>, file type support, and whether findings are informational. |</p>
+<p>| Verification failed | Review File Review and post-clean report before distributing files. |</p>
+<p>| Writing Assistant is missing | Ask your administrator to confirm you are using the latest DocGuard AI package. |</p>
+<p>| License looks wrong | Use <code>Tools -&gt; License Status</code> and contact your administrator. |</p>
+<p>| App does not launch | Reopen from the extracted portable folder or contact support. |</p>
+<h2>27. What To Send Support</h2>
+<p>When asking for help, include:</p>
+<ul>
+<li>DocGuard AI version</li>
+<li>Windows version</li>
+<li>Whether you used GUI or CLI</li>
+<li>Source file type, not sensitive content</li>
+<li>Profile used</li>
+<li>Safety settings used</li>
+<li>Screenshot of the error, relevant Activity row, or report excerpt</li>
+<li>Report path, if available</li>
+<li>Whether the issue happens on a copied sample</li>
+</ul>
+<p>Do not include confidential document content or full product keys unless your administrator explicitly approves that handling path.</p>
+</body></html>

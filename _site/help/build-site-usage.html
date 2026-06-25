@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Readme</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+    <h1>Readme</h1>
+    <p><strong>Purpose:</strong> rebuild the local multi-file static documentation site in <code>G:\Docs\_site</code>.</p>
+
+    <h2>Quick Start</h2>
+    <ol>
+      <li>Place source documents under <code>G:\Docs\TTIS</code>, <code>G:\Docs\TSG</code>, <code>G:\Docs\Pursuite</code>, or <code>G:\Docs\DocGuardAI</code>.</li>
+      <li>Open PowerShell in <code>G:\Docs</code>.</li>
+      <li>Run the build script.</li>
+    </ol>
+    <pre><code>cd G:\Docs
+&amp; "C:\Users\echar\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" build_site.py</code></pre>
+
+    <h2>What It Builds</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Output</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>_site\index.html</code></td>
+          <td>The tabbed shell with TTIS, TSG, Pursuite, and DocGuardAI navigation.</td>
+        </tr>
+        <tr>
+          <td><code>_site\&lt;tab&gt;\*.html</code></td>
+          <td>One generated page for every source <code>.md</code> or <code>.html</code> document.</td>
+        </tr>
+        <tr>
+          <td><code>_site\assets\css\styles.css</code></td>
+          <td>Shared site styles plus embedded Pygments syntax highlighting CSS.</td>
+        </tr>
+        <tr>
+          <td><code>_site\assets\js\app.js</code></td>
+          <td>Hash routing and tab/sub-nav behavior.</td>
+        </tr>
+        <tr>
+          <td><code>_site\build-report.md</code></td>
+          <td>Source counts, conversion status, Unsorted warnings, and skipped files.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Rules</h2>
+    <ul>
+      <li>Tab assignment is based only on the top-level folder under <code>G:\Docs</code>.</li>
+      <li><code>.md</code> files are converted to HTML at build time with tables, fenced code, footnotes, table of contents, attributes, and code highlighting enabled.</li>
+      <li>Existing <code>.html</code> files are ingested by extracting body content and stripping page-level scripts/styles.</li>
+      <li>The script rewrites internal links between generated documents and copies referenced local images into <code>_site\assets\img</code>.</li>
+      <li>The script deletes and recreates <code>_site</code> on each run, so re-running is clean and idempotent.</li>
+      <li>Files already inside <code>_site</code> are never re-ingested.</li>
+    </ul>
+
+    <h2>Admin &amp; Ops Living Source</h2>
+    <ol>
+      <li>Edit the Markdown source named <code>TTIS_ADMIN_OPERATIONS_GUIDE.md</code>.</li>
+      <li>Place it in <code>G:\Docs\TTIS</code>.</li>
+      <li>Run <code>build_site.py</code>.</li>
+      <li>The build pins the Admin &amp; Ops tab to the Markdown-derived page, refreshes <code>G:\Docs\TTIS\TTIS_ADMIN_OPERATIONS_GUIDE.html</code>, then moves the Markdown source to <code>G:\Docs\_source_originals\TTIS\TTIS_ADMIN_OPERATIONS_GUIDE.md.orig</code>.</li>
+      <li>For the next edit, place a fresh updated <code>.md</code> copy back into <code>G:\Docs\TTIS</code> and rebuild.</li>
+    </ol>
+
+    <h2>After Running</h2>
+    <ul>
+      <li>Open <code>G:\Docs\_site\index.html</code> by double-clicking it.</li>
+      <li>Review <code>G:\Docs\_site\build-report.md</code> after every build.</li>
+      <li>If the report lists Unsorted files, move them into one of the four project folders and run the script again.</li>
+    </ul>
+  </main>
+</body>
+</html>

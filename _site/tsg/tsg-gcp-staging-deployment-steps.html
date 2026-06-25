@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TSG License Manager GCP Staging Deployment Steps</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1>TSG License Manager GCP Staging Deployment Steps</h1>
+<p>This runbook deploys TSG License Manager to GCP staging using Cloud Run, Cloud SQL for PostgreSQL, Secret Manager, and Artifact Registry.</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Staging values" id="staging-values"><h2>Staging values</h2>
+<pre>GCP_PROJECT_ID=ttis-ai
+GCP_REGION=us-central1
+ARTIFACT_REPOSITORY=tsg-platform
+ARTIFACT_IMAGE=tsg-license-manager
+CLOUD_RUN_SERVICE=tsg-license-manager-staging
+CLOUD_SQL_INSTANCE=tsg-license-manager-staging
+CLOUD_SQL_DATABASE=tsg_license_manager
+CLOUD_SQL_USER=tsg_app
+STAGING_BASE_URL=https://license-staging.tti-solutions.com</pre>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="1. Authenticate GCP tools" id="1-authenticate-gcp-tools"><h2>1. Authenticate GCP tools</h2>
+<pre>gcloud auth login
+gcloud config set project ttis-ai
+gcloud auth configure-docker us-central1-docker.pkg.dev</pre>
+<pre>gcloud config get-value project
+gcloud auth list</pre>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="2. Enable required GCP APIs" id="2-enable-required-gcp-apis"><h2>2. Enable required GCP APIs</h2>
+<pre>gcloud services enable `
+  run.googleapis.com `
+  sqladmin.googleapis.com `
+  secretmanager.googleapis.com `
+  artifactregistry.googleapis.com `
+  cloudbuild.googleapis.com</pre>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="3. Create Artifact Registry repository" id="3-create-artifact-registry-repository"><h2>3. Create Artifact Registry repository</h2>
+<pre>gcloud artifacts repositories create tsg-platform `
+  --repository-format=docker `
+  --location=us-central1 `
+  --description="TSG License Manager container images"</pre>
+<p>If the repository already exists, record that and continue.</p>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="4. Build and push the container image" id="4-build-and-push-the-container-image"><h2>4. Build and push the container image</h2>
+<pre>cd G:\Tools\tsg-platform-v0.2.0-dev-sprint-n
+
+docker build --tag tsg-platform:0.2.0-rc.1 .
+
+docker tag tsg-platform:0.2.0-rc.1 `
+  us-central1-docker.pkg.dev/ttis-ai/tsg-platform/tsg-license-manager:0.2.0-rc.1
+
+docker push us-central1-docker.pkg.dev/ttis-ai/tsg-platform/tsg-license-manager:0.2.0-rc.1</pre>
+<p>Record the pushed image digest in the release evidence.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="5. Create Cloud SQL PostgreSQL" id="5-create-cloud-sql-postgresql"><h2>5. Create Cloud SQL PostgreSQL</h2>
+<pre>gcloud sql instances create tsg-license-manager-staging `
+  --database-version=POSTGRES_17 `
+  --tier=db-f1-micro `
+  --region=us-central1 `
+  --storage-type=SSD `
+  --storage-size=10GB `
+  --availability-type=zonal</pre>
+<pre>gcloud sql databases create tsg_license_manager `
+  --instance=tsg-license-manager-staging</pre>
+<pre>gcloud sql users create tsg_app `
+  --instance=tsg-license-manager-staging `
+  --password="REPLACE_WITH_STRONG_PASSWORD"</pre>
+<p class="note">Use a strong generated password. Do not commit it.</p>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="6. Create Secret Manager secrets" id="6-create-secret-manager-secrets"><h2>6. Create Secret Manager secrets</h2>
+<p>Required secrets:</p>
+<pre>DATABASE_URL
+TSG_AUTH_SECRET
+TSG_LICENSE_SIGNING_SECRET
+TSG_CLIENT_API_SECRET
+STRIPE_WEBHOOK_SECRET
+SMTP_PASSWORD</pre>
+<p>The Cloud Run / Cloud SQL Unix-socket <code>DATABASE_URL</code> should look like:</p>
+<pre>postgresql://tsg_app:YOUR_PASSWORD@/tsg_license_manager?host=/cloudsql/ttis-ai:us-central1:tsg-license-manager-staging</pre>
+<pre>echo "postgresql://tsg_app:YOUR_PASSWORD@/tsg_license_manager?host=/cloudsql/ttis-ai:us-central1:tsg-license-manager-staging" | gcloud secrets create tsg-license-manager-staging-database-url --data-file=-
+
+echo "YOUR_AUTH_SECRET" | gcloud secrets create tsg-license-manager-staging-auth-secret --data-file=-
+
+echo "YOUR_LICENSE_SIGNING_SECRET" | gcloud secrets create tsg-license-manager-staging-license-signing-secret --data-file=-
+
+echo "YOUR_CLIENT_API_SECRET" | gcloud secrets create tsg-license-manager-staging-client-api-secret --data-file=-
+
+echo "YOUR_STRIPE_WEBHOOK_SECRET" | gcloud secrets create tsg-license-manager-staging-stripe-webhook-secret --data-file=-
+
+echo "YOUR_SMTP_PASSWORD" | gcloud secrets create tsg-license-manager-staging-smtp-password --data-file=-</pre>
+<p class="note">PowerShell note: if <code>echo</code> introduces formatting issues, write each secret to a temporary local file, create the secret with <code>--data-file</code>, then securely delete the temporary file.</p>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="7. Deploy Cloud Run" id="7-deploy-cloud-run"><h2>7. Deploy Cloud Run</h2>
+<pre>gcloud run deploy tsg-license-manager-staging `
+  --image us-central1-docker.pkg.dev/ttis-ai/tsg-platform/tsg-license-manager:0.2.0-rc.1 `
+  --region us-central1 `
+  --platform managed `
+  --add-cloudsql-instances ttis-ai:us-central1:tsg-license-manager-staging `
+  --set-env-vars TSG_ENV=staging,TSG_DB_BACKEND=postgres,TSG_SECURE_COOKIES=true,TSG_PUBLIC_BASE_URL=https://license-staging.tti-solutions.com,TSG_ALLOWED_HOSTS=license-staging.tti-solutions.com,docguard-ai-staging.tti-solutions.com,pursuite-staging.tti-solutions.com `
+  --set-secrets DATABASE_URL=tsg-license-manager-staging-database-url:latest,TSG_AUTH_SECRET=tsg-license-manager-staging-auth-secret:latest,TSG_LICENSE_SIGNING_SECRET=tsg-license-manager-staging-license-signing-secret:latest,TSG_CLIENT_API_SECRET=tsg-license-manager-staging-client-api-secret:latest,STRIPE_WEBHOOK_SECRET=tsg-license-manager-staging-stripe-webhook-secret:latest,SMTP_PASSWORD=tsg-license-manager-staging-smtp-password:latest `
+  --allow-unauthenticated</pre>
+<p>Ingress can be restricted later if the existing Virtual Business Solution owns routing.</p>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="8. Map staging domain" id="8-map-staging-domain"><h2>8. Map staging domain</h2>
+<pre>gcloud run domain-mappings create `
+  --service tsg-license-manager-staging `
+  --domain license-staging.tti-solutions.com `
+  --region us-central1</pre>
+<p>Add the DNS records returned by Google at the DNS provider.</p>
+<p>Repeat later if product portals route directly to this service:</p>
+<pre>docguard-ai-staging.tti-solutions.com
+pursuite-staging.tti-solutions.com</pre>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="9. Verify deployment" id="9-verify-deployment"><h2>9. Verify deployment</h2>
+<pre>curl https://license-staging.tti-solutions.com/health
+curl https://license-staging.tti-solutions.com/ready</pre>
+<p>Expected <code>/ready</code> result:</p>
+<pre>database=ok
+status=ready</pre>
+<pre>gcloud run services logs read tsg-license-manager-staging `
+  --region us-central1 `
+  --limit 100</pre>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="10. Run staging acceptance smoke checks" id="10-run-staging-acceptance-smoke-checks"><h2>10. Run staging acceptance smoke checks</h2>
+<ul>
+<li><code>/health</code> returns OK.</li>
+<li><code>/ready</code> returns ready with database OK.</li>
+<li>Admin login does not expose development credentials.</li>
+<li>DocGuard AI portal route resolves.</li>
+<li>Pursuite portal route resolves.</li>
+<li>DocGuard AI product appears as <code>docguard_ai</code>.</li>
+<li>No retired development codename appears in customer-facing evidence.</li>
+<li>Client API rejects missing credentials.</li>
+<li>Client API accepts valid DocGuard AI credentials.</li>
+<li>Stripe signed test webhook passes.</li>
+<li>Stripe tampered webhook fails.</li>
+<li>SMTP password setup email sends.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="Closure evidence to record" id="closure-evidence-to-record"><h2>Closure evidence to record</h2>
+<ul>
+<li>GCP project ID.</li>
+<li>Cloud Run service URL.</li>
+<li>Cloud Run revision.</li>
+<li>Image path and digest.</li>
+<li>Cloud SQL instance/database.</li>
+<li>Secret Manager secret names.</li>
+<li><code>/health</code> result.</li>
+<li><code>/ready</code> result.</li>
+<li>Smoke-test timestamp.</li>
+<li>Operator name.</li>
+<li>Any DNS/domain mapping records.</li>
+<li>Links or screenshots for successful acceptance checks.</li>
+</ul>
+</section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+﻿<!doctype html><html><head><meta charset="utf-8"><title>QUICK_START</title><style>body{font-family:Segoe UI,Arial,sans-serif;line-height:1.55;margin:32px;max-width:1060px;color:#0b2136}h1,h2,h3{color:#0b2136}code,pre{background:#f3f6f9;border:1px solid #d8dee6;border-radius:6px}code{padding:1px 4px}pre{padding:12px;overflow:auto}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #d8dee6;padding:8px;text-align:left}th{background:#f3f6f9}blockquote{border-left:4px solid #008c7f;padding-left:12px;color:#526579}</style></head><body>
+<h1>DocGuard AI Quick Start</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Status: Production release approved</p>
+<h2>Install</h2>
+<p>Use the approved installer:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<p>The installer supports non-admin installation and installs DocGuard AI for the current user when elevation is not available.</p>
+<p>For portable validation, launch:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe
+</code></pre>
+<h2>Recommended Desktop Workflow</h2>
+<p>1. Open DocGuard AI.</p>
+<p>2. Select a source file or folder.</p>
+<p>3. Choose a profile: <code>Standard</code>, <code>Aggressive</code>, or <code>Paranoid</code>.</p>
+<p>4. Keep <code>Backup</code> enabled for normal work.</p>
+<p>5. Use <code>Dry Run</code> for previews.</p>
+<p>6. Click <code>Scan</code>.</p>
+<p>7. Review Dashboard, File Review, Findings, and Risk Map.</p>
+<p>8. Click <code>Run Cleanroom</code> when ready to clean, verify, report, and record activity.</p>
+<p>9. Review Reports and Activity before sharing cleaned output.</p>
+<h2>Dashboard Drill-Downs</h2>
+<p>Dashboard cards open the matching detail page:</p>
+<p>| Card | Opens |</p>
+<p>|---|---|</p>
+<p>| Files Scanned | File Review |</p>
+<p>| Open Findings | Findings |</p>
+<p>| Highest Risk | Risk Map |</p>
+<p>| Cleaned Files | Reports |</p>
+<h2>CLI Quick Commands</h2>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+sanitize scan &quot;C:\Path\To\Source&quot; --profile aggressive --summary
+sanitize run &quot;C:\Path\To\Source&quot; --profile aggressive --html-report auto
+sanitize history --last 10
+</code></pre>
+<h2>Writing Assistant</h2>
+<p>Writing Assistant is included in the Core package.</p>
+<pre><code>
+sanitize analyze-text --text &quot;Paste text here.&quot; --heatmap
+sanitize rewrite --text &quot;Paste text here.&quot; --style executive
+</code></pre>
+</body></html>

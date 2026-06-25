@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite RFP Shredder User Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+.doc-nav{max-width:920px; margin:-18px auto 24px; padding:0 24px;}
+.doc-nav-inner{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 16px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+.doc-nav a{display:inline-block; margin:.15rem .8rem .15rem 0; font-size:.92rem; font-weight:600;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .doc-nav{display:none}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+  .doc-nav{padding:0 12px}
+}
+.doc-footer{max-width:920px; margin:24px auto 0; padding:0 24px 48px; color:var(--muted); font-size:.9rem;}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite RFP Shredder User Guide</h1>
+    <p>End-user guide for verified RFP Shredder workflows.</p>
+  </div>
+</header>
+<nav class="doc-nav" aria-label="Document navigation">
+  <div class="doc-nav-inner">
+    <a href="#introduction">Introduction</a><a href="#getting-started">Getting Started</a><a href="#manual-shred-process">Manual Shred Process</a><a href="#wizard-shred-process">Wizard Shred Process</a><a href="#reports-and-outputs">Reports</a><a href="#troubleshooting">Troubleshooting</a>
+  </div>
+</nav>
+<div class="wrap">
+  <main>
+    <section aria-label="Document content">
+      <article>
+<h1 id="pursuite-rfp-shredder-user-guide">Pursuite RFP Shredder User Guide</h1>
+<p>Document type: End-user guide<br>
+Product area: Pursuite RFP Shredder, Compliance Matrix, Proposal Kickoff wizard<br>
+Version: 1.0<br>
+Last updated: June 23, 2026<br>
+Status: Publication-ready draft with screenshot placeholders and SME review markers</p>
+<hr>
+<h2 id="source-and-verification-standard">Source And Verification Standard</h2>
+<p>This guide uses only verified product information from the provided source materials. UI labels, roles, file limits, status values, workflow gates, and API behavior are drawn from existing Pursuite documentation, frontend source, backend routes, permissions, and API reference material.</p>
+<p>Where the requested documentation outline asks for behavior that is not verified in the source materials, this guide uses <code>[SME Review Required: ...]</code> instead of inventing product behavior.</p>
+<p>Source priority used:</p>
+<ol>
+<li>Product screenshots and UI labels.</li>
+<li>Existing repository code and API routes.</li>
+<li>Existing documentation.</li>
+<li>SME notes.</li>
+<li>Clearly marked assumptions.</li>
+</ol>
+<p>No product screenshots were provided in the source materials. Screenshot placeholders are included for the documentation team to replace.</p>
+<hr>
+<h2 id="table-of-contents">Table Of Contents</h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#understanding-the-shredding-process">Understanding The Shredding Process</a></li>
+<li><a href="#manual-shred-process">Manual Shred Process</a></li>
+<li><a href="#wizard-shred-process">Wizard Shred Process</a></li>
+<li><a href="#working-with-requirements">Working With Requirements</a></li>
+<li><a href="#reports-and-outputs">Reports And Outputs</a></li>
+<li><a href="#collaboration-features">Collaboration Features</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#audit-considerations">Audit Considerations</a></li>
+<li><a href="#appendix-a-verified-source-traceability">Appendix A: Verified Source Traceability</a></li>
+</ol>
+<hr>
+<h2 id="revision-history">Revision History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>June 23, 2026</td>
+<td>Codex</td>
+<td>Initial RFP Shredder user guide created from verified source materials.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="introduction">Introduction</h2>
+<h3 id="purpose">Purpose</h3>
+<p>The Pursuite RFP Shredder helps proposal teams convert solicitation documents into a structured, editable requirements list. Confirming the requirements unlocks downstream proposal workflows, including the Compliance Matrix and the Autonomous Pipeline.</p>
+<h3 id="scope">Scope</h3>
+<p>This guide covers:</p>
+<ul>
+<li>Uploading an RFP, RFI, RFQ, SOW, or related solicitation document into the RFP Shredder when that document is represented as a supported RFP upload.</li>
+<li>Reviewing, editing, adding, deleting, and confirming extracted requirements.</li>
+<li>Using the Proposal Kickoff wizard when available.</li>
+<li>Generating and reviewing the Compliance Matrix after requirements are confirmed.</li>
+<li>Troubleshooting verified upload, processing, review, and confirmation issues.</li>
+</ul>
+<p>This guide does not document solicitation content strategy, proposal writing policy, or organization-specific capture methodology.</p>
+<h3 id="intended-audience">Intended Audience</h3>
+<table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Typical Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Proposal Manager</td>
+<td>Upload and confirm RFP requirements, manage proposal readiness gates, and generate the Compliance Matrix.</td>
+</tr>
+<tr>
+<td>Admin</td>
+<td>Assist Proposal Managers, resolve blocked workflows, and configure prerequisite AI or CUI controls.</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>Review completed requirements and use them as proposal context.</td>
+</tr>
+<tr>
+<td>Executive Approver</td>
+<td>View requirements and downstream proposal context where access is permitted.</td>
+</tr>
+<tr>
+<td>Read-Only user</td>
+<td><code>[SME Review Required: RFP Shredder visibility for Read-Only users is not verified for this guide.]</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="benefits">Benefits</h3>
+<ul>
+<li>Reduces manual transcription of solicitation requirements.</li>
+<li>Creates a structured requirement set for review.</li>
+<li>Identifies mandatory and optional requirements.</li>
+<li>Supports proposal compliance review through the Compliance Matrix.</li>
+<li>Preserves review and confirmation gates before downstream automation runs.</li>
+</ul>
+<h3 id="key-terminology">Key Terminology</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RFP Shredder</td>
+<td>The Pursuite panel that uploads an RFP PDF or DOCX, extracts requirements using AI, and lets authorized users review and confirm them.</td>
+</tr>
+<tr>
+<td>Requirement</td>
+<td>A solicitation instruction, clause, deadline, evaluation factor, CLIN, certification, format item, or other extracted requirement.</td>
+</tr>
+<tr>
+<td>Mandatory</td>
+<td>A requirement marked as required for compliance.</td>
+</tr>
+<tr>
+<td>Optional</td>
+<td>A requirement not marked mandatory.</td>
+</tr>
+<tr>
+<td>AI confidence</td>
+<td>The extraction confidence shown for AI-generated requirements.</td>
+</tr>
+<tr>
+<td>Review required</td>
+<td>A low-confidence requirement state that must be edited or marked reviewed before confirmation.</td>
+</tr>
+<tr>
+<td>Confirm Requirements</td>
+<td>The action that locks the requirement set and unlocks the Compliance Matrix and Autonomous Pipeline.</td>
+</tr>
+<tr>
+<td>Compliance Matrix</td>
+<td>A downstream panel that maps confirmed requirements to proposal coverage status.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="access-requirements">Access Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Verified Access</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upload RFP files</td>
+<td>Admin or Proposal Manager.</td>
+</tr>
+<tr>
+<td>Replace RFP files</td>
+<td>Admin or Proposal Manager.</td>
+</tr>
+<tr>
+<td>Retry or re-process extraction</td>
+<td>Admin or Proposal Manager.</td>
+</tr>
+<tr>
+<td>Add, edit, delete, or mark requirements reviewed</td>
+<td>Admin or Proposal Manager.</td>
+</tr>
+<tr>
+<td>Confirm requirements</td>
+<td>Admin or Proposal Manager.</td>
+</tr>
+<tr>
+<td>View completed requirements</td>
+<td>Writer can view. Executive Approver has <code>rfp:read</code> permission in backend permissions.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> If a control is hidden or disabled, verify your system role and proposal workspace access before treating it as a system error.</p>
+</blockquote>
+<h3 id="step-by-step-sign-in">Step-By-Step: Sign In</h3>
+<ol>
+<li>Open Pursuite using the method provided by your administrator.</li>
+<li>Sign in with the account provided by your administrator.</li>
+<li>Confirm the Pursuite workspace opens.</li>
+<li>If sign-in fails, ask an Admin to verify that your account is active and assigned to the correct organization.</li>
+</ol>
+<p>[Screenshot: Pursuite sign-in page]</p>
+<p>Expected result: You are signed in and can access the Pursuite sidebar.</p>
+<h3 id="step-by-step-open-the-proposal-workspace">Step-By-Step: Open The Proposal Workspace</h3>
+<ol>
+<li>In the sidebar, open <strong>Proposals</strong>.</li>
+<li>Open the proposal workspace for the solicitation you want to shred.</li>
+<li>In the proposal workspace toolbar, open <strong>RFP Shredder</strong>.</li>
+<li>Confirm the RFP Shredder panel opens.</li>
+</ol>
+<p>[Screenshot: Proposal workspace toolbar with RFP Shredder control]</p>
+<p>Expected result: The <strong>RFP Shredder</strong> panel opens. If no RFP is uploaded, the upload area is displayed.</p>
+<h3 id="navigation-overview">Navigation Overview</h3>
+<p>The verified user workflow uses these areas:</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Proposals</td>
+<td>Open the proposal workspace.</td>
+</tr>
+<tr>
+<td>RFP Shredder</td>
+<td>Upload and review the solicitation requirement set.</td>
+</tr>
+<tr>
+<td>Compliance Matrix</td>
+<td>Generate and review coverage after requirements are confirmed.</td>
+</tr>
+<tr>
+<td>Guided Setup</td>
+<td>Launch the Proposal Kickoff wizard when available.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="understanding-the-shredding-process">Understanding The Shredding Process</h2>
+<h3 id="what-is-an-rfp-shred">What Is An RFP Shred?</h3>
+<p>An RFP shred is the process of turning solicitation text into a structured list of requirements that the proposal team can review, edit, confirm, and use for compliance tracking.</p>
+<h3 id="why-shredding-is-performed">Why Shredding Is Performed</h3>
+<p>Proposal teams shred RFPs to:</p>
+<ol>
+<li>Identify what the solicitation requires.</li>
+<li>Separate mandatory requirements from optional or contextual items.</li>
+<li>Preserve a reviewed requirement baseline.</li>
+<li>Map requirements to proposal sections.</li>
+<li>Detect missing or partial proposal coverage before final review.</li>
+</ol>
+<h3 id="verified-shred-workflow">Verified Shred Workflow</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>System Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upload</td>
+<td>Admin or Proposal Manager uploads a PDF or DOCX file up to 50 MB.</td>
+</tr>
+<tr>
+<td>Queue</td>
+<td>The file is queued for analysis.</td>
+</tr>
+<tr>
+<td>Extract</td>
+<td>AI extracts requirements. PDF files can use OCR fallback when text extraction returns no text.</td>
+</tr>
+<tr>
+<td>Review</td>
+<td>Authorized users edit, add, delete, or mark requirements reviewed.</td>
+</tr>
+<tr>
+<td>Confirm</td>
+<td>Admin or Proposal Manager confirms the reviewed set.</td>
+</tr>
+<tr>
+<td>Unlock</td>
+<td>Compliance Matrix and Autonomous Pipeline become available for the proposal.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="process-diagram">Process Diagram</h3>
+<pre><code class="language-text">Proposal Workspace
+  -&gt; RFP Shredder upload
+  -&gt; Background extraction
+  -&gt; Requirement review
+  -&gt; Confirm Requirements
+  -&gt; Compliance Matrix / Autonomous Pipeline
+</code></pre>
+<p>[Screenshot: RFP Shredder lifecycle states]</p>
+<h3 id="status-values">Status Values</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uploaded</td>
+<td>File received; extraction is queued or not yet started.</td>
+</tr>
+<tr>
+<td>Pending</td>
+<td>Worker picked up or queued the extraction run.</td>
+</tr>
+<tr>
+<td>Processing</td>
+<td>AI extraction is in progress.</td>
+</tr>
+<tr>
+<td>Completed</td>
+<td>Requirements are extracted and ready for review.</td>
+</tr>
+<tr>
+<td>Confirmed</td>
+<td>Requirements are confirmed; Compliance Matrix and Autonomous Pipeline are unlocked.</td>
+</tr>
+<tr>
+<td>Failed</td>
+<td>Extraction failed; an authorized user can retry or upload a different file when the failure is not a CUI block.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Warning:</strong> Confirmation is a hard workflow gate. The Compliance Matrix and Autonomous Pipeline cannot run until the requirement set is confirmed.</p>
+</blockquote>
+<hr>
+<h2 id="manual-shred-process">Manual Shred Process</h2>
+<p>The verified manual process is performed inside the <strong>RFP Shredder</strong> panel after a proposal workspace exists. The requested standalone actions &quot;create project&quot; and &quot;enter solicitation details&quot; are not verified as RFP Shredder-specific controls.</p>
+<p>[SME Review Required: Confirm whether RFP Shredder has a separate project-creation workflow outside the proposal workspace.]</p>
+<h3 id="step-by-step-upload-a-solicitation-document">Step-By-Step: Upload A Solicitation Document</h3>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Open <strong>RFP Shredder</strong>.</li>
+<li>If no document has been uploaded, locate the upload area that says <strong>Drop your RFP here or browse</strong>.</li>
+<li>Drop a supported file onto the upload area, or select <strong>browse</strong>.</li>
+<li>Choose a PDF or DOCX file.</li>
+<li>Confirm the file is 50 MB or smaller.</li>
+<li>Wait while the upload completes.</li>
+<li>Watch the processing status.</li>
+</ol>
+<p>[Screenshot: RFP Shredder upload area]</p>
+<p>Expected result: The document is accepted and processing starts. If the document is unsupported or too large, Pursuite shows an error.</p>
+<h3 id="supported-file-types">Supported File Types</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Verified Support</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PDF</td>
+<td>Yes</td>
+<td>Text extraction is used first. OCR fallback is available for scanned or image-only PDFs.</td>
+</tr>
+<tr>
+<td>DOCX</td>
+<td>Yes</td>
+<td>Word document text extraction is used. OCR is not used for DOCX.</td>
+</tr>
+<tr>
+<td>Other formats</td>
+<td>No verified support</td>
+<td><code>[SME Review Required: Confirm whether additional file types are planned.]</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-review-extracted-requirements">Step-By-Step: Review Extracted Requirements</h3>
+<ol>
+<li>Wait until the RFP Shredder status is <strong>Completed</strong>.</li>
+<li>Review the extracted requirement count.</li>
+<li>Review the mandatory and optional counts.</li>
+<li>Review each requirement row.</li>
+<li>Compare low-confidence rows to the source solicitation.</li>
+<li>Look for rows marked <strong>Review required</strong>.</li>
+<li>Confirm whether each row belongs in the final requirement set.</li>
+</ol>
+<p>[Screenshot: Extracted requirements list with category badges]</p>
+<p>Expected result: You have identified incorrect, missing, duplicate, or low-confidence requirements before confirmation.</p>
+<h3 id="step-by-step-edit-a-requirement">Step-By-Step: Edit A Requirement</h3>
+<ol>
+<li>Hover over the requirement row.</li>
+<li>Select the edit control.</li>
+<li>Update <strong>Requirement text</strong> as needed.</li>
+<li>Select the correct <strong>Category</strong>.</li>
+<li>Select or clear <strong>Mandatory</strong>.</li>
+<li>Select <strong>Save</strong>.</li>
+</ol>
+<p>[Screenshot: Edit requirement row]</p>
+<p>Expected result: The row updates and remains in the requirement list.</p>
+<h3 id="step-by-step-mark-a-low-confidence-requirement-reviewed">Step-By-Step: Mark A Low-Confidence Requirement Reviewed</h3>
+<ol>
+<li>Locate a row marked <strong>Review required</strong>.</li>
+<li>Compare the extracted text to the source solicitation.</li>
+<li>If the row is correct, select <strong>Reviewed</strong>.</li>
+<li>If the row is not correct, edit it instead.</li>
+<li>Repeat until no low-confidence rows remain unreviewed.</li>
+</ol>
+<p>[Screenshot: Review required row with Reviewed action]</p>
+<p>Expected result: The row no longer blocks confirmation.</p>
+<h3 id="step-by-step-add-a-requirement-manually">Step-By-Step: Add A Requirement Manually</h3>
+<ol>
+<li>Select <strong>Add requirement manually</strong>.</li>
+<li>Enter the requirement text.</li>
+<li>Select a category.</li>
+<li>Select or clear <strong>Mandatory</strong>.</li>
+<li>Select <strong>Add</strong>.</li>
+</ol>
+<p>[Screenshot: Add Requirement form]</p>
+<p>Expected result: The new manual requirement is appended to the active requirement list.</p>
+<h3 id="step-by-step-delete-a-false-positive">Step-By-Step: Delete A False Positive</h3>
+<ol>
+<li>Locate the false-positive or duplicate requirement.</li>
+<li>Select the delete control.</li>
+<li>Confirm the row is removed from the active list.</li>
+</ol>
+<p>[Screenshot: Requirement row delete control]</p>
+<p>Expected result: The requirement is excluded from the active list. Verified backend behavior soft-deletes requirements rather than hard-deleting them.</p>
+<h3 id="step-by-step-confirm-requirements">Step-By-Step: Confirm Requirements</h3>
+<ol>
+<li>Confirm the document status is <strong>Completed</strong>.</li>
+<li>Confirm all rows marked <strong>Review required</strong> have been edited or marked reviewed.</li>
+<li>Confirm the requirement list is complete and accurate.</li>
+<li>Select <strong>Confirm Requirements</strong>.</li>
+<li>Wait for the success message.</li>
+</ol>
+<p>[Screenshot: Confirm Requirements button]</p>
+<p>Expected result: Pursuite displays <strong>Requirements confirmed! Compliance Matrix and Pipeline are now available.</strong> The requirement set is locked and downstream proposal workflows unlock.</p>
+<blockquote>
+<p><strong>Warning:</strong> After confirmation, the list is locked for downstream workflows. Re-processing can replace active rows only after a successful extraction run.</p>
+</blockquote>
+<h3 id="step-by-step-retry-or-re-process">Step-By-Step: Retry Or Re-Process</h3>
+<ol>
+<li>Open <strong>RFP Shredder</strong>.</li>
+<li>If processing failed, review the displayed error.</li>
+<li>If the failure is not a CUI block, select <strong>Retry Processing</strong>.</li>
+<li>If needed, select <strong>Upload Different File</strong> or <strong>Replace File</strong> and upload a corrected file.</li>
+<li>Wait for processing to complete.</li>
+<li>Review the updated requirement list before confirming.</li>
+</ol>
+<p>[Screenshot: Processing failed state with Retry Processing]</p>
+<p>Expected result: A new processing run is queued. Existing visible requirements remain available if the new run fails.</p>
+<hr>
+<h2 id="wizard-shred-process">Wizard Shred Process</h2>
+<p>The verified guided process is the <strong>Proposal Kickoff</strong> wizard. It is launched from <strong>Guided Setup</strong> or from the proposal workspace <strong>Kickoff wizard</strong> button when available.</p>
+<p>The wizard is server-gated. It cannot advance past RFP confirmation until the proposal has an uploaded, shredded, and confirmed RFP.</p>
+<h3 id="verified-proposal-kickoff-wizard-steps">Verified Proposal Kickoff Wizard Steps</h3>
+<table>
+<thead>
+<tr>
+<th>Wizard Step</th>
+<th>Verified Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Proposal Basics</td>
+<td>Name the proposal and set top-level parameters such as proposal name and page limit.</td>
+</tr>
+<tr>
+<td>RFP Ingestion</td>
+<td>Upload the solicitation PDF. The RFP Shredder extracts requirements automatically.</td>
+</tr>
+<tr>
+<td>Review &amp; Confirm Requirements</td>
+<td>Close the wizard, open the RFP Shredder panel, review and confirm requirements, then return to Guided Setup.</td>
+</tr>
+<tr>
+<td>Compliance Matrix Preview</td>
+<td>Generate the matrix after requirements are confirmed.</td>
+</tr>
+<tr>
+<td>Structure &amp; Team</td>
+<td>Assign writers and reviewers from the proposal workspace.</td>
+</tr>
+<tr>
+<td>Win Themes</td>
+<td>Optionally add win themes to steer drafting.</td>
+</tr>
+<tr>
+<td>Summary &amp; Launch</td>
+<td>Finish and mark the proposal draft-ready.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> The verified wizard upload step accepts PDF. The RFP Shredder panel itself accepts PDF and DOCX.</p>
+</blockquote>
+<h3 id="step-by-step-start-the-proposal-kickoff-wizard">Step-By-Step: Start The Proposal Kickoff Wizard</h3>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Select <strong>Kickoff wizard</strong> if it is visible.</li>
+<li>If launching from the sidebar, select <strong>Guided Setup</strong> and start <strong>Proposal Kickoff: RFP -&gt; Draft-Ready</strong>.</li>
+<li>Complete <strong>Proposal Basics</strong>.</li>
+<li>Continue to <strong>RFP Ingestion</strong>.</li>
+</ol>
+<p>[Screenshot: Proposal Kickoff wizard launcher]</p>
+<p>Expected result: The wizard starts and displays the first available step.</p>
+<h3 id="step-by-step-upload-in-the-wizard">Step-By-Step: Upload In The Wizard</h3>
+<ol>
+<li>On <strong>RFP Ingestion</strong>, choose the solicitation PDF.</li>
+<li>Upload the file.</li>
+<li>Wait for the upload action to complete.</li>
+<li>Continue to <strong>Review &amp; Confirm Requirements</strong>.</li>
+</ol>
+<p>[Screenshot: Wizard RFP Ingestion step]</p>
+<p>Expected result: The RFP document is uploaded and tied to the proposal.</p>
+<h3 id="step-by-step-confirm-requirements-for-the-wizard-gate">Step-By-Step: Confirm Requirements For The Wizard Gate</h3>
+<ol>
+<li>Read the <strong>Review &amp; Confirm Requirements</strong> instructions.</li>
+<li>Close the wizard when prompted.</li>
+<li>Open the proposal workspace.</li>
+<li>Select <strong>RFP Shredder</strong>.</li>
+<li>Review, edit, add, delete, and mark requirements reviewed as needed.</li>
+<li>Select <strong>Confirm Requirements</strong>.</li>
+<li>Return to <strong>Guided Setup</strong>.</li>
+<li>Reopen the Proposal Kickoff wizard.</li>
+</ol>
+<p>[Screenshot: Wizard Review &amp; Confirm Requirements gate]</p>
+<p>Expected result: The server gate unlocks and the wizard can continue to the Compliance Matrix Preview step.</p>
+<h3 id="step-by-step-generate-the-compliance-matrix-preview">Step-By-Step: Generate The Compliance Matrix Preview</h3>
+<ol>
+<li>Continue to <strong>Compliance Matrix Preview</strong>.</li>
+<li>Select <strong>Generate matrix</strong>.</li>
+<li>Wait for matrix generation to be queued.</li>
+<li>Continue when the wizard allows the next step.</li>
+</ol>
+<p>[Screenshot: Wizard Compliance Matrix Preview step]</p>
+<p>Expected result: Matrix generation is queued for the proposal.</p>
+<hr>
+<h2 id="working-with-requirements">Working With Requirements</h2>
+<h3 id="requirement-categories">Requirement Categories</h3>
+<p>The RFP Shredder displays verified category labels mapped to internal category values:</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Internal Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eval Factor</td>
+<td><code>evaluation_factor</code></td>
+</tr>
+<tr>
+<td>PWS</td>
+<td><code>pws_requirement</code></td>
+</tr>
+<tr>
+<td>Format</td>
+<td><code>format</code></td>
+</tr>
+<tr>
+<td>Deadline</td>
+<td><code>deadline</code></td>
+</tr>
+<tr>
+<td>CLIN</td>
+<td><code>clin</code></td>
+</tr>
+<tr>
+<td>Cert</td>
+<td><code>certification</code></td>
+</tr>
+<tr>
+<td>Other</td>
+<td><code>other</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="requirement-fields">Requirement Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirement text</td>
+<td>The extracted or manually entered requirement.</td>
+</tr>
+<tr>
+<td>Category</td>
+<td>The selected requirement category.</td>
+</tr>
+<tr>
+<td>Mandatory</td>
+<td>Whether the requirement is mandatory.</td>
+</tr>
+<tr>
+<td>Source</td>
+<td>AI or Manual.</td>
+</tr>
+<tr>
+<td>Confidence</td>
+<td>AI confidence score, shown as a percentage when available.</td>
+</tr>
+<tr>
+<td>Review required</td>
+<td>Indicates low-confidence rows that must be edited or marked reviewed before confirmation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="requirement-status-and-ownership">Requirement Status And Ownership</h3>
+<p>The source materials verify mandatory/optional state, AI/manual source, confidence, and review-required state. They do not verify a separate requirement owner field, priority field, or lifecycle status field inside RFP Shredder.</p>
+<p>[SME Review Required: Confirm whether requirement ownership, priority, assignment, and status fields exist in the current RFP Shredder UI.]</p>
+<h3 id="bulk-updates">Bulk Updates</h3>
+<p>[SME Review Required: Bulk requirement update controls were not verified in the provided source materials.]</p>
+<hr>
+<h2 id="reports-and-outputs">Reports And Outputs</h2>
+<h3 id="verified-output-compliance-matrix">Verified Output: Compliance Matrix</h3>
+<p>The Compliance Matrix maps confirmed requirements to proposal coverage. It is available only after RFP requirements are confirmed.</p>
+<p>Coverage statuses in the current UI:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Addressed</td>
+<td>The requirement appears covered by proposal content.</td>
+</tr>
+<tr>
+<td>Partial</td>
+<td>The requirement appears partially covered.</td>
+</tr>
+<tr>
+<td>Missing</td>
+<td>The requirement appears not covered.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-generate-the-compliance-matrix">Step-By-Step: Generate The Compliance Matrix</h3>
+<ol>
+<li>Confirm RFP requirements in <strong>RFP Shredder</strong>.</li>
+<li>Open <strong>Compliance Matrix</strong> from the proposal workspace.</li>
+<li>Select <strong>Generate Compliance Matrix</strong>.</li>
+<li>Wait for the queued generation to complete.</li>
+<li>Review the summary counts for missing, partial, and addressed requirements.</li>
+<li>Review each requirement row and AI rationale.</li>
+</ol>
+<p>[Screenshot: Compliance Matrix summary badges]</p>
+<p>Expected result: The matrix displays coverage results for confirmed requirements.</p>
+<h3 id="step-by-step-override-a-matrix-item">Step-By-Step: Override A Matrix Item</h3>
+<ol>
+<li>Open <strong>Compliance Matrix</strong>.</li>
+<li>Select a row.</li>
+<li>In <strong>Override Coverage Status</strong>, choose <strong>Missing</strong>, <strong>Partial</strong>, or <strong>Addressed</strong>.</li>
+<li>Enter an optional note explaining the override.</li>
+<li>Select <strong>Save Override</strong>.</li>
+</ol>
+<p>[Screenshot: Override Coverage Status drawer]</p>
+<p>Expected result: The row is marked as overridden. You can clear the override later.</p>
+<h3 id="step-by-step-export-the-matrix">Step-By-Step: Export The Matrix</h3>
+<ol>
+<li>Open <strong>Compliance Matrix</strong>.</li>
+<li>Confirm the matrix contains one or more requirements.</li>
+<li>Select <strong>CSV</strong>.</li>
+<li>Open or save the downloaded file when the browser prompts.</li>
+</ol>
+<p>[Screenshot: Compliance Matrix CSV export control]</p>
+<p>Expected result: A CSV export is downloaded or opened. API documentation also references queued DOCX export behavior, and update notes reference DOCX/PDF export. The current verified UI source shows CSV export in the panel.</p>
+<p>[SME Review Required: Confirm current user-facing controls for DOCX and PDF Compliance Matrix exports.]</p>
+<h3 id="requested-report-inventory">Requested Report Inventory</h3>
+<table>
+<thead>
+<tr>
+<th>Requested Report</th>
+<th>Verified In Source Materials</th>
+<th>User Guidance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compliance Matrix</td>
+<td>Yes</td>
+<td>Use the Compliance Matrix panel after RFP confirmation.</td>
+</tr>
+<tr>
+<td>Requirement Register</td>
+<td>Partial</td>
+<td>The RFP Shredder requirement list functions as the active register. A named report/export was not verified.</td>
+</tr>
+<tr>
+<td>Action Item Report</td>
+<td>No</td>
+<td><code>[SME Review Required: Confirm report availability and generation steps.]</code></td>
+</tr>
+<tr>
+<td>Risk Register</td>
+<td>No</td>
+<td><code>[SME Review Required: Confirm report availability and generation steps.]</code></td>
+</tr>
+<tr>
+<td>Evaluation Criteria Report</td>
+<td>No</td>
+<td>Evaluation factor category is verified; a named report was not verified.</td>
+</tr>
+<tr>
+<td>Deliverables Report</td>
+<td>No</td>
+<td><code>[SME Review Required: Confirm report availability and generation steps.]</code></td>
+</tr>
+<tr>
+<td>Executive Summary</td>
+<td>No</td>
+<td><code>[SME Review Required: Confirm report availability and generation steps.]</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="collaboration-features">Collaboration Features</h2>
+<p>The proposal workspace includes collaboration-related panels such as team, discussion, timeline, export, and debrief in existing user documentation. The provided source materials do not verify RFP Shredder-specific comments, notes, assignments, notifications, or task-management controls inside the RFP Shredder panel.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Verified RFP Shredder-Specific Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Comments</td>
+<td><code>[SME Review Required: Not verified inside RFP Shredder.]</code></td>
+</tr>
+<tr>
+<td>Notes</td>
+<td>Matrix override notes are verified for Compliance Matrix items. RFP Shredder row notes are not verified.</td>
+</tr>
+<tr>
+<td>Assignments</td>
+<td><code>[SME Review Required: Not verified inside RFP Shredder.]</code></td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td>Backend notification text exists for <code>rfp_shredded</code>; user-facing notification workflow requires SME confirmation.</td>
+</tr>
+<tr>
+<td>Task management</td>
+<td><code>[SME Review Required: Not verified inside RFP Shredder.]</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upload is rejected</td>
+<td>File is not PDF or DOCX.</td>
+<td>Upload a PDF or DOCX file.</td>
+</tr>
+<tr>
+<td>Upload is rejected because of size</td>
+<td>File exceeds 50 MB.</td>
+<td>Reduce file size or split the solicitation according to internal policy.</td>
+</tr>
+<tr>
+<td>RFP Shredder shows read-only access</td>
+<td>User is not Admin or Proposal Manager.</td>
+<td>Ask an Admin or Proposal Manager to upload, edit, or confirm.</td>
+</tr>
+<tr>
+<td>Processing remains pending or processing</td>
+<td>Background extraction is still running.</td>
+<td>Wait for the panel to update automatically. If it remains stuck, ask an Admin to check worker and queue health.</td>
+</tr>
+<tr>
+<td>Processing failed</td>
+<td>Extraction failed.</td>
+<td>Review the error, then use <strong>Retry Processing</strong> or upload a different file if available.</td>
+</tr>
+<tr>
+<td>Processing failed with <code>CUI_BLOCKED</code></td>
+<td>The document is classified as CUI and external CUI processing is not enabled.</td>
+<td>Ask an Admin to review CUI external-processing approval. Do not bypass CUI controls.</td>
+</tr>
+<tr>
+<td>No requirements extracted</td>
+<td>The document may contain no readable text, or OCR may not have extracted text.</td>
+<td>Upload a higher-quality scan, or add requirements manually.</td>
+</tr>
+<tr>
+<td>Confirm Requirements fails</td>
+<td>Low-confidence requirements require review.</td>
+<td>Edit each flagged row or mark it reviewed, then confirm again.</td>
+</tr>
+<tr>
+<td>Compliance Matrix is unavailable</td>
+<td>RFP requirements have not been confirmed.</td>
+<td>Return to RFP Shredder and select <strong>Confirm Requirements</strong>.</td>
+</tr>
+<tr>
+<td>Matrix generation fails with confirmation message</td>
+<td>A1 gate is not complete.</td>
+<td>Confirm requirements first.</td>
+</tr>
+<tr>
+<td>Export fails</td>
+<td>Export generation or download failed.</td>
+<td>Retry the export and escalate if the issue persists.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li>Upload the cleanest available solicitation document.</li>
+<li>Prefer text-searchable PDFs or DOCX files when available.</li>
+<li>Review low-confidence rows first.</li>
+<li>Compare requirement text against the source solicitation before confirming.</li>
+<li>Add missed requirements manually before confirmation.</li>
+<li>Delete false positives rather than leaving them for downstream compliance checks.</li>
+<li>Confirm only after the proposal team agrees the requirement set is usable.</li>
+<li>Generate the Compliance Matrix after requirements are confirmed and after meaningful proposal section content exists.</li>
+<li>Re-run or refresh the matrix after major proposal edits.</li>
+<li>Preserve audit context for CUI, AI processing, and confirmation decisions.</li>
+</ol>
+<hr>
+<h2 id="audit-considerations">Audit Considerations</h2>
+<p>Verified audit-relevant behaviors include:</p>
+<ul>
+<li>OCR fallback records an <code>rfp.ocr_fallback</code> audit event.</li>
+<li>RFP upload, shredding, confirmation, and requirement edits are listed as common audited actions in admin documentation.</li>
+<li>Low-confidence review gates prevent confirmation until uncertain rows are edited or marked reviewed.</li>
+<li>CUI external-processing gates prevent classified RFP text from being sent to an AI provider unless approved.</li>
+<li>Soft-delete behavior preserves history for removed requirements.</li>
+</ul>
+<blockquote>
+<p><strong>Warning:</strong> Do not route CUI or export-controlled solicitation material outside approved Pursuite workflows. If a CUI block appears, escalate to an Admin or security owner.</p>
+</blockquote>
+<hr>
+<h2 id="appendix-a-verified-source-traceability">Appendix A: Verified Source Traceability</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Source Material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RFP Shredder workflow, file support, confirmation, review-required behavior</td>
+<td><code>app/apps/web/src/pages/proposals/RfpShredderPanel.tsx</code></td>
+</tr>
+<tr>
+<td>Compliance Matrix UI and CSV export</td>
+<td><code>app/apps/web/src/pages/proposals/ComplianceMatrixPanel.tsx</code></td>
+</tr>
+<tr>
+<td>Proposal Kickoff wizard steps</td>
+<td><code>app/apps/web/src/components/wizards/registry.tsx</code></td>
+</tr>
+<tr>
+<td>RFP permissions</td>
+<td><code>app/apps/api/src/middleware/permissions.ts</code></td>
+</tr>
+<tr>
+<td>RFP API behavior, status values, low-confidence gate</td>
+<td><code>Docs/engineering/api-ref/Pursuite_API_Reference.md</code></td>
+</tr>
+<tr>
+<td>User-facing RFP Shredder guidance</td>
+<td><code>app/docs/Pursuite_End_User_Guide.md</code></td>
+</tr>
+<tr>
+<td>Admin controls and troubleshooting</td>
+<td><code>app/docs/Pursuite_Admin_User_Guide.md</code></td>
+</tr>
+<tr>
+<td>OCR fallback notes</td>
+<td><code>Docs/060126_updates/InApp_User_Guide_Chunks.md</code></td>
+</tr>
+</tbody>
+</table>
+
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <p>Generated from user-guide.md. Review all SME Review Required items before final publication.</p>
+</footer>
+</body>
+</html>

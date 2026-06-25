@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DocGuard AI Workflow Guide</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink: #172033;
+  --muted: #56657a;
+  --line: #d8dee8;
+  --header: #eaf0f8;
+  --accent: #2f6f8f;
+  --soft: #f6f8fb;
+}
+body {
+  margin: 0;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 44px 72px;
+}
+h1 {
+  margin: 0 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 3px solid var(--accent);
+  font-size: 34px;
+  letter-spacing: 0;
+}
+h2 {
+  margin: 34px 0 10px;
+  padding-top: 6px;
+  font-size: 24px;
+  color: #1f4963;
+}
+h3 {
+  margin: 26px 0 8px;
+  font-size: 18px;
+  color: #24364a;
+}
+h4 {
+  margin: 18px 0 6px;
+  font-size: 15px;
+  color: #42516a;
+}
+p {
+  margin: 8px 0;
+}
+ol, ul {
+  margin: 8px 0 14px 24px;
+  padding: 0;
+}
+li {
+  margin: 5px 0;
+}
+ul.checklist {
+  list-style: none;
+  margin-left: 0;
+}
+ul.checklist li::before {
+  content: "\2610";
+  margin-right: 8px;
+  color: var(--accent);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0 18px;
+  table-layout: fixed;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+th {
+  background: var(--header);
+  text-align: left;
+  color: #1d3448;
+}
+tbody tr:nth-child(even) td {
+  background: var(--soft);
+}
+code {
+  font-family: Consolas, "Courier New", monospace;
+  background: #eef2f7;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+strong {
+  color: #0d2f46;
+}
+@media print {
+  main { padding: 24px; }
+}
+</style>
+</head>
+<body>
+<main>
+<h1>DocGuard AI Workflow Guide</h1>
+<h2>Header Block</h2>
+<p>Confidence Summary: No procedural steps in this section; product identity and scope are verified from the repository documentation.</p>
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Product name</td><td>DocGuard AI</td></tr>
+<tr><td>Product type</td><td>SaaS/software, delivered as a local-first Windows desktop and command-line application</td></tr>
+<tr><td>Product version</td><td>v1.2.0 RC1 U6.1</td></tr>
+<tr><td>Guide date</td><td>2026-06-24</td></tr>
+<tr><td>Primary end-user audience</td><td>Document owners, reviewers, analysts, records teams, and operators who inspect, clean, verify, and report on files</td></tr>
+<tr><td>Primary administrator audience</td><td>IT administrators, release managers, security reviewers, support leads, licensing administrators, and data governance owners</td></tr>
+<tr><td>Environment notes</td><td>Windows 10 or Windows 11 endpoints; portable package, installer package, or source validation; local processing for document workflows; optional TSG License Manager for licensing, entitlement refresh, deactivation, and update checks</td></tr>
+<tr><td>Purpose</td><td>Provide one operational workflow guide that separates day-to-day DocGuard AI use from administrative deployment, governance, licensing, and evidence-retention responsibilities.</td></tr>
+</tbody></table>
+<p>Grounding corpus used: <code>README.md</code>, <code>docs/USER_GUIDE.md</code>, <code>docs/ADMIN_GUIDE.md</code>, <code>docs/QUICK_START.md</code>, <code>docs/INSTALL_AND_RUN.md</code>, <code>docs/CLI_REFERENCE.md</code>, <code>docs/LICENSING.md</code>, <code>docs/TSG_PLATFORM_INTEGRATION.md</code>, <code>profiles/standard.json</code>, <code>profiles/aggressive.json</code>, <code>profiles/paranoid.json</code>, and implementation checks in <code>sanitize/cli.py</code>, <code>sanitize/automation.py</code>, <code>sanitize/engine.py</code>, <code>sanitize/backup.py</code>, and <code>sanitize/history.py</code>.</p>
+<h2>At-a-Glance</h2>
+<p>Confidence Summary: No procedural steps in this section; capability statements are verified from the repository documentation.</p>
+<table>
+<thead><tr><th>Capability Area</th><th>End User Can Do</th><th>Administrator Can Do</th></tr></thead>
+<tbody>
+<tr><td>Source selection</td><td>Select one file or a folder for review.</td><td>Define approved source locations and endpoint access expectations.</td></tr>
+<tr><td>Scan</td><td>Inspect supported files before changing them.</td><td>Run CLI scans, diagnose discovery issues, and generate scan reports.</td></tr>
+<tr><td>Clean</td><td>Clean supported files after reviewing findings and safety controls.</td><td>Set profile policy, restrict unsafe options, and validate post-clean outcomes.</td></tr>
+<tr><td>Cleanroom</td><td>Run the full scan, clean, post-scan, verify, report, and Activity workflow.</td><td>Automate Cleanroom with CLI, batch jobs, watch mode, and scheduled-task helpers.</td></tr>
+<tr><td>Reports</td><td>Review local HTML reports and retain them with the relevant release or case record.</td><td>Configure report locations, retention expectations, and evidence handling.</td></tr>
+<tr><td>Activity</td><td>Confirm recent workflow results from the Activity page.</td><td>Query <code>history.db</code> for recent runs, stats, and top-risk runs.</td></tr>
+<tr><td>Licensing</td><td>View license status when support or an administrator asks.</td><td>Activate, refresh, deactivate, and update-check through local or TSG License Manager paths.</td></tr>
+<tr><td>Extensions</td><td>View enabled core Extensions and integration/module packs.</td><td>Verify expected Extension status and bridge commands for integrations.</td></tr>
+</tbody></table>
+<h2>Setup / Onboarding Sequence</h2>
+<p>Confidence Summary: Procedural steps in this section are 100% [verified], 0% inferred, and 0% unknown.</p>
+<h3>End-User Track</h3>
+<p>Precondition: DocGuard AI is installed, extracted as a portable package, or made available by an administrator; the user has access to the files to be reviewed.</p>
+<ol>
+<li><strong>Confirm you have permission to inspect and clean the target content before selecting it in DocGuard AI.</strong> [verified]</li>
+<li>Launch <code>DocGuardAI.exe</code> from the Start menu, desktop shortcut, or portable folder. [verified]</li>
+<li>Confirm the window title shows <code>DocGuard AI v1.2.0 RC1 U6.1</code>. [verified]</li>
+<li>Confirm the left sidebar is visible with Dashboard, File Review, Findings, Writing Assistant, Risk Map, Cleanroom, Reports, Activity, Extensions, and Settings. [verified]</li>
+<li>Click <code>Browse</code> and select a source file or folder. [verified]</li>
+<li>Confirm the selected path appears in the Source field. [verified]</li>
+<li>Leave <code>Recursive</code> enabled when the selected folder&#x27;s subfolders should be included. [verified]</li>
+<li>Clear <code>Recursive</code> when only the selected folder level should be included. [verified]</li>
+<li>Select a profile, with <code>aggressive</code> as the recommended first choice for release preparation. [verified]</li>
+<li>Keep <code>Backup</code> enabled unless an administrator gives a different recovery control. [verified]</li>
+<li>Turn <code>Dry Run</code> on for the first review of critical or unfamiliar files. [verified]</li>
+<li>Click <code>Scan</code> to inspect the source before cleaning. [verified]</li>
+</ol>
+<p>Expected result: DocGuard AI populates Dashboard metrics, File Review, Findings, Risk Map, and Recent Activity for the selected source.</p>
+<p>Confirm success: The Dashboard shows files scanned, total findings, highest risk, and recent activity for the selected source.</p>
+<h3>Admin Track</h3>
+<p>Precondition: The administrator has the approved package or source workspace and a target endpoint or validation environment.</p>
+<ol>
+<li>Use <code>release\DocGuardAISetup.exe</code> for the approved installer path. [verified]</li>
+<li>Use <code>dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe</code> for approved portable validation or controlled file-share deployment. [verified]</li>
+<li><strong>Confirm users have read and execute access to the installed or extracted application folder.</strong> [verified]</li>
+<li><strong>Confirm users have write access to the intended report and Activity location.</strong> [verified]</li>
+<li>Launch DocGuard AI on the endpoint. [verified]</li>
+<li>Confirm the application title is <code>DocGuard AI v1.2.0 RC1 U6.1</code>. [verified]</li>
+<li>Confirm the full sidebar is visible: Dashboard, File Review, Findings, Writing Assistant, Risk Map, Cleanroom, Reports, Activity, Extensions, and Settings. [verified]</li>
+<li>Run a scan against a known safe sample. [verified]</li>
+<li>Confirm Reports and Activity populate after a Cleanroom run. [verified]</li>
+<li>For source-based validation only, create a virtual environment, install with <code>pip install -e .</code>, and launch with <code>sanitize-gui</code>, <code>py main.py</code>, or <code>py -m sanitize</code>. [verified]</li>
+</ol>
+<p>Expected result: The endpoint can launch DocGuard AI, run a known-safe sample scan, and produce Reports and Activity evidence.</p>
+<p>Confirm success: The application opens, expected navigation is present, a sample scan completes, and an Activity row is recorded.</p>
+<h2>Core Operating Procedures</h2>
+<p>Confidence Summary: Procedural steps in this section are 100% [verified], 0% inferred, and 0% unknown.</p>
+<h3>Task 1: Inspect A Source With Scan</h3>
+<p>Trigger: A user or administrator needs to inspect files before making changes.</p>
+<h4>End-User Track</h4>
+<p>Precondition: A file or folder source is selected in the Source field.</p>
+<ol>
+<li><strong>Confirm the selected source path is correct and that you have permission to inspect the content.</strong> [verified]</li>
+<li>Select <code>standard</code>, <code>aggressive</code>, or <code>paranoid</code> from the Profile selector. [verified]</li>
+<li>Set <code>Backup</code>, <code>Recursive</code>, <code>Dry Run</code>, <code>Typography</code>, and <code>Remove EXIF</code> controls for the review. [verified]</li>
+<li>Use <code>Dry Run</code> for preview when working with critical or unfamiliar files. [verified]</li>
+<li>Click <code>Scan</code>. [verified]</li>
+<li>Wait for progress to complete. [verified]</li>
+<li>Review the Dashboard metrics. [verified]</li>
+<li>Open File Review and Findings for details. [verified]</li>
+</ol>
+<p>Expected result: DocGuard AI scans supported files and populates Dashboard cards, risk distribution, top risk files, File Review, Findings, Risk Map, and Recent Activity.</p>
+<p>Confirm success: The Dashboard shows the latest run summary and Findings lists file path, category, severity, score, finding name, and remediation.</p>
+<h4>Admin Track</h4>
+<p>Precondition: The CLI is installed or the administrator is running from the source environment.</p>
+<ol>
+<li>Run <code>sanitize scan &quot;C:\Path\To\FileOrFolder&quot; --profile aggressive --summary</code> for an aggregate scan summary. [verified]</li>
+<li>Add <code>--html-report auto</code> when an HTML scan report is required. [verified]</li>
+<li>Add <code>--json-report &lt;path&gt;</code> or <code>--csv-report &lt;path&gt;</code> when machine-readable evidence is required. [verified]</li>
+<li>Use <code>--only-risky</code> when the output should show only files with findings or errors. [verified]</li>
+<li>Use <code>--diagnose</code> when file discovery or supported-extension behavior needs investigation. [verified]</li>
+</ol>
+<p>Expected result: The CLI prints scan results, optionally writes reports, and records the run in the configured Activity database.</p>
+<p>Confirm success: The command returns a scan summary and, when requested, an HTML, JSON, or CSV report exists at the specified path.</p>
+<h3>Task 2: Review Findings And Risk</h3>
+<p>Trigger: A scan or Cleanroom run has completed and findings need review.</p>
+<h4>End-User Track</h4>
+<p>Precondition: Dashboard, File Review, Findings, or Risk Map contains results from a recent run.</p>
+<ol>
+<li>Open <code>File Review</code>. [verified]</li>
+<li>Expand the file tree. [verified]</li>
+<li>Select a file to view file-level details. [verified]</li>
+<li>Select a category to view category details. [verified]</li>
+<li>Select an individual finding to view detail and remediation guidance. [verified]</li>
+<li>Open <code>Findings</code>. [verified]</li>
+<li>Review high-risk rows first. [verified]</li>
+<li>Review file path, category, severity, score, finding name, and remediation. [verified]</li>
+<li>Open <code>Risk Map</code> to prioritize files by risk band. [verified]</li>
+<li>Decide whether to clean, document residual risk, or remove the file from the release set. [verified]</li>
+</ol>
+<p>Expected result: The user understands which files and categories require cleaning, manual remediation, or residual-risk documentation.</p>
+<p>Confirm success: High-risk files are identified and the next action for each is clear.</p>
+<h4>Admin Track</h4>
+<p>Precondition: Scan, clean, or pipeline reports are available locally.</p>
+<ol>
+<li>Open the generated HTML report for detailed evidence. [verified]</li>
+<li>Run <code>sanitize history --last 20</code> to review recent run records. [verified]</li>
+<li>Run <code>sanitize history --top-risk</code> to identify highest-risk historical runs. [verified]</li>
+<li><strong>Treat generated reports as sensitive because they may include file paths and finding details.</strong> [verified]</li>
+<li><strong>Store reports with the related case, release record, or approved evidence location for regulated workflows.</strong> [verified]</li>
+</ol>
+<p>Expected result: Findings review is supported by report evidence and Activity records.</p>
+<p>Confirm success: The relevant report path and Activity entry are available for support, audit, or release review.</p>
+<h3>Task 3: Clean Supported Files</h3>
+<p>Trigger: Findings have been reviewed and the operator is ready to modify supported files.</p>
+<h4>End-User Track</h4>
+<p>Precondition: A scan has been reviewed and the selected source is ready for cleaning.</p>
+<ol>
+<li><strong>Confirm the source path is correct before cleaning because supported files can be modified.</strong> [verified]</li>
+<li>Confirm <code>Backup</code> is on. [verified]</li>
+<li>Turn off <code>Dry Run</code> when the run should make actual changes. [verified]</li>
+<li>Select the appropriate profile. [verified]</li>
+<li><strong>Click <code>Clean</code> to clean supported files.</strong> [verified]</li>
+<li>Wait for completion. [verified]</li>
+<li>Review the Dashboard, Reports, and Activity. [verified]</li>
+</ol>
+<p>Expected result: Supported files with score-bearing findings are cleaned according to the selected profile; backup files are created when backup is enabled and the run is not a dry run.</p>
+<p>Confirm success: The clean result shows cleaned files, Reports are available if generated, and Activity records the clean run.</p>
+<h4>Admin Track</h4>
+<p>Precondition: The target path exists and the administrator has defined the profile and reporting expectations.</p>
+<ol>
+<li>Run <code>sanitize clean &quot;C:\Path\To\FileOrFolder&quot; --profile aggressive --html-report auto</code> for a normal CLI clean workflow. [verified]</li>
+<li>Add <code>--summary</code> to print aggregate results after the clean operation. [verified]</li>
+<li>Add <code>--json-report &lt;path&gt;</code> or <code>--csv-report &lt;path&gt;</code> when downstream evidence processing is required. [verified]</li>
+<li><strong>Restrict <code>--no-backup</code> to workflows that already have separate recovery controls.</strong> [verified]</li>
+<li>Review the clean report and Activity entry after the command completes. [verified]</li>
+</ol>
+<p>Expected result: The CLI cleans supported files, writes requested reports, and records the run.</p>
+<p>Confirm success: Cleaned file counts, artifacts removed, report paths, and Activity records match the expected target and profile.</p>
+<h3>Task 4: Run Cleanroom End To End</h3>
+<p>Trigger: A document set is ready for release preparation or controlled evidence generation.</p>
+<h4>End-User Track</h4>
+<p>Precondition: The selected source is the intended release or review set, and the user has already considered a dry-run scan.</p>
+<ol>
+<li>Select a source. [verified]</li>
+<li>Select a profile. [verified]</li>
+<li>Confirm safety controls. [verified]</li>
+<li><strong>Click <code>Run Cleanroom</code> when ready to run scan, clean, post-clean scan, verify, report, and Activity as one pipeline.</strong> [verified]</li>
+<li>Wait for the run to complete. [verified]</li>
+<li>Review <code>Pipeline Verification</code>. [verified]</li>
+<li>Open Reports. [verified]</li>
+<li>Review Activity. [verified]</li>
+</ol>
+<p>Expected result: The full pipeline performs <code>scan -&gt; clean -&gt; post-clean scan -&gt; verify -&gt; report -&gt; Activity</code>.</p>
+<p>Confirm success: Pipeline Verification passes or clearly identifies residual findings that require review.</p>
+<h4>Admin Track</h4>
+<p>Precondition: The CLI target exists and report/history locations are approved.</p>
+<ol>
+<li>Run <code>sanitize run &quot;C:\Path\To\Source&quot; --profile aggressive --report-dir &quot;C:\Path\To\Reports&quot;</code> for the recommended full pipeline. [verified]</li>
+<li>Pass <code>--history-db &quot;C:\Path\To\Reports\history.db&quot;</code> when Activity should be written to a specific database. [verified]</li>
+<li>Use a batch JSON file with <code>profile</code>, <code>report_dir</code>, and <code>sources</code> when multiple sources must be processed. [verified]</li>
+<li>Run <code>sanitize batch jobs.json</code> to process the batch. [verified]</li>
+<li>Run <code>sanitize watch &quot;C:\Path\To\DropFolder&quot; --interval 30</code> when a drop folder should be polled for changed supported candidates. [verified]</li>
+<li>Run <code>sanitize schedule nightly --profile aggressive</code> to write a PowerShell scheduled-task helper under <code>reports\</code>. [verified]</li>
+<li>Review the printed <code>schtasks</code> command and register it according to endpoint policy. [verified]</li>
+</ol>
+<p>Expected result: Cleanroom creates pre-clean scan, clean, and post-clean scan reports, verifies residual findings, and records Activity.</p>
+<p>Confirm success: The pipeline summary shows files scanned, files cleaned, findings before and after, verification pass/fail counts, and report paths.</p>
+<h3>Task 5: Verify Results And Handle Residual Findings</h3>
+<p>Trigger: Cleanroom or a clean workflow has completed.</p>
+<h4>End-User Track</h4>
+<p>Precondition: Pipeline Verification or post-clean review is available.</p>
+<ol>
+<li>Review <code>Pipeline Verification</code>. [verified]</li>
+<li>If verification passes, open Reports and review the post-clean scan report. [verified]</li>
+<li>If verification fails, open File Review. [verified]</li>
+<li>Review each file with residual findings. [verified]</li>
+<li>Open Reports and review the post-clean scan report. [verified]</li>
+<li>Decide whether to retry with a stronger profile, perform manual remediation, or document residual risk. [verified]</li>
+<li><strong>Do not distribute files until verification failures are understood.</strong> [verified]</li>
+</ol>
+<p>Expected result: The user either confirms cleaned output is ready for final review or identifies the residual-risk path.</p>
+<p>Confirm success: Verification status and residual findings are understood before cleaned files are shared.</p>
+<h4>Admin Track</h4>
+<p>Precondition: Pre-clean, clean, and post-clean evidence is available.</p>
+<ol>
+<li>Compare the pre-clean and post-clean reports. [verified]</li>
+<li>Review the Activity entry for mode, profile, target, files scanned, files cleaned, findings, removed findings, highest risk, and report path. [verified]</li>
+<li>Run <code>sanitize history --stats</code> when aggregate run statistics are needed. [verified]</li>
+<li><strong>Retain pre-clean scan report, clean report, post-clean scan report, verification result, Activity entry, manual remediation notes, and final accepted artifact hash when required for controlled release workflows.</strong> [verified]</li>
+</ol>
+<p>Expected result: Verification is evidenced by reports and Activity records.</p>
+<p>Confirm success: Evidence is sufficient for release review, support, or audit handling.</p>
+<h3>Task 6: Use The Writing Assistant</h3>
+<p>Trigger: A user needs heuristic writing analysis or rule-based rewrite assistance.</p>
+<h4>End-User Track</h4>
+<p>Precondition: DocGuard AI is open and the text to review is available.</p>
+<ol>
+<li>Open <code>Writing Assistant</code>. [verified]</li>
+<li>Paste text into the editor. [verified]</li>
+<li>Review the live analysis. [verified]</li>
+<li>Review Findings and Statistics tabs. [verified]</li>
+<li>Review sentence heatmap output. [verified]</li>
+<li>Select a rewrite style: <code>natural</code>, <code>humanize</code>, <code>executive</code>, <code>technical</code>, <code>academic</code>, or <code>government</code>. [verified]</li>
+<li>Click <code>Rewrite</code>. [verified]</li>
+<li>Review the suggested rewrite. [verified]</li>
+<li>Review changed words and applied changes. [verified]</li>
+<li><strong>Use <code>Replace Original</code> only after reviewing the rewritten text.</strong> [verified]</li>
+<li>Use <code>Copy</code> to copy the rewrite. [verified]</li>
+</ol>
+<p>Expected result: The user receives heuristic analysis and, when requested, a rule-based rewrite suggestion.</p>
+<p>Confirm success: The user has reviewed the analysis or rewrite and understands that the output does not prove authorship, guarantee compliance, or replace human review.</p>
+<h4>Admin Track</h4>
+<p>Precondition: The deployed build is DocGuard AI v1.2.0 RC1 U6.1 or later.</p>
+<ol>
+<li>Confirm Writing Assistant appears in the sidebar. [verified]</li>
+<li>Confirm Extensions lists Writing Assistant as a Core Extension. [verified]</li>
+<li>Use <code>sanitize analyze-text --text &quot;Paste text here&quot; --heatmap</code> for CLI analysis. [verified]</li>
+<li>Use <code>sanitize rewrite --text &quot;Paste text here&quot; --style executive</code> for CLI rewrite assistance. [verified]</li>
+<li>Tell support staff that Writing Assistant is included in Core and is not separately licensed in this build. [verified]</li>
+</ol>
+<p>Expected result: Writing Assistant availability and command-line operation are validated.</p>
+<p>Confirm success: The GUI and CLI both expose analysis or rewrite behavior.</p>
+<h3>Task 7: Review Reports And Activity</h3>
+<p>Trigger: A scan, clean, or Cleanroom run has produced evidence.</p>
+<h4>End-User Track</h4>
+<p>Precondition: At least one run has completed.</p>
+<ol>
+<li>Open <code>Reports</code>. [verified]</li>
+<li>Click <code>Refresh Reports</code> if needed. [verified]</li>
+<li>Select a report. [verified]</li>
+<li>Review the report in the viewer. [verified]</li>
+<li>Open <code>Activity</code>. [verified]</li>
+<li>Click <code>Refresh Activity</code>. [verified]</li>
+<li>Review timestamp, mode, profile, scanned files, cleaned files, findings, removed findings, and highest risk. [verified]</li>
+<li><strong>Treat reports as sensitive if they contain paths or finding details.</strong> [verified]</li>
+</ol>
+<p>Expected result: The user can confirm what ran, what was found, what changed, and where report evidence is stored.</p>
+<p>Confirm success: The report and Activity row match the expected source and workflow.</p>
+<h4>Admin Track</h4>
+<p>Precondition: Report and Activity paths are known or defaults are in use.</p>
+<ol>
+<li>Use the default <code>reports\</code> directory for local reports when no alternate path is specified. [verified]</li>
+<li>Use the default <code>reports\history.db</code> Activity database when no alternate path is specified. [verified]</li>
+<li>Run <code>sanitize history --last 50</code> to inspect recent Activity. [verified]</li>
+<li>Run <code>sanitize history --stats</code> to inspect aggregate Activity statistics. [verified]</li>
+<li>Run <code>sanitize history --top-risk</code> to inspect highest-risk runs. [verified]</li>
+<li><strong>Apply the team&#x27;s retention policy to reports, Activity data, and backup files before using DocGuard AI for regulated workflows.</strong> [verified]</li>
+</ol>
+<p>Expected result: Evidence can be retrieved, reviewed, and retained according to policy.</p>
+<p>Confirm success: Reports and Activity data are available in the expected local paths.</p>
+<h2>Admin Configuration &amp; Governance</h2>
+<p>Confidence Summary: Procedural steps in this section are 100% [verified], 0% inferred, and 0% unknown.</p>
+<h3>End-User Track</h3>
+<p>Precondition: The user is operating inside the approved deployment and needs to confirm local settings or license state.</p>
+<ol>
+<li>Open <code>Settings</code> to view product and license details. [verified]</li>
+<li>Use <code>Tools -&gt; License Status</code> when an administrator asks for activation state. [verified]</li>
+<li>Do not send full product keys in screenshots or support requests. [verified]</li>
+<li>Keep <code>Backup</code> enabled for normal work. [verified]</li>
+<li>Use <code>Dry Run</code> on unfamiliar file sets. [verified]</li>
+<li>Ask an administrator before using <code>paranoid</code> on important documents. [verified]</li>
+<li><strong>Ask an administrator before cleaning regulated, controlled, or business-critical document sets outside the approved workflow.</strong> [verified]</li>
+</ol>
+<p>Expected result: The user can operate within approved safety, licensing, and support boundaries.</p>
+<p>Confirm success: The user can state the active version, license status path, profile, and safety settings used.</p>
+<h3>Admin Track</h3>
+<p>Precondition: Administrative owners have been assigned for release ownership, endpoint deployment, licensing, security review, support readiness, and data governance.</p>
+<ol>
+<li>Use the approved installer <code>release\DocGuardAISetup.exe</code> for managed endpoint installation. [verified]</li>
+<li>Use the approved portable build <code>dist-docguard-ui-polish\DocGuardAI</code> for controlled portable deployment. [verified]</li>
+<li><strong>Restrict deployment folder write permissions.</strong> [verified]</li>
+<li><strong>Confirm users have read access to target source documents and write access to selected output/report locations.</strong> [verified]</li>
+<li>Confirm product identity: product name <code>DocGuard AI</code>, product ID <code>docguard_ai</code>, product key prefix <code>DGA</code>, edition <code>Core</code>, executable <code>DocGuardAI.exe</code>. [verified]</li>
+<li>Run <code>sanitize plugins</code> to verify expected Extension status. [verified]</li>
+<li>Run <code>sanitize license</code> to check license status. [verified]</li>
+<li><strong>Activate offline with <code>sanitize license --activate DGA-XXXX-XXXX-XXXX</code> only through an approved product-key handling path.</strong> [verified]</li>
+<li><strong>Activate online with <code>sanitize license --activate DGA-XXXX-XXXX-XXXX --online --server-url https://&lt;tsg-platform-url&gt;</code> only against the approved TSG License Manager endpoint.</strong> [verified]</li>
+<li>Refresh online licensing with <code>sanitize license --refresh --server-url https://&lt;tsg-platform-url&gt;</code>. [verified]</li>
+<li><strong>Deactivate locally or online with <code>sanitize license --deactivate</code> or <code>sanitize license --deactivate --online --server-url https://&lt;tsg-platform-url&gt;</code> when access must be removed.</strong> [verified]</li>
+<li>Set <code>TSG_API_URL</code> or pass <code>--server-url</code> for TSG License Manager operations. [verified]</li>
+<li>Run <code>sanitize update-check --server-url https://&lt;tsg-platform-url&gt;</code> when update checks are part of the environment. [verified]</li>
+<li>Define profile policy: <code>standard</code> for conservative cleanup, <code>aggressive</code> for normal release preparation, and <code>paranoid</code> only after sample validation for business-critical document sets. [verified]</li>
+<li><strong>Keep <code>Backup</code> enabled in the GUI unless another recovery mechanism exists.</strong> [verified]</li>
+<li><strong>Restrict CLI use of <code>--no-backup</code> to workflows with separate recovery controls.</strong> [verified]</li>
+<li><strong>Use an approved reports folder for regulated workflows.</strong> [verified]</li>
+<li><strong>Treat generated reports as sensitive because they may include file paths and finding details.</strong> [verified]</li>
+<li><strong>Review backup retention policy before cleaning sensitive sources.</strong> [verified]</li>
+<li>Configure CLI evidence locations with <code>--report-dir</code> and <code>--history-db</code> when defaults are not appropriate. [verified]</li>
+<li>Retain pre-clean scan report, clean report, post-clean scan report, verification result, Activity entry, manual remediation notes, and final accepted artifact hash when required for controlled release workflows. [verified]</li>
+<li>Run endpoint protection scans on signed production artifacts. [verified]</li>
+<li>Review dependency vulnerability results before production release. [verified]</li>
+<li>Confirm local-only processing language in customer-facing materials. [verified]</li>
+</ol>
+<p>Expected result: Deployment, license state, evidence generation, local data handling, and profile policy are governed consistently.</p>
+<p>Confirm success: A deployment owner can show package identity, license status, plugin status, report/history locations, profile policy, and release evidence.</p>
+<h2>Lifecycle &amp; Decision Points</h2>
+<p>Confidence Summary: No numbered procedures in this section; decision points are verified from the repository documentation and implementation behavior.</p>
+<h3>End-User Track</h3>
+<table>
+<thead><tr><th>Decision Point</th><th>Trigger Condition</th><th>Branch</th></tr></thead>
+<tbody>
+<tr><td>Scan vs. Clean</td><td>You have not reviewed the source yet.</td><td>Scan first, then decide whether cleaning is appropriate.</td></tr>
+<tr><td>Dry Run vs. actual clean</td><td>The file set is critical or unfamiliar.</td><td>Use Dry Run for preview; turn it off only when ready to change supported files.</td></tr>
+<tr><td>Standard vs. Aggressive vs. Paranoid</td><td>The workflow ranges from routine metadata reduction to strongest cleanup.</td><td>Use <code>standard</code> for routine cleanup, <code>aggressive</code> for release preparation, and <code>paranoid</code> only with careful verification.</td></tr>
+<tr><td>Cleanroom vs. individual actions</td><td>A final release package or controlled document set needs the complete pipeline.</td><td>Use Cleanroom for scan, clean, post-clean scan, verify, report, and Activity.</td></tr>
+<tr><td>Verification pass vs. fail</td><td>Pipeline Verification reports success or residual findings.</td><td>Use cleaned output only after pass; if fail, review residual findings before distribution.</td></tr>
+<tr><td>Report retain vs. discard</td><td>The run supports a case, release, audit, or regulated workflow.</td><td>Retain reports according to team policy and treat them as sensitive.</td></tr>
+<tr><td>Manual remediation vs. retry</td><td>A report says the finding is residual, unsupported, informational, or inspection-first.</td><td>Follow remediation guidance, retry with a stronger profile when appropriate, or document residual risk.</td></tr>
+</tbody></table>
+<h3>Admin Track</h3>
+<table>
+<thead><tr><th>Decision Point</th><th>Trigger Condition</th><th>Branch</th></tr></thead>
+<tbody>
+<tr><td>Installer vs. portable vs. source</td><td>The environment is production deployment, controlled validation, or engineering validation.</td><td>Use installer for managed endpoints, portable for controlled validation/file share deployment, and source only for engineering validation.</td></tr>
+<tr><td>Trial/offline vs. online TSG licensing</td><td>TSG License Manager is unavailable or available for production activation.</td><td>Use local trial/offline where appropriate; prefer online activation for production when TSG License Manager is available.</td></tr>
+<tr><td>Default reports vs. approved evidence path</td><td>Reports need governance, retention, or central review.</td><td>Set <code>--report-dir</code> and <code>--history-db</code> to approved local paths.</td></tr>
+<tr><td>Manual run vs. batch/watch/schedule</td><td>One-time processing is insufficient for the operating model.</td><td>Use <code>batch</code>, <code>watch</code>, or <code>schedule</code> after reviewing endpoint policy.</td></tr>
+<tr><td>Enable vs. restrict <code>--no-backup</code></td><td>A workflow requests cleanup without backups.</td><td>Permit only when separate recovery controls exist.</td></tr>
+<tr><td>Retain vs. purge evidence</td><td>Reports, backups, or Activity data include sensitive or regulated details.</td><td>Apply data governance retention and disposal policy.</td></tr>
+<tr><td>Roll out vs. hold</td><td>Validation evidence is incomplete or endpoint policy blocks launch.</td><td>Hold deployment until package QA, installer QA, license checks, and support readiness pass.</td></tr>
+</tbody></table>
+<h2>Troubleshooting</h2>
+<p>Confidence Summary: Procedural actions in this section are 100% [verified], 0% inferred, and 0% unknown.</p>
+<h3>User-Resolvable Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely Cause</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>No source selected</td><td>No file or folder has been chosen.</td><td>Click <code>Browse</code> and choose a file or folder. [verified]</td></tr>
+<tr><td>Scan finds nothing</td><td>Unsupported file type or <code>Recursive</code> is not set as intended.</td><td>Confirm the file type is supported and set <code>Recursive</code> correctly. [verified]</td></tr>
+<tr><td>Reports page is empty</td><td>No report has been generated.</td><td>Use <code>Run Cleanroom</code> or the Cleanroom page first. [verified]</td></tr>
+<tr><td>Activity is empty</td><td>No scan, clean, or full pipeline has been recorded.</td><td>Run a scan, clean, or full pipeline first. [verified]</td></tr>
+<tr><td>Clean did not change files</td><td><code>Dry Run</code> is on, the file type is unsupported, or findings are informational.</td><td>Check <code>Dry Run</code>, file type support, and whether findings are informational. [verified]</td></tr>
+<tr><td>Verification failed</td><td>Residual findings remain after cleaning.</td><td>Review File Review and the post-clean report before distributing files. [verified]</td></tr>
+<tr><td>Writing Assistant is missing</td><td>The package may be outdated.</td><td>Ask an administrator to confirm the latest DocGuard AI package is installed. [verified]</td></tr>
+<tr><td>License looks wrong</td><td>The activation state is unexpected.</td><td>Use <code>Tools -&gt; License Status</code> and contact an administrator. [verified]</td></tr>
+<tr><td>App does not launch</td><td>The launch source or endpoint state needs review.</td><td>Reopen from the extracted portable folder or contact support. [verified]</td></tr>
+</tbody></table>
+<h3>Admin-Only Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely Cause</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Reports page is empty</td><td>No report has been generated.</td><td>Use <code>Run Cleanroom</code> or run <code>sanitize run</code>. [verified]</td></tr>
+<tr><td>Activity is empty</td><td>No run is recorded or the wrong history database is being reviewed.</td><td>Check <code>reports\history.db</code> or pass <code>--history-db</code>. [verified]</td></tr>
+<tr><td>License shows trial</td><td>No local or TSG license cache exists.</td><td>Activate or refresh the license. [verified]</td></tr>
+<tr><td>Online activation fails</td><td>TSG API is unavailable or the URL is wrong.</td><td>Check endpoint, firewall, DNS, and <code>TSG_API_URL</code>. [verified]</td></tr>
+<tr><td>TSG connection is refused</td><td>TSG License Manager is not running.</td><td>Start TSG License Manager on the configured port and retry. [verified]</td></tr>
+<tr><td>License not found</td><td>Product key is missing from TSG License Manager.</td><td>Generate or register the license through the approved TSG process. [verified]</td></tr>
+<tr><td>Invalid key format</td><td>Product key does not match the DGA format.</td><td>Use <code>DGA-XXXX-XXXX-XXXX</code>. [verified]</td></tr>
+<tr><td>File not detected</td><td>Unsupported extension or discovery issue.</td><td>Run <code>sanitize scan &lt;path&gt; --diagnose</code>. [verified]</td></tr>
+<tr><td>Cleaning does not remove a finding</td><td>Finding is informational, inspection-only, or requires stronger handling.</td><td>Review report remediation and profile selection. [verified]</td></tr>
+<tr><td>Verification fails</td><td>Residual findings remain after cleaning.</td><td>Review File Review and post-clean report, remediate, or document residual risk. [verified]</td></tr>
+<tr><td>Portable app does not launch</td><td>Blocked file, missing runtime file, endpoint policy, or endpoint protection quarantine.</td><td>Re-extract the package, unblock files, check endpoint logs, and verify package hash. [verified]</td></tr>
+<tr><td>Writing Assistant missing</td><td>Outdated build or legacy package behavior.</td><td>Deploy the latest package and confirm Extensions shows Writing Assistant as Core. [verified]</td></tr>
+</tbody></table>
+<h2>Verification Checklist</h2>
+<p>Confidence Summary: Checklist items in this section are 100% [verified], 0% inferred, and 0% unknown.</p>
+<h3>End-User Track</h3>
+<ul class="checklist">
+<li>Confirm the source path is correct before scanning or cleaning. [verified]</li>
+<li>Confirm you have permission to inspect and clean the selected content. [verified]</li>
+<li>Confirm the selected profile matches the workflow risk level. [verified]</li>
+<li>Confirm <code>Backup</code> is enabled unless an administrator directed another recovery path. [verified]</li>
+<li>Confirm <code>Dry Run</code> was used before cleaning critical or unfamiliar files. [verified]</li>
+<li>Confirm Scan results were reviewed in Dashboard, File Review, Findings, and Risk Map. [verified]</li>
+<li>Confirm Cleanroom was used for final release or controlled document-set preparation. [verified]</li>
+<li>Confirm Pipeline Verification passed or residual findings were reviewed and understood. [verified]</li>
+<li>Confirm Reports were reviewed before sharing cleaned output. [verified]</li>
+<li>Confirm Activity contains the expected run record. [verified]</li>
+<li>Confirm reports are treated as sensitive when they include paths or finding details. [verified]</li>
+</ul>
+<h3>Admin Track</h3>
+<ul class="checklist">
+<li>Confirm the approved installer or portable package was used. [verified]</li>
+<li>Confirm endpoint users have read/execute access to the application folder. [verified]</li>
+<li>Confirm endpoint users have write access to approved report and Activity locations. [verified]</li>
+<li>Confirm the application title is <code>DocGuard AI v1.2.0 RC1 U6.1</code>. [verified]</li>
+<li>Confirm <code>Writing Assistant</code> appears in the sidebar and Extensions lists it as Core. [verified]</li>
+<li>Confirm expected Extensions are enabled with <code>sanitize plugins</code>. [verified]</li>
+<li>Confirm license status with <code>sanitize license</code> or <code>Tools -&gt; License Status</code>. [verified]</li>
+<li>Confirm TSG activation, refresh, deactivation, and update-check paths if online licensing is used. [verified]</li>
+<li>Confirm profile policy covers <code>standard</code>, <code>aggressive</code>, and <code>paranoid</code>. [verified]</li>
+<li>Confirm <code>--no-backup</code> use is restricted to workflows with separate recovery controls. [verified]</li>
+<li>Confirm report and Activity paths are configured with <code>--report-dir</code> and <code>--history-db</code> when defaults are unsuitable. [verified]</li>
+<li>Confirm generated reports, Activity data, backups, and evidence records follow retention policy. [verified]</li>
+<li>Confirm endpoint protection scans and dependency vulnerability reviews are complete before production release. [verified]</li>
+<li>Confirm support handoff can collect version, installation type, Windows version, license source, workflow, source file type, profile, safety settings, report path, Activity database path, error text, and reproduction notes without full product keys or confidential document content. [verified]</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS LMS — QMS Competence System-of-Record: Architecture &amp; Schema (v3.0)</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="ttis-lms-qms-competence-system-of-record-architecture-schema-v30">TTIS LMS — QMS Competence System-of-Record: Architecture &amp; Schema (v3.0)</h1>
+<p><strong>Doc ID:</strong> R-LMS-01 / QMS-COMP-01
+<strong>Status:</strong> As-built design-review baseline · 2026-06-15. Covers R-LMS-01 (Q1–Q6), R-XC-01
+(external credentials), R-COMP-01 (competency registry), and R-AA-01 P4a (three-stage approval
+gate + per-user capability grants) — all backend + frontend merged.
+<strong>Supersedes:</strong> v2.0 (Q1–Q6 only). v1.0 was the pre-build gap analysis.
+<strong>Source of truth (backend, repo <code>ttis-ai</code>):</strong> <code>dashboard/lms.py</code> (service + schema, 22 <code>lms_*</code>
+tables), <code>dashboard/main.py</code> (<code>/api/v1/lms/*</code>), <code>dashboard/abac.py</code> (capability PDP),
+<code>dashboard/users.py</code> (<code>capability_grants</code>), <code>orchestration/audit_logger.py</code> (SHA-256 hash chain).
+<strong>Front end (repo <code>TTI-S_Dashboard</code>):</strong> <code>src/components/vbs/lms-*</code>, <code>src/components/admin/*</code>,
+<code>src/lib/vbs/{schemas,types,endpoints}.ts</code>.</p>
+<blockquote>
+<p><strong>Reviewer's orientation.</strong> This is an in-house LMS <em>fused</em> into the TTIS VBS platform — not a
+standalone product and not a bridge to an external LMS. The fusion is deliberate: credentials
+inherit the platform's single identity and single tamper-evident audit chain, which is what makes
+them compliance-grade. §1 covers the coupling and what extraction would take.</p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="0. Purpose &amp; the distinction that drives the design" id="0-purpose-the-distinction-that-drives-the-design"><h2 id="0-purpose-the-distinction-that-drives-the-design">0. Purpose &amp; the distinction that drives the design</h2>
+<p>A <strong>QMS competence system-of-record</strong> for an SDVOSB low-voltage telecom contractor. It delivers
+training, assesses <strong>written knowledge and observed practical skill</strong>, issues <strong>earned, expiring,
+chain-anchored credentials</strong> (and records <strong>externally-earned</strong> ones by attestation), maps a
+<strong>role→competency matrix</strong> to readiness, decomposes competence into an auditable <strong>competency
+registry</strong>, recerts per-competency, and governs all curriculum content through a <strong>three-stage
+approval gate</strong>.</p>
+<p>The auditor distinction — <em>training tool vs. system of record</em> — is the north star:
+- Every competence event (quiz attempt, course completion, practical assessment, credential
+  issue/revoke/expire, approval decision, evidence-row change) is <strong>fail-closed chain-anchored</strong> into
+  an append-only, <code>verify_chain()</code>-checkable log.
+- Evidence rows are <strong>WORM</strong> — no service/API path mutates or deletes them after the fact.
+- A documented <strong>retention floor</strong> (<code>LMS_RETENTION_DAYS</code>, default 2557 ≈ 7y) governs persistence.
+- Curriculum content cannot reach a learner without a competence-routed human gate, and each
+  approval signature attests <strong>only to what its holder can verify</strong> (authority ≠ competence).</p>
+<pre><code>            ┌───────────────────────────────────────────────────────────────────────┐
+ Frontend   │  Next.js dashboard (TTI-S_Dashboard) — Learning tabs + User-Admin       │
+ (separate  │  Courses · Certifications · Assess · Review (gate) · Authoring (CEO)     │
+  repo)     └───────────────────────────────┬───────────────────────────────────────┘
+                                             │  HTTPS + per-user JWT
+            ┌───────────────────────────────▼───────────────────────────────────────┐
+ API        │  FastAPI :8000  dashboard/main.py   /api/v1/lms/*                        │
+            │  require_capability(resource, Action) → ABAC PDP (dashboard/abac.py)     │
+            └───────────────────────────────┬───────────────────────────────────────┘
+ Domain     │  dashboard/lms.py  (auth-agnostic; takes by_actor; no abac import)       │
+            │  catalog · delivery · assessment · certs/credentials · competency        │
+            │  registry · matrix · recert · three-stage gate                           │
+            └───────┬───────────────────────────────────────────┬───────────────────┘
+ Data       │  SQLite/Postgres  lms.db (22 lms_* tables)         │ auth.db (capability_grants)
+ Spine      │  orchestration/audit_logger.py — SHA-256 hash chain (audit.db), verify_chain()
+            └───────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr/>
+</section><section class="doc-section-page" data-section-index="2" data-section-title='1. System boundaries &amp; coupling (the "is it separable?" question)' id="1-system-boundaries-coupling-the-is-it-separable-question"><h2 id="1-system-boundaries-coupling-the-is-it-separable-question">1. System boundaries &amp; coupling (the "is it separable?" question)</h2>
+<p>The LMS is a <strong>modular monolith inside VBS</strong>. Cleanly isolated: domain logic (one file, auth-agnostic
+— imports <code>db</code> only, never <code>abac</code>), data (own <code>lms.db</code> / <code>lms_*</code> namespace), API namespace
+(<code>/api/v1/lms/*</code>), UI components. Three platform seams bind it:</p>
+<table>
+<thead>
+<tr>
+<th>Seam</th>
+<th>Mechanism</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Auth / ABAC</strong></td>
+<td>capabilities checked at the route layer (<code>require_capability</code>)</td>
+<td>domain is auth-agnostic — a clean seam</td>
+</tr>
+<tr>
+<td><strong>Audit hash-chain</strong></td>
+<td><code>orchestration/audit_logger</code> (<code>log_event_strict</code>, <code>verify_chain</code>)</td>
+<td><strong>load-bearing &amp; deliberate</strong> — the compliance backbone</td>
+</tr>
+<tr>
+<td><strong>Identity</strong></td>
+<td>learners/assessors/reviewers are VBS users (<code>auth.db</code>)</td>
+<td>single user store, no parallel LMS identity</td>
+</tr>
+</tbody>
+</table>
+<p>Standalone extraction is a <em>bounded refactor</em>, not a rewrite: abstract the three seams (inject an
+authz policy, carry/re-provide a tamper-evident log, supply a user store), split the route module +
+UI bundle. The audit-chain dependency is the one you would never drop.</p>
+<p><strong>Persistence/concurrency.</strong> <code>db.get_connection("lms")</code> → <code>data/sqlite/lms.db</code> locally / Cloud SQL
+Postgres in prod (<code>DATABASE_URL</code>); DDL dialect-portable (<code>exec_ddl</code> + <code>_pg_adapt</code>); all tables in
+<code>init_lms_db()</code>; column additions are idempotent <code>ALTER … ADD COLUMN</code>. Integer OCC <code>version</code> guards
+mutable parents (courses, enrollments, curricula, certifications, credentials, practicals, competencies).</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="2. Compliance spine" id="2-compliance-spine"><h2 id="2-compliance-spine">2. Compliance spine</h2>
+<ul>
+<li><strong>Fail-closed anchoring.</strong> <code>_strict_anchor()</code> wraps <code>log_event_strict</code>; a competence mutation that
+  cannot be anchored <strong>fails</strong> rather than silently proceeding. Chain:
+  <code>entry_hash = SHA-256(msg_type ‖ payload_hash ‖ prev_hash)</code>, genesis <code>GENESIS_BLOCK_TTIS_2026</code>;
+  <code>verify_chain()</code> recomputes the whole log and flags any altered/removed row. Config-level authoring
+  uses best-effort <code>log_event</code>.</li>
+<li><strong>WORM evidence.</strong> Practicals lock on submit (<code>locked=1</code>); credentials transition forward only
+  (<code>active → expired|revoked</code>); there is <strong>no</strong> service/API path that updates or deletes attempts,
+  completions, credentials, practicals, or audit rows. Corrections are new linked records.</li>
+<li><strong>Row-level evidence audit (Q2).</strong> <code>lms_record_audit</code> appends a chain-anchored before/after row for
+  every evidence mutation, with actor — so an app-path change is attributed and a <strong>direct-DB</strong> change
+  is caught by <code>verify_chain()</code>. <code>integrity_status()</code> surfaces the live verdict; <code>record_history()</code>
+  returns a record's trail.</li>
+<li><strong>Retention.</strong> <code>RETENTION_DAYS</code> (env, default 2557) is the stated floor; no hard-delete path exists.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="3. Capability model (ABAC)" id="3-capability-model-abac"><h2 id="3-capability-model-abac">3. Capability model (ABAC)</h2>
+<p>CEO = allow-all; auditor sub-role = read-only (denies all mutations, ahead of the CEO override); other
+roles get an explicit matrix. <strong>Per-user grants (R-AA-01 slice 0)</strong> overlay person-bound caps on top.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Actions</th>
+<th>Held by</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lms</code></td>
+<td>VIEW (all) · C/U/D (CEO)</td>
+<td>all view; authoring CEO</td>
+<td>catalog/authoring + learner surface</td>
+</tr>
+<tr>
+<td><code>lms_assess</code></td>
+<td>VIEW, CREATE</td>
+<td>field_ops_mgr (+CEO)</td>
+<td>conduct practical assessments (Q1)</td>
+</tr>
+<tr>
+<td><code>lms_extcred</code></td>
+<td>VIEW, CREATE</td>
+<td>field_ops_mgr (+CEO)</td>
+<td>record external credentials (R-XC-01); attestor ≠ learner</td>
+</tr>
+<tr>
+<td><code>lms_approve_policy</code></td>
+<td>VIEW, APPROVE, REJECT</td>
+<td>field_ops_mgr (+CEO)</td>
+<td>Stage-2 gate, <code>policy_anchored</code> courses</td>
+</tr>
+<tr>
+<td><code>lms_approve_trade</code></td>
+<td>VIEW, APPROVE, REJECT</td>
+<td><strong>per-user grant</strong></td>
+<td>Stage-2 gate, <code>trade_technical</code>; credential-gated (A4)</td>
+</tr>
+<tr>
+<td><code>lms_approve_compliance</code></td>
+<td>VIEW, APPROVE, REJECT</td>
+<td><strong>per-user grant</strong></td>
+<td>Stage-2 gate, <code>federal_compliance</code> (FAR/CMMC)</td>
+</tr>
+<tr>
+<td><code>lms_release</code></td>
+<td>APPROVE</td>
+<td>CEO (allow-all)</td>
+<td>Stage-3 release authorization</td>
+</tr>
+<tr>
+<td><code>lms_author</code></td>
+<td>VIEW, CREATE</td>
+<td>authoring agent principal (+CEO)</td>
+<td>draft-only authoring (P4b)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Per-user grants overlay.</strong> <code>Principal.grants</code> (frozenset of <code>(resource, action)</code>) is loaded <strong>per
+request</strong> in <code>get_current_principal</code> (immediate revoke; not in the JWT). <code>can()</code> allows an action when
+the role matrix doesn't but an explicit grant does — <strong>after</strong> the auditor-deny and CEO override, so a
+grant can never subvert those. Store: <code>capability_grants</code> (<code>auth.db</code>); CEO-only, audit-anchored API
+<code>GET/POST/DELETE /admin/users/{id}/grants</code>; UI in User &amp; Access Management.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="4. Data model — full schema (22 lms_* tables + capability_grants )" id="4-data-model-full-schema-22-lms-tables-capability-grants"><h2 id="4-data-model-full-schema-22-lms_-tables-capability_grants">4. Data model — full schema (22 <code>lms_*</code> tables + <code>capability_grants</code>)</h2>
+<p>TEXT typed-prefix ids; ISO-8601 UTC TEXT timestamps; INTEGER 0/1 booleans; integer OCC <code>version</code>; JSON
+arrays as TEXT. <strong>Bold</strong> = added since v2.0.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="4.1 Catalog &amp; delivery" id="4-1-catalog-delivery"><h3 id="41-catalog-delivery">4.1 Catalog &amp; delivery</h3>
+<pre><code class="language-sql">lms_courses(course_id PK, code UNIQUE, title, description,
+            status['draft'|'pending_review'|'release_pending'|'published'|'retired'],
+            approval_track['policy_anchored'|'trade_technical'|'federal_compliance' DEFAULT trade_technical],  -- R-AA-01
+            owner, version, created_by, created_at, updated_at)
+lms_modules(module_id PK, course_id, title, position, created_at)
+lms_lessons(lesson_id PK, module_id, course_id, title, position,
+            content_type['native_md'|'video'|'document'|'scorm'|'xapi'], body, content_ref, created_at)
+lms_enrollments(enrollment_id PK, learner_id, course_id, status['assigned'|'in_progress'|'completed'|'waived'],
+                progress REAL, assigned_by, auto_basis, due_date, completed_at, chain_hash, version, created/updated_at)
+lms_lesson_progress(enrollment_id, lesson_id, completed_at, PK(enrollment_id,lesson_id))
+</code></pre>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="4.2 Assessment — written + practical (Q1)" id="4-2-assessment-written-practical-q1"><h3 id="42-assessment-written-practical-q1">4.2 Assessment — written + practical (Q1)</h3>
+<pre><code class="language-sql">lms_quizzes(quiz_id PK, course_id, title, passing_score REAL, attempt_limit INTEGER, created_at)
+lms_questions(question_id PK, quiz_id, stem, qtype['mc'|'truefalse'|'multi'|'short'], points REAL,
+              options(JSON), answer_key(JSON), position, competency_id)            -- competency_id: R-COMP-01
+lms_attempts(attempt_id PK, enrollment_id, quiz_id, attempt_no, answers(JSON), score REAL, passed, chain_hash, created_at)
+lms_rubrics(rubric_id PK, code UNIQUE, title, description, status, version, created_by, created/updated_at)
+lms_rubric_criteria(criterion_id PK, rubric_id, ordinal, text, standard_ref, is_critical,
+                    measure_type['observed'|'measured'|'document'], expected_value, competency_id)  -- R-COMP-01
+lms_practical_assessments(assessment_id PK, learner_id, rubric_id, assessor_id, cert_id,
+                          status['scheduled'|'in_progress'|'submitted'|'passed'|'failed'], overall_result,
+                          assessor_attestation, started_at, decided_at, chain_hash, locked, version, created/updated_at)
+lms_practical_results(result_id PK, assessment_id, criterion_id, outcome['pass'|'fail'|'na'], measured_value, note, captured_at)
+</code></pre>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="4.3 Certifications &amp; credentials (Q2 + R-XC-01)" id="4-3-certifications-credentials-q2-r-xc-01"><h3 id="43-certifications-credentials-q2-r-xc-01">4.3 Certifications &amp; credentials (Q2 + R-XC-01)</h3>
+<pre><code class="language-sql">lms_curricula(curriculum_id PK, code, title, description, course_ids(JSON[]), final_quiz_id, version, created/updated_at)
+lms_certifications(cert_id PK, code, title, curriculum_id, validity_days INTEGER, recert_cadence, issuing_authority,
+                   practical_rubric_id, standard_ref, issuance_mode['earned'|'external_attested'],  -- R-XC-01
+                   version, created/updated_at)
+lms_credentials(credential_id PK, learner_id, cert_id, issued_at, valid_until,
+                status['active'|'expired'|'revoked'], certificate_hash, version, created/updated_at,
+                issuance_mode, attested_by, external_provider, external_ref, attestation_note, evidence_uri)  -- R-XC-01
+</code></pre>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="4.4 Competency registry (R-COMP-01)" id="4-4-competency-registry-r-comp-01"><h3 id="44-competency-registry-r-comp-01">4.4 Competency registry (R-COMP-01)</h3>
+<pre><code class="language-sql">lms_competencies(competency_id PK,                 -- '{CERT}-{TOPIC}-{NN}', e.g. FND-BP-04
+                 code, title, description,
+                 owning_course_id,                 -- EXACTLY ONE owner (no junction table = the enforcement)
+                 cert_id, governing_standard_ref,  -- the clause
+                 standard_authority['CSI'|'TIA'|'NEC'|'OSHA'|'FAR'|'CMMC'|'IEC'|'QMS'|'OTHER'],
+                 is_critical, measure_type,
+                 authored_by, source_refs, ratified_by, ratified_at,   -- provenance + M6 sign-off
+                 version, created/updated_at)
+lms_competency_prereqs(competency_id, requires_competency_id, created_at, PK(...))  -- cycle-guarded
+</code></pre>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="4.5 Matrix, prerequisites, recert (Q4–Q6)" id="4-5-matrix-prerequisites-recert-q4-q6"><h3 id="45-matrix-prerequisites-recert-q4q6">4.5 Matrix, prerequisites, recert (Q4–Q6)</h3>
+<pre><code class="language-sql">lms_competency_matrix(role, cert_id, required, grace_days, created/updated_at, PK(role,cert_id))  -- keyed by job titles
+lms_prerequisites(course_id, requires_course_id, created_at, PK(course_id,requires_course_id))    -- course DAG
+lms_standard_revisions(revision_id PK, standard_ref, revised_on, note, affected, created_at)
+</code></pre>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="4.6 Approval gate + audit (R-AA-01 / Q2)" id="4-6-approval-gate-audit-r-aa-01-q2"><h3 id="46-approval-gate-audit-r-aa-01-q2">4.6 Approval gate + audit (R-AA-01 / Q2)</h3>
+<pre><code class="language-sql">lms_approval_log(log_id PK, artifact_id, artifact_version, stage['track'|'release'], track, actor_id,
+                 capability_used, reviewer_credential_id, reviewer_cred_type, reviewer_cred_ref,
+                 reviewer_cred_valid_until,                          -- A7 credential capture (trade track)
+                 action['approve'|'reject'|'release'|'override'], justification, chain_hash, created_at)
+lms_record_audit(audit_id PK, record_table, record_id, action, actor, before_state(JSON), after_state(JSON), chain_hash, created_at)
+</code></pre>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="4.7 Auth overlay ( auth.db )" id="4-7-auth-overlay-auth-db"><h3 id="47-auth-overlay-authdb">4.7 Auth overlay (<code>auth.db</code>)</h3>
+<pre><code class="language-sql">capability_grants(user_id, resource, action, granted_by, granted_at, PK(user_id,resource,action))
+</code></pre>
+<hr/>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="5. Competence layers (behavior)" id="5-competence-layers-behavior"><h2 id="5-competence-layers-behavior">5. Competence layers (behavior)</h2>
+<ul>
+<li><strong>Delivery.</strong> <code>enroll</code> (prereq-gated, idempotent) → <code>mark_lesson_complete</code> (progress rollup) →
+  <code>submit_attempt</code> (server-scored: <code>mc/truefalse/multi</code> auto-graded, <code>short</code> manual; attempt-limited;
+  anchored) → <code>complete_course</code> (server-verifies all lessons done + every quiz passed; anchored).</li>
+<li><strong>Earned credentials.</strong> Eligibility = <em>all curriculum courses complete AND final assessment passed
+  (if any) AND practical passed (if the cert sets <code>practical_rubric_id</code>)</em> — so "passed the quiz =
+  competent" is structurally impossible when a practical is required. <code>issue_credential</code> is
+  server-verified, idempotent, anchored; <code>valid_until</code> from <code>validity_days</code> (NULL = permanent);
+  <code>expire_due_credentials</code> is NULL-safe.</li>
+<li><strong>External credentials (R-XC-01).</strong> <code>record_external_credential</code> attests a credential earned outside
+  the LMS (OSHA, BICSI, FOA, manufacturer). <strong>M4 mutual-exclusion wall:</strong> <code>issue_credential</code> refuses
+  <code>external_attested</code> certs; <code>record_external_credential</code> refuses <code>earned</code> certs. Attestor ≠ learner
+  (M5); dates are an attested claim (M7); fail-closed anchored. External certs carry no curriculum/rubric.</li>
+<li><strong>Competency registry (R-COMP-01).</strong> <code>create_competency</code> (one-owner + cert/owner consistency; external
+  certs can't own competencies), <code>list_competencies</code> (filter by cert/course/authority/clause),
+  <code>update</code>/<code>ratify_competency</code> (M6), competency-level prereqs, <code>link_criterion/question_competency</code>.
+  <code>competency_record</code> (Q3) is a self-verifying per-person JSON: courses + written + practicals +
+  credentials + <strong>per-competency clause + credential hash</strong> + a live <code>verify_chain</code> verdict.</li>
+<li><strong>Matrix &amp; readiness (Q5).</strong> <code>learner_readiness(role)</code> → held/expired/missing per required cert;
+  <code>assign_required</code> bulk-enrolls the courses behind a role's certs.</li>
+<li><strong>Recert (Q6).</strong> Each credential expires on its own clock; <code>record_standard_revision</code> additionally
+  re-triggers recert on the citing certs only (per-competency, not a calendar reset);
+  <code>expiring_credentials</code> is the reminder list.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="6. The three-stage approval gate (R-AA-01)" id="6-the-three-stage-approval-gate-r-aa-01"><h2 id="6-the-three-stage-approval-gate-r-aa-01">6. The three-stage approval gate (R-AA-01)</h2>
+<p>No curriculum content reaches a learner without a competence-routed human gate. <em>Authority is never a
+substitute for competence — each signature attests only to what its holder can verify.</em></p>
+<pre><code> draft ──submit_for_review──▶ pending_review ──review_course(approve)──▶ release_pending ──record_release──▶ published
+   ▲          (Stage 1: agent       │  Stage 2: TRACK GATE (competent      │   Stage 3: CEO release          │
+   │           machine pre-review)  │  reviewer; capability by track)      │   (lms_release)                 │ retire
+   └────reject(reason)──────────────┘                                      └──reject──▶ pending_review       ▼
+                                                                                                        retired
+</code></pre>
+<ul>
+<li><strong>Track routing</strong> (per-course <code>approval_track</code>, fail-safe default <code>trade_technical</code>):
+  <code>policy_anchored</code>→<code>lms_approve_policy</code> · <code>trade_technical</code>→<code>lms_approve_trade</code> ·
+  <code>federal_compliance</code>→<code>lms_approve_compliance</code>. The required cap is checked in-handler (data-dependent).</li>
+<li><strong>A4 — credential-bound trade gate.</strong> A <code>trade_technical</code> approval is <strong>blocked unless the reviewer's
+  own R-XC-01 credential is currently active</strong>; the credential (type/ref/validity-at-approval) is
+  captured in <code>lms_approval_log</code> (A7) — the defensibility payload when a CO asks who stood behind a claim.</li>
+<li><strong>A6 — no silent override.</strong> The CEO may reject freely and release <code>release_pending</code> content; releasing
+  content that did <strong>not</strong> pass Stage 2 is an <code>override</code> requiring a justification, logged with full
+  attribution. Final authority is never a silent backdoor around the competent gate.</li>
+<li><strong>Enforcement boundary.</strong> <code>POST /lms/courses/{id}/status</code> refuses the gate-managed states (409) — the
+  only externally-reachable publish path is the release chain. (Follow-up: extend the refusal to the
+  <code>set_course_status</code> service primitive for defense-in-depth; it's retained today for trusted seeds.)</li>
+<li><strong>UI.</strong> Authoring console: a draft shows <strong>Submit for review</strong> (not Publish). <strong>Review</strong> tab (any
+  approver): track-gate Approve/Reject (trade → reviewer-credential picker) and CEO Release.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="7. Authoring agent (R-AA-01 P4b) — planned, not yet built" id="7-authoring-agent-r-aa-01-p4b-planned-not-yet-built"><h2 id="7-authoring-agent-r-aa-01-p4b-planned-not-yet-built">7. Authoring agent (R-AA-01 P4b) — planned, not yet built</h2>
+<p>The AI <strong>curriculum authoring agent</strong> drafts content + assessment items for the content-empty course
+shells, grounded in the approved corpus, staged as <code>draft</code> for the gate. Locked mandates: reuse the
+existing Sonnet specialist service (roles <code>curriculum_author</code> + <code>curriculum_compliance_reviewer</code>, no
+new standalone service); <strong>grounded generation only</strong> (every standards claim carries ≥1 corpus
+provenance ref, else a flag); structured-output contract; <strong>draft-only</strong> (holds <code>lms_author</code>, never a
+publish/approve cap — the M9 fence); human owns the bar (<code>_proposed</code> clause/<code>is_critical</code>/cut scores
+until confirmed); copyright wall (clause references, not licensed standard text). <strong>Blocked on Open
+Decision 1 — the approved corpus</strong> (contents, coverage of the 14 courses, curator). When built, the
+agent + the AI course tutor are registered in the agent roster + capabilities guide.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="8. API surface ( /api/v1/lms/* , plus /admin/users/* grants)" id="8-api-surface-api-v1-lms-plus-admin-users-grants"><h2 id="8-api-surface-apiv1lms-plus-adminusers-grants">8. API surface (<code>/api/v1/lms/*</code>, plus <code>/admin/users/*</code> grants)</h2>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Routes (method)</th>
+<th>Capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Catalog</td>
+<td><code>GET/POST /courses</code>, <code>GET /courses/{id}</code>, <code>POST /courses/{id}/modules</code>, <code>POST /modules/{id}/lessons</code>, <code>POST /courses/{id}/status</code> (draft/retired only — publish gated)</td>
+<td>view / <strong>CEO</strong></td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td><code>POST /courses/{id}/enroll</code>, <code>GET /enrollments</code>, <code>…/lessons/{lid}/complete</code>, <code>…/complete</code></td>
+<td>view (own)</td>
+</tr>
+<tr>
+<td>Written</td>
+<td><code>GET/POST /courses/{id}/quizzes</code>, <code>POST /quizzes/{id}/questions</code>, <code>GET /quizzes/{id}</code>, <code>…/quizzes/{qid}/attempt</code></td>
+<td>view / <strong>CEO</strong></td>
+</tr>
+<tr>
+<td>Certs</td>
+<td><code>GET/POST /curricula</code>, <code>GET/POST /certifications</code>, <code>…/{id}/eligibility</code>, <code>…/{id}/issue</code>, <code>GET /credentials[/{id}]</code>, <code>…/revoke</code>, <strong><code>POST /credentials/external</code></strong> (<code>lms_extcred</code>), <code>/admin/credentials</code>, <code>/admin/credentials/expire-sweep</code></td>
+<td>view / <strong>CEO</strong> / attestor</td>
+</tr>
+<tr>
+<td>Practical</td>
+<td><code>GET/POST /rubrics</code>, <code>…/criteria</code>, <code>POST /practicals[/{id}/results|/submit]</code>, <code>GET /practicals[/assessing|/{id}]</code></td>
+<td>authoring <strong>CEO</strong>; conduct <strong><code>lms_assess</code></strong></td>
+</tr>
+<tr>
+<td>Competency registry</td>
+<td><code>GET/POST /competencies</code>, <code>GET/POST /competencies/{id}</code> (update), <code>…/ratify</code>, <code>…/prereqs</code>, <code>POST /criteria|questions/{id}/competency</code></td>
+<td>view / <strong>CEO</strong></td>
+</tr>
+<tr>
+<td>Matrix/recert</td>
+<td><code>GET/PUT/DELETE /competency-matrix…</code>, <code>GET /readiness/{id}?role=</code>, <code>POST /people/{id}/assign-required</code>, <code>GET/POST /standard-revisions</code>, <code>GET /admin/expiring</code></td>
+<td>view / self / <strong>CEO</strong></td>
+</tr>
+<tr>
+<td><strong>Gate</strong></td>
+<td><code>PUT /courses/{id}/approval-track</code>, <code>POST /courses/{id}/submit-review</code>, <code>POST /courses/{id}/review</code>, <code>POST /courses/{id}/release</code>, <code>GET /reviews/pending</code>, <code>GET /courses/{id}/approval-log</code></td>
+<td>author / <strong>track cap</strong> / <strong>lms_release</strong> / view</td>
+</tr>
+<tr>
+<td>Records</td>
+<td><code>GET /people/{id}/competency-record</code>, <code>GET /admin/records/{id}/history</code>, <code>GET /admin/integrity</code></td>
+<td>self / <strong>CEO</strong></td>
+</tr>
+<tr>
+<td>Grants</td>
+<td><code>GET/POST/DELETE /admin/users/{id}/grants</code></td>
+<td><strong>CEO</strong></td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="9. Security &amp; threat model" id="9-security-threat-model"><h2 id="9-security-threat-model">9. Security &amp; threat model</h2>
+<p><strong>Key properties:</strong> no silent publish (API publish path is the gate; direct status → 409); competence ≠
+authority (trade approval credential-bound A4; CEO release scoped to "authorized for use" not technical
+correctness A5; overrides explicit + logged A6); tamper-evidence (all evidence + approval rows
+chain-anchored; <code>verify_chain()</code> catches direct-DB edits; WORM; retention floor); least privilege
+(reviewer caps are revocable per-user grants; auditor read-only ahead of CEO override; agent draft-only);
+one-owner audit line (each competency → one course + clause, schema-enforced).</p>
+<table>
+<thead>
+<tr>
+<th>Attack / failure</th>
+<th>Result</th>
+<th>Adequate?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Edit a completion/score/credential via API</td>
+<td>No such endpoint; completion is server-recomputed</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Privileged code edits an <code>lms_*</code> evidence row</td>
+<td>App paths WORM-guarded; any change breaks the anchor → <code>verify_chain()</code> detects; app-path changes attributed in <code>lms_record_audit</code></td>
+<td>✅ detect + attribute</td>
+</tr>
+<tr>
+<td>Delete an attempt/credential/practical/approval row</td>
+<td>Chain breaks → detected</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Backdate/forge a credential</td>
+<td><code>issued_at</code>/<code>valid_until</code> set server-side; anchored</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Claim practical competence without doing it</td>
+<td>Requires assessor-bound, attested, locked, anchored rubric record</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>One-click publish bypassing review</strong></td>
+<td>Status endpoint 409s on gate states; only the release chain publishes</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Trade content approved by a non-credentialed reviewer</strong></td>
+<td><code>lms_approve_trade</code> is a per-user grant; A4 blocks approval unless the reviewer's own credential is active</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>CEO silently publishes rejected content</strong></td>
+<td>Requires an <code>override</code> action + justification, logged with attribution (A6)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>A grant escalates an auditor / overrides a deny</strong></td>
+<td>Grant check runs <em>after</em> auditor-deny + CEO override; can't subvert them</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="10. Open items / roadmap" id="10-open-items-roadmap"><h2 id="10-open-items-roadmap">10. Open items / roadmap</h2>
+<ul>
+<li><strong>P4b</strong> authoring agent (blocked on the corpus, §7) and the <strong>AI course tutor</strong> (P4d).</li>
+<li><strong>Service-level publish enforcement</strong> (defense-in-depth beyond the API boundary).</li>
+<li><strong>E1 scheduler</strong> wiring of <code>expire_due_credentials</code> / <code>expiring_credentials</code>.</li>
+<li><strong>P3</strong> SCORM/xAPI import (<code>content_type</code> accepts them as placeholders; no runtime yet).</li>
+<li><strong>P5</strong> onboarding back-fill (feed <code>onboarding_training</code> from completion — closes OQ-12).</li>
+<li><strong>Content fill</strong> of the 14 course shells (gated on the corpus); media hosting + public credential
+  verification.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="11. Changelog" id="11-changelog"><h2 id="11-changelog">11. Changelog</h2>
+<ul>
+<li><strong>v3.0 (2026-06-15)</strong> — added R-XC-01 (external credentials), R-COMP-01 (competency registry +
+  one-owner invariant + assessment linkage), R-AA-01 P4a (three-stage gate, per-user capability-grants
+  overlay, enforcement). Schema now <strong>22 <code>lms_*</code> tables + <code>capability_grants</code></strong>. Curriculum decisions:
+  OSHA-30 for supervisory roles; tiered blueprint courses (C3 + C16/C17); C13 federal as a third
+  competence domain. PR trail: backend ttis-ai #171–#188, frontend TTI-S_Dashboard #127–#135.</li>
+<li><strong>v2.0 (2026-06-14)</strong> — Q1–Q6 as-built (practical assessment, WORM/retention/audit, competency-record
+  export, prerequisite DAG, competency matrix, recert). PR trail: ttis-ai #161–#170, dash #116–#126.</li>
+<li><strong>v1.0</strong> — pre-build gap analysis.</li>
+</ul></section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

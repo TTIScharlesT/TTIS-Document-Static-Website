@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS Certification &amp; Competence Matrix — High-Level</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="ttis-certification-competence-matrix-high-level">TTIS Certification &amp; Competence Matrix — High-Level</h1>
+<p><strong>Doc ID:</strong> QMS-COMP-MATRIX-01 · <strong>Generated:</strong> 2026-06-15
+<strong>Source of truth:</strong> <code>scripts/seed/ttis_lms_seed_credentials_matrix.sql</code> (catalog + role matrix) and the
+live competency registry (<code>lms_competencies</code>, R-COMP-01). See
+<a href="../index.html#/ttis/ttis-lms-qms-architecture" target="_top">LMS_QMS_ARCHITECTURE.md</a> for the system design.</p>
+<p>This is a <strong>planning-level</strong> view of every credential, what a learner must complete to earn it
+(its course bundle + practical), the standards it certifies against, the discrete competencies it
+carries, and which deployment job titles require it. Course shells are authored under the R-AA-01
+approval gate; competencies beyond the federal/lead set below are added during content development.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="1. Certification catalog — what each credential requires to obtain" id="1-certification-catalog-what-each-credential-requires-to-obtain"><h2 id="1-certification-catalog-what-each-credential-requires-to-obtain">1. Certification catalog — what each credential requires to obtain</h2>
+<p><strong>Type:</strong> <em>Earned</em> = completed in this LMS (courses + practical). <em>External</em> = earned outside (OSHA
+OTI) and recorded by attestation (R-XC-01) — no LMS courses or practical.
+<strong>Practical:</strong> the observed skills rubric that must be passed in addition to coursework (the "observed
+half" of competence). FED is knowledge-only.</p>
+<table>
+<thead>
+<tr>
+<th>Cert</th>
+<th>Title</th>
+<th>Type</th>
+<th>Required courses (curriculum)</th>
+<th>Practical rubric</th>
+<th>Validity</th>
+<th>Recert trigger</th>
+<th>Governing standards</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CERT-FND</strong></td>
+<td>Field Foundation</td>
+<td>Earned</td>
+<td>C01 + C03 + C04 (CUR-FND)</td>
+<td>RUB-FND</td>
+<td>5 yr</td>
+<td>5 yr / std revision</td>
+<td>ITSIMM; NEC 800/830</td>
+</tr>
+<tr>
+<td><strong>CERT-CU-INST</strong></td>
+<td>Copper Installer</td>
+<td>Earned</td>
+<td>C05 (CUR-CUINST)</td>
+<td>RUB-CUINST</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-568.2-D; ITSIMM</td>
+</tr>
+<tr>
+<td><strong>CERT-CU-CERT</strong></td>
+<td>Copper Certification Tech</td>
+<td>Earned</td>
+<td>C06 (CUR-CUCERT)</td>
+<td>RUB-CUCERT</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-568.2-D; POL-4.1 §7</td>
+</tr>
+<tr>
+<td><strong>CERT-FO-INST</strong></td>
+<td>Fiber Installer</td>
+<td>Earned</td>
+<td>C07 (CUR-FOINST)</td>
+<td>RUB-FOINST</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-568.3-D; ITSIMM</td>
+</tr>
+<tr>
+<td><strong>CERT-FO-SPL</strong></td>
+<td>Fiber Splicing Tech</td>
+<td>Earned</td>
+<td>C08 (CUR-FOSPL)</td>
+<td>RUB-FOSPL</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-568.3-D; IEC 61300-3-35</td>
+</tr>
+<tr>
+<td><strong>CERT-FO-CERT</strong></td>
+<td>Fiber Certification Tech (OTDR)</td>
+<td>Earned</td>
+<td>C09 (CUR-FOCERT)</td>
+<td>RUB-FOCERT</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-568.3-D</td>
+</tr>
+<tr>
+<td><strong>CERT-INF</strong></td>
+<td>Infrastructure: Pathways + TR/ER</td>
+<td>Earned</td>
+<td>C10 + C11 (CUR-INF)</td>
+<td>RUB-INF</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-569; TIA-607-C</td>
+</tr>
+<tr>
+<td><strong>CERT-LEAD</strong></td>
+<td>Lead Technician</td>
+<td>Earned</td>
+<td>C12 + C14 + C15 + C16 + C17 (CUR-LEAD)</td>
+<td>RUB-LEAD</td>
+<td>3 yr</td>
+<td>3 yr / std revision</td>
+<td>TIA-606-C; POL-4.3</td>
+</tr>
+<tr>
+<td><strong>CERT-FED</strong></td>
+<td>Federal Project Compliance</td>
+<td>Earned</td>
+<td>C13 (CUR-FED)</td>
+<td>— (knowledge only)</td>
+<td>1 yr</td>
+<td>1 yr / std revision</td>
+<td>FAR; CMMC 2.0</td>
+</tr>
+<tr>
+<td><strong>CERT-OSHA10</strong></td>
+<td>OSHA 10-Hour</td>
+<td>External</td>
+<td>— (OTI provider)</td>
+<td>—</td>
+<td>5 yr*</td>
+<td>5 yr* / std revision</td>
+<td>OSHA 29 CFR 1910/1926</td>
+</tr>
+<tr>
+<td><strong>CERT-OSHA30</strong></td>
+<td>OSHA 30-Hour</td>
+<td>External</td>
+<td>— (OTI provider)</td>
+<td>—</td>
+<td>5 yr*</td>
+<td>5 yr* / std revision</td>
+<td>OSHA 29 CFR 1910/1926</td>
+</tr>
+</tbody>
+</table>
+<p>* OSHA cards do not federally expire; the 5-yr clock is the TTIS policy refresh cadence required for
+GC/federal projects.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="2. Course shells (the building blocks)" id="2-course-shells-the-building-blocks"><h2 id="2-course-shells-the-building-blocks">2. Course shells (the building blocks)</h2>
+<p>Each is a content-empty DRAFT shell, authored and pushed through the R-AA-01 gate before learners see it.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Course</th>
+<th>Used by curricula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C01</td>
+<td>Low-Voltage Industry Orientation</td>
+<td>CUR-FND</td>
+</tr>
+<tr>
+<td>C03</td>
+<td>Blueprint Reading — Foundations</td>
+<td>CUR-FND</td>
+</tr>
+<tr>
+<td>C04</td>
+<td>Tools, Materials &amp; Workmanship Standards</td>
+<td>CUR-FND</td>
+</tr>
+<tr>
+<td>C05</td>
+<td>Copper Structured Cabling Installation</td>
+<td>CUR-CUINST</td>
+</tr>
+<tr>
+<td>C06</td>
+<td>Copper Cabling Testing &amp; Certification</td>
+<td>CUR-CUCERT</td>
+</tr>
+<tr>
+<td>C07</td>
+<td>Fiber Optic Cable Installation</td>
+<td>CUR-FOINST</td>
+</tr>
+<tr>
+<td>C08</td>
+<td>Fiber Optic Termination &amp; Splicing</td>
+<td>CUR-FOSPL</td>
+</tr>
+<tr>
+<td>C09</td>
+<td>OTDR &amp; Fiber Testing</td>
+<td>CUR-FOCERT</td>
+</tr>
+<tr>
+<td>C10</td>
+<td>Pathways &amp; Spaces: Tray, Conduit &amp; Innerduct</td>
+<td>CUR-INF</td>
+</tr>
+<tr>
+<td>C11</td>
+<td>Telecommunications Room &amp; Equipment Room Build-Out</td>
+<td>CUR-INF</td>
+</tr>
+<tr>
+<td>C12</td>
+<td>Infrastructure Documentation &amp; As-Built Reporting</td>
+<td>CUR-LEAD</td>
+</tr>
+<tr>
+<td>C13</td>
+<td>Federal Project Compliance &amp; Flow-Down Requirements</td>
+<td>CUR-FED</td>
+</tr>
+<tr>
+<td>C14</td>
+<td>Safety Leadership: JHA, TBT &amp; Incident Reporting</td>
+<td>CUR-LEAD</td>
+</tr>
+<tr>
+<td>C15</td>
+<td>Quality Control &amp; Workmanship Self-Inspection</td>
+<td>CUR-LEAD</td>
+</tr>
+<tr>
+<td>C16</td>
+<td>Construction Spec Navigation (CSI / Div 27-28)</td>
+<td>CUR-LEAD</td>
+</tr>
+<tr>
+<td>C17</td>
+<td>Field Document Control: RFIs, Submittals &amp; As-Builts</td>
+<td>CUR-LEAD</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Blueprint reading is tiered by courses, not modules:</strong> foundational depth in C03 (all field roles
+via CERT-FND); advanced spec/document depth in C16 (spec navigation) + C17 (document control), both
+in CERT-LEAD. The LEAD doc cluster is split into two courses because spec interpretation (CSI/TIA)
+and document control (QMS/FAR) are governed by different authorities.</p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="3. Discrete competencies (registry — R-COMP-01)" id="3-discrete-competencies-registry-r-comp-01"><h2 id="3-discrete-competencies-registry-r-comp-01">3. Discrete competencies (registry — R-COMP-01)</h2>
+<p>Each competency belongs to <strong>exactly one owning course</strong> and cites the clause it certifies against.
+This is the auditable unit of competence. Four are registered today; the remainder are authored
+alongside course content.</p>
+<table>
+<thead>
+<tr>
+<th>Competency</th>
+<th>Title</th>
+<th>Carried by cert</th>
+<th>Owning course</th>
+<th>Authority</th>
+<th>Governing clause</th>
+<th>Critical</th>
+<th>Measure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FED-FAR-01</strong></td>
+<td>FAR contract flow-down requirements</td>
+<td>CERT-FED</td>
+<td>C13</td>
+<td>FAR</td>
+<td>FAR 52.244-6</td>
+<td>✓</td>
+<td>document</td>
+</tr>
+<tr>
+<td><strong>FED-CMMC-01</strong></td>
+<td>CMMC 2.0 cybersecurity controls</td>
+<td>CERT-FED</td>
+<td>C13</td>
+<td>CMMC</td>
+<td>CMMC 2.0 L2 / NIST SP 800-171 r2</td>
+<td>✓</td>
+<td>document</td>
+</tr>
+<tr>
+<td><strong>FED-D28-01</strong></td>
+<td>Division 28 electronic safety &amp; security on federal jobs</td>
+<td>CERT-FED</td>
+<td>C13</td>
+<td>CSI</td>
+<td>CSI Division 28</td>
+<td>✓</td>
+<td>document</td>
+</tr>
+<tr>
+<td><strong>LEAD-DC-01</strong></td>
+<td>Redline drawings &amp; produce As-Built documentation</td>
+<td>CERT-LEAD</td>
+<td>C17</td>
+<td>TIA</td>
+<td>POL-4.1 §7; TIA-606-C</td>
+<td>✓</td>
+<td>document</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>More competencies will be registered against each course (e.g. the copper/fiber install and test
+certs) as their content is authored. The matrix above is the current as-registered state, not the
+final inventory.</em></p>
+</blockquote>
+<hr/>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="4. Role → required certifications matrix" id="4-role-required-certifications-matrix"><h2 id="4-role-required-certifications-matrix">4. Role → required certifications matrix</h2>
+<p>Deployment job titles (not ABAC roles) drive readiness. ✓ = required to be deployable in that role.
+<code>learner_readiness(role)</code> checks all of a role's ✓ cells; OSHA carries <strong>grace_days = 0</strong> (no lapsed
+safety card on site).</p>
+<table>
+<thead>
+<tr>
+<th>Job title</th>
+<th style="text-align: center;">FND</th>
+<th style="text-align: center;">CU-INST</th>
+<th style="text-align: center;">CU-CERT</th>
+<th style="text-align: center;">FO-INST</th>
+<th style="text-align: center;">FO-SPL</th>
+<th style="text-align: center;">FO-CERT</th>
+<th style="text-align: center;">INF</th>
+<th style="text-align: center;">LEAD</th>
+<th style="text-align: center;">FED</th>
+<th style="text-align: center;">OSHA-10</th>
+<th style="text-align: center;">OSHA-30</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>helper</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td><strong>installer_copper</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td><strong>installer_fiber</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td><strong>cert_tech</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td><strong>lead_tech</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr>
+<td><strong>foreman</strong></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+</tr>
+<tr>
+<td><strong>federal</strong> <em>(overlay)</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading the grid</strong>
+- <strong><code>federal</code> is a standalone overlay,</strong> not a job title. A foreman on a federal job must satisfy
+  <strong>both</strong> <code>foreman</code> <strong>and</strong> <code>federal</code> — readiness is checked for each and AND-ed.
+- <strong>OSHA-30 supersedes OSHA-10 for supervisors.</strong> lead_tech and foreman carry OSHA-30 <em>instead of</em>
+  OSHA-10 (the 30-hour is the supervisory/competent-person card), not in addition.
+- <strong>Ladders are cumulative.</strong> cert_tech is the testing specialist (install + all test certs); foreman
+  is the superset (trade + testing + infrastructure + lead).</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="5. How a credential is actually earned (the gate behind every ✓)" id="5-how-a-credential-is-actually-earned-the-gate-behind-every"><h2 id="5-how-a-credential-is-actually-earned-the-gate-behind-every">5. How a credential is actually earned (the gate behind every ✓)</h2>
+<p>For an <strong>earned</strong> cert, eligibility (<code>certification_eligibility</code>) is the <em>full</em> competence picture,
+recomputed server-side at issue — never self-asserted:</p>
+<pre><code>eligible  ==  every curriculum course COMPLETED
+          AND final assessment PASSED        (if the curriculum sets one)
+          AND practical rubric PASSED         (if the cert sets a practical_rubric_id)
+</code></pre>
+<p>The practical is an assessor-bound, attested, WORM-locked, chain-anchored rubric record — so
+"passed the quiz = competent" is structurally impossible wherever a practical is required. <strong>External</strong>
+certs (OSHA) skip coursework/practical and are recorded by an attestor ≠ the learner. Every issue,
+revoke, and expiry is chain-anchored; recert fires on each credential's own clock or on a cited
+standard's revision.</p>
+<hr/>
+<p><em>Counts (post-seed): 11 certifications · 16 course shells · 9 in-LMS curricula · 8 practical rubrics ·
+7 job titles + 1 federal overlay · 4 competencies registered to date.</em></p></section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

@@ -1,0 +1,1382 @@
+# TTIS Admin & Operations Guide
+
+**Audience:** TTIS administrators/operators (CEO + ops).
+**Scope:** setup, deploy, configuration, management, and troubleshooting for every TTIS system —
+the VBS backend, the Dashboard, the Field App, GCP/Caddy, the marketing site, the LMS, the RAG
+corpus, and Ask‑LYNNE.
+**Last updated:** 2026‑06‑16.
+
+> Conventions used below
+> - Commands are PowerShell-friendly on Windows dev boxes; the GCP host is Linux (bash).
+> - `H:\Projects\…` are the local working copies; `~/ttis-ai` is the repo on the GCP VM.
+> - "VBS" = the FastAPI backend (`ttis-ai`). "Dashboard" = the Next.js app (`TTI-S_Dashboard`).
+> - Anything marked **(verify)** is an expected/observed value — confirm against the live system.
+
+---
+
+## 0. Overview & Architecture
+
+### 0.1 The systems and where they live
+
+| System | Repo / path | Stack | Prod surface |
+|---|---|---|---|
+| **TTI‑VBS** (backend) | `H:\Projects\TTI-S_VBS\ttis-ai` | Python 3.11, FastAPI | `app.tti-solutions.com/api/*`, `webhook.tti-solutions.com` |
+| **TTI‑Dashboard** (web UI) | `H:\Projects\TTI-S_Dashboard` | Next.js 15, TypeScript | `app.tti-solutions.com` |
+| **TTIS Field App** | `H:\Projects\ttis-field-app` | Expo / React Native (native iOS+Android) | App stores (EAS) — talks to `app.tti-solutions.com` |
+| **Marketing site** | `ttis-ai\website` | Static (Markdown → HTML) | `tti-solutions.com`, `www.…` |
+| **LMS** | part of VBS (`dashboard/lms.py`) | FastAPI module + Dashboard tabs | `app.tti-solutions.com` (LMS tabs) |
+| **RAG corpus** | `ttis-ai\data\documents` + ChromaDB | ChromaDB + hybrid BM25 | internal (port 8002) |
+| **Ask‑LYNNE** | part of VBS (`dashboard/lynne_*`) | Claude Opus + SSE | `app.tti-solutions.com` (Ask‑LYNNE tab), Telegram |
+
+### 0.2 How prod fits together (single GCP VM, Caddy host-routing)
+
+```
+                         ┌──────────── GCP VM: ttis-prod (us-central1-a) ────────────┐
+   Internet  ──DNS──►    │  Caddy (TLS / Let's Encrypt, host-based routing)          │
+                         │    tti-solutions.com / www      → static file_server      │
+   app.tti-solutions.com │    app.tti-solutions.com        → /api/* → dashboard:8000 │
+   www.tti-solutions.com │                                   /*     → frontend:3000  │
+   webhook.tti-…         │    webhook.tti-solutions.com     → webhook:8001           │
+                         │                                                          │
+                         │  docker compose:  dashboard(8000) frontend(3000)          │
+                         │                   webhook(8001) worker  redis(6379)       │
+                         │                   chromadb(8002)  caddy                   │
+                         │  Cloud SQL (Postgres) via DATABASE_URL                    │
+                         └──────────────────────────────────────────────────────────┘
+```
+
+- **COMMAND‑CORE** (`orchestration/command_core.py`) is a deterministic event→workflow router (not an LLM).
+- **Agents** (~34, `config/agents.yaml`) are Claude-backed (Haiku/Sonnet/Opus tiers).
+- **Execution mode:** `inline` (dev, in-process) vs `queue` (prod, Redis + `python -m orchestration.worker`).
+
+### 0.3 Prerequisites (admin workstation)
+
+- Git, Python 3.11+, Node 20+, Docker Desktop (Compose v2).
+- Access: GitHub org `TTIScharlesT`, the GCP project `tti-solutions-ai`, the Anthropic console.
+- A populated `config/.env` for the VBS (never committed). See §1.2.
+
+---
+
+## 1. TTI‑VBS (Backend)
+
+### 1.1 Setup
+
+```powershell
+cd H:\Projects\TTI-S_VBS\ttis-ai
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+Copy-Item config\.env.template config\.env   # then edit (see §1.2)
+```
+
+Generate the two mandatory secrets:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(48))"   # → DASHBOARD_JWT_SECRET (>=32 chars)
+python -c "import secrets; print(secrets.token_urlsafe(24))"   # → DASHBOARD_PWD_SALT  (>=16 chars)
+```
+
+### 1.2 Configuration — `config/.env`
+
+The full template is `config/.env.template`. The variables that matter most:
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | **Yes** | Claude API key (all agents + LYNNE). |
+| `DASHBOARD_JWT_SECRET` | **Yes** | JWT signing key, **≥32 chars**, never a placeholder. |
+| `DASHBOARD_PWD_SALT` | **Yes** | Password hash salt, **≥16 chars**. |
+| `DASHBOARD_USERS` | first boot | JSON seed of users (after first boot the `auth.db` is source of truth). |
+| `WORKFLOW_EXECUTION_MODE` | prod | `inline` (dev) or `queue` (prod). |
+| `REDIS_URL` | queue mode | e.g. `redis://localhost:6379/0` (`redis://redis:6379/0` in Docker). |
+| `DATABASE_URL` | prod | unset → SQLite; `postgresql://…` → Cloud SQL. |
+| `CORS_ALLOW_LIST` | web UI | Must include the Dashboard origin (e.g. `https://app.tti-solutions.com`). |
+| `SCHEDULER_ENABLED` | opt‑in | `1` starts the recurring-job loop (reminders, daily updates). Default `0`. |
+| `SCHEDULER_TZ` | opt‑in | e.g. `America/Chicago` — daily job times are local. |
+| Deploy/domains | prod | `APP_DOMAIN`, `DASHBOARD_PUBLIC_URL`, `WEBSITE_DOMAIN`, `ACME_EMAIL`, `WEBHOOK_DOMAIN`, `FRONTEND_UPSTREAM`. |
+| Integrations | optional | `PURSUITE_*`, `DUFFEL_API_TOKEN`, `GOOGLE_*`, `GOOGLE_MAPS_API_KEY`, `TICKETMASTER_API_KEY`, `SLACK_WEBHOOK_URL`, `OWNER_EMAIL`. |
+
+Optional/unset integration keys **degrade gracefully** — the feature just isn't offered.
+
+### 1.3 Run — dev (inline mode), 3 terminals
+
+```powershell
+# 1) Bootstrap (loads .env, inits all SQLite DBs, builds tool + agent registries, COMMAND-CORE)
+python main.py
+
+# 2) Dashboard API (port 8000)
+uvicorn dashboard.main:app --host 127.0.0.1 --port 8000
+
+# 3) Webhook receiver (port 8001) — Pursuite CRM + Telegram inbound
+uvicorn tools.pursuite_webhook:webhook_app --host 0.0.0.0 --port 8001
+```
+
+`python main.py` prints a startup banner ending with the service URLs and the two `uvicorn`
+commands. Health check: `curl http://127.0.0.1:8000/health` → `200`.
+
+**One-shot maintenance commands** (don't start a server):
+
+```powershell
+python main.py --ingest-docs      # ingest documents into ChromaDB (see §7)
+python main.py --verify-chain     # verify the append-only audit hash chain
+python main.py --list-gates       # list workflows awaiting a human gate
+python main.py --test-pursuite     # test Pursuite CRM connectivity
+```
+
+### 1.4 Run — Docker (queue mode, production shape)
+
+```powershell
+docker-compose up -d           # chromadb:8002, redis:6379, dashboard:8000, webhook:8001, worker
+docker-compose logs -f         # tail
+docker-compose up -d --scale worker=3   # more queue throughput
+docker-compose down            # stop (add -v to wipe volumes)
+```
+
+In queue mode the API/webhook enqueue to Redis (`queue:workflow_jobs`) and the **worker** consumes
+them: `python -m orchestration.worker`. Inline mode runs the workflow in a background thread (dev
+only — not durable across restarts).
+
+> **Docker Desktop / WSL2 gotcha — single‑file `.env` bind mounts.** On Windows, bind‑mounting a
+> single file (e.g. `./.env:/app/.env`) is unreliable: Docker Desktop can create the destination as a
+> **directory**, and then `runc` rejects the mount with
+> `not a directory: Are you trying to mount a directory onto a file (or vice‑versa)?` — typically
+> **on restart** of a container that was first created when the mount existed. Fixes:
+> - **Prefer `env_file:`** over a single‑file bind mount — it injects the vars with no filesystem mount.
+> - If you hit it, **recreate** (don't restart) the container so it picks up the current config:
+>   `docker compose down --remove-orphans && docker compose … up -d --force-recreate`. Never
+>   `docker start`/`restart` the stale container — that replays the dead mount.
+> - If Docker auto‑created a bogus **directory** at the host `.env` path, delete it and ensure a real
+>   file exists (copy from `.env.template`) before bringing the stack back up.
+
+### 1.5 Data layer
+
+- **SQLite** (dev/Railway) in `data/sqlite/`: `audit.db` (append-only, chain-verified — **never disable**),
+  `auth.db`, `state.db`, `finance*.db`, `hr.db` (PII-guarded), `contracts.db`, `schedule.db`,
+  plus domain + safety DBs. Tables are created idempotently on boot.
+- **PostgreSQL** (prod GCP Cloud SQL) when `DATABASE_URL=postgresql://…`. `db.py` adapts placeholders
+  and DDL automatically; no app code changes.
+- **ChromaDB** (RAG vector store) — `data/chroma_db/`, container port 8002.
+- **Redis** — task queue + workflow context + telemetry.
+
+### 1.6 Manage
+
+- **Scheduler** (`orchestration/scheduler_runner.py`): set `SCHEDULER_ENABLED=1` to start the
+  in‑process tick loop. Seeds the CEO daily‑update job (if `DAILY_UPDATE_RECIPIENTS` is set) and the
+  timecard reminder/supervisor‑digest jobs. Knobs: `SCHEDULER_TZ`, `SCHEDULER_TICK_SECONDS`,
+  `TIMECARD_REMINDER_INTERVAL_SECONDS`, `TIMECARD_SUPERVISOR_DIGEST_TIME`.
+- **Agent kill‑switch** (`orchestration/agent_flags.py`): durable disable/enable per agent, broadcast
+  over Redis; consulted before each agent run.
+- **Useful scripts** (`scripts/`): `migrate_db_files.py`, `setup_google_workspace.py`,
+  `setup_staging_env.py`, `register_telegram_webhook.py`, `seed_wizards.py`, `seed_lms_catalog.py`,
+  `seed_policy_ack.py`, `ingest_rag_corpus.py`, `scaffold_corpus.py`, `build_agent_guide.py`,
+  `build_workflow_guide.py`, `deploy_prod.sh`.
+
+### 1.7 Test
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -q          # full suite
+.\.venv\Scripts\python.exe -m pytest tests/test_abac_pdp.py -q   # subset
+```
+
+Integration/realtime tests need Redis:
+
+```powershell
+docker-compose -f docker-compose.test.yml up -d         # ephemeral Redis on 6399
+$env:REDIS_URL = "redis://localhost:6399/0"
+.\.venv\Scripts\python.exe -m pytest tests/test_realtime_integration.py -q
+docker-compose -f docker-compose.test.yml down -v
+```
+
+CI (`.github/workflows/ci.yml`) runs the full guardrail + integration suite on every push/PR with an
+ephemeral Redis, Python 3.11.
+
+### 1.8 User & password management (local/dev)
+
+Identities live in `auth.db`. The password hash is `sha256(DASHBOARD_PWD_SALT + plaintext)` — use the
+`users` helpers so the salt is applied for you. To reset the tester's password **and** create/refresh
+a `charles` CEO login:
+
+```powershell
+cd H:\Projects\TTI-S_VBS\ttis-ai
+.\.venv\Scripts\python.exe -c "
+from dotenv import load_dotenv
+load_dotenv('config/.env')
+from dashboard.users import init_users_db, set_password, upsert_user, hash_password, get_user
+from dashboard.abac import Role
+init_users_db()
+PW = 'TTIS-CEO-2026!'
+print('reset tester (U-TEST):', set_password('U-TEST', PW))
+upsert_user(user_id='U-001', username='charles', password_sha256=hash_password(PW),
+            role=Role.parse('ceo'), domain='tti-solutions.com')
+u = get_user('charles')
+print('charles present:', bool(u), '| role:', u['role'] if u else None)
+"
+```
+
+(On the prod VM the equivalent runs inside the container with `docker exec` — see §4.6.)
+
+### 1.9 Local dev against the seeded DB
+
+To exercise the real seeded data end‑to‑end on your workstation:
+
+```powershell
+# Backend on :8000, loading config/.env explicitly
+cd H:\Projects\TTI-S_VBS\ttis-ai
+.\.venv\Scripts\activate
+uvicorn dashboard.main:app --host 127.0.0.1 --port 8000 --env-file config\.env
+
+# Frontend on :3000 (separate terminal), then HARD-refresh the browser (Ctrl+F5)
+cd H:\Projects\TTI-S_Dashboard
+git pull
+npm run dev          # or: npm run build; npm start
+```
+
+> The `--env-file config\.env` flag is what loads your keys when starting uvicorn directly (without it
+> the backend boots with no secrets and fails closed). After a fresh frontend build, **hard‑refresh**
+> to drop the cached bundle or you'll see stale UI.
+
+### 1.10 Troubleshoot
+
+| Symptom | Diagnose | Fix |
+|---|---|---|
+| Startup aborts: JWT secret missing/short/placeholder | the error names the var | Set a ≥32‑char `DASHBOARD_JWT_SECRET` (§1.1). |
+| Backend boots with no auth / 401 everything | started uvicorn without env | Add `--env-file config\.env` (§1.9). |
+| `ModuleNotFoundError` | wrong/own venv not active | `.\.venv\Scripts\activate`; `pip install -r requirements.txt`. |
+| Redis connection refused | `redis-cli ping` fails | `docker-compose up -d redis`; check `REDIS_URL`. |
+| Workflows enqueue but never run | `redis-cli llen queue:workflow_jobs` grows | Start `python -m orchestration.worker` (or `--scale worker`). |
+| Audit chain "tampered" | `python main.py --verify-chain` reports a break | **Do not disable** — investigate; the chain is inviolable by design. |
+| 403 on all routes | user/role not provisioned | Create a user (§1.8); verify ABAC role in `auth.db`. |
+| Login fails after salt change | old hashes no longer match | Re‑set passwords with the helper (§1.8) — it re‑hashes with the current salt. |
+| CORS errors from the web UI | browser console shows blocked origin | Add the origin to `CORS_ALLOW_LIST`, restart VBS. |
+| Port already in use (`:8000`/`:3000`/`:8081`) | another process holds it | Kill it — Windows one‑liner in the Appendix. |
+| LYNNE/agents 429 | Anthropic rate limit | Auto‑retries with back‑off; raise the org token/min if persistent. |
+
+### 1.11 Security & regression testing (MTH + pipeline)
+
+**Mutative Test Harness (MTH, R‑MTH‑01)** — adversarial, in‑process RBAC/auth/injection fuzzing
+(`tools/mth/`). It mints a JWT per role, fires mutated requests at the app via `TestClient`, and an
+oracle **grounded in `dashboard/abac.py::can()`** flags any divergence — so it's self‑checking against
+the live policy.
+
+```powershell
+python -m tools.mth                  # full run → data/mth/latest.{json,html}
+python -m tools.mth --dry-run        # build the plan, send nothing
+python -m tools.mth --out DIR        # write the report elsewhere
+```
+
+Strategy groups: Protocol (missing‑auth / forged `alg=none` / malformed), RBAC (wrong‑role), Structural
+(overpost / remove‑field / empty‑object), Type (coercion / binary), Value (SQLi / XSS / path‑traversal /
+long‑string), Semantic (cross‑entity TTIS↔ROSS_LV), Chaos (1 MB / duplicate), Injection (login SQLi).
+**CRITICAL** findings (`AUTH_BYPASS`, `RBAC_BYPASS`, `INJECTION_ACCEPTED`, `OVERPOST_ESCALATION`,
+`CROSS_ENTITY_LEAK`) → exit 1; `UNEXPECTED_CRASH`/`IDEMPOTENCY_VIOLATION` (HIGH) and `MISSING_VALIDATION`
+(LOW) are reported, not blocking. It seeds a real charge code + a timecard advanced through the approval
+chain so write/approval routes hit valid targets. **Add an endpoint = add a `Baseline` in
+`tools/mth/baselines.py`** (the engine auto‑generates every variant). CI gates on it
+(`tests/test_mth_oracle.py` + a step that fails on CRITICAL and uploads the report artifact).
+
+**Regression pipeline (R‑REG‑01)** — one command runs the whole suite as ordered phases + the MTH gate
++ a summary report:
+
+```powershell
+python scripts/run_regression.py                 # or:  .\scripts\run-regression.ps1
+python scripts/run_regression.py --list          # phases + file assignment
+python scripts/run_regression.py --phase auth_identity
+python scripts/run_regression.py --skip-realtime --skip-mth --filter timecard
+```
+
+14 phases (guardrails, auth_identity, timecards, finance_payroll, field_ops, projects_pm,
+lms_onboarding, lynne_eaa, agents_workflows, wizards, travel, integrations, security, realtime) + the
+MTH harness; the realtime phase auto‑skips when Redis is unreachable. Report → `test-results/
+regression-<ts>.txt`; exit 0/1. (Plain `pytest tests/ -q` still works for ad‑hoc runs.)
+
+---
+
+## 2. TTI‑Dashboard (`app.tti-solutions.com`)
+
+### 2.1 Setup
+
+```powershell
+cd H:\Projects\TTI-S_Dashboard
+npm ci                       # clean install from package-lock (Node 20+)
+Copy-Item .env.example .env.local   # then edit (see §2.3)
+```
+
+### 2.2 Run — dev
+
+```powershell
+npm run dev                  # http://127.0.0.1:3000  (use 127.0.0.1, not localhost — cookie SameSite)
+```
+
+The Dashboard talks to the VBS API at `NEXT_PUBLIC_VBS_BASE_URL` (dev: `http://127.0.0.1:8000`).
+The VBS backend's `CORS_ALLOW_LIST` **must** include the Dashboard origin.
+
+### 2.3 Configuration
+
+| Variable | Dev value | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_VBS_BASE_URL` | `http://127.0.0.1:8000` | VBS API base (prod: `https://app.tti-solutions.com`). |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | The app's own public origin. |
+| `NEXT_PUBLIC_STEPUP_THRESHOLD_USD` | `100000` | Step‑up MFA threshold for high‑value actions. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | optional | Google OAuth (restricted to `tti-solutions.com`). |
+| `ROLE_MAP` | dev/staging | JSON email→role override until backend supplies role claims. |
+| `*_DEMO` flags | dev | Seed sample data (agents/workflows/finance/etc.) with no backend. |
+
+`NEXT_PUBLIC_*` values are **build‑time** for the prod image (baked by CI); runtime secrets
+(OAuth, OTEL) are injected at container start.
+
+### 2.4 Build & test
+
+```powershell
+npm run typecheck            # tsc --noEmit
+npm run lint                 # eslint --max-warnings 0
+npm run test:cov             # vitest + coverage (gate: 80% global; 100% on abac/ + finance/)
+npm run build                # .next/standalone
+npm run e2e                  # Playwright (desktop / Pixel 7 / tablet)
+```
+
+CI (`.github/workflows/ci.yml`) runs lint → typecheck → test:cov → build → e2e. Do **not** run
+`npm audit fix --force` (it can downgrade Next.js and break the App Router).
+
+**Smoke‑test against a running VBS backend** (`scripts/vbs-smoke*.mjs` — pure Node, hits the API over
+HTTP; the backend must be up and reachable at `NEXT_PUBLIC_VBS_BASE_URL`):
+
+```powershell
+cd H:\Projects\TTI-S_Dashboard
+$env:VBS_SMOKE_USER="charles"
+$env:VBS_SMOKE_PASS="<your VBS password>"
+npm run vbs:smoke                 # full smoke; or a slice: npm run vbs:smoke:timecard / :payroll / :lynne / …
+Remove-Item Env:VBS_SMOKE_PASS    # clear the password from the shell when done
+```
+
+Slices available: `vbs:smoke:v3 / :timecard / :daily-log / :incident / :session / :phase3 / :uam /
+:phase5-obs / :phase4 / :rag / :lynne / :rag-resolver / :agent-mgmt / :history / :payroll`.
+
+### 2.5 Deploy
+
+- On every push to `main`, `.github/workflows/ghcr.yml` builds and pushes a Docker image to GHCR
+  (`ghcr.io/ttischarlest/tti-s_dashboard:latest`) with the prod `NEXT_PUBLIC_*` baked in.
+- The VBS deploy script pulls that image onto the GCP VM (`docker compose pull frontend`) — see §4.
+- Local Windows redeploy helper: `./scripts/run-redeploy.ps1 [-Ref main] [-Port 3000]`.
+
+### 2.6 Debugging a failing API call in the browser (DevTools)
+
+When the UI misbehaves, the fastest diagnosis is to watch the actual request the browser made.
+
+**Open DevTools** (Windows — Chrome/Edge/Firefox):
+- `F12` (or `Ctrl+Shift+I`) — DevTools.
+- `Ctrl+Shift+J` — straight to the **Console**.
+- Firefox `Ctrl+Shift+E` — straight to **Network**. (Mac: `Cmd+Option+I`.)
+
+**Capture the failing call:**
+1. `F12` → **Network** tab.
+2. Click the **Fetch/XHR** filter (hides images/CSS, shows just API calls); optionally type `api/v1` in the filter box.
+3. Leave DevTools open, then click the panel in the app (or `Ctrl+R` to reload).
+4. Look for rows in **red** or with a **4xx/5xx** Status — those are the failures.
+5. Click a red row → the **Status** (top of *Headers*), the **Request URL**, and the **Response** tab tell the story.
+
+Common reads: a `4xx`/`5xx` with no `Access-Control-Allow-Origin` header → CORS (fix the VBS
+`CORS_ALLOW_LIST`); `401` → auth/token; `404` on a new endpoint → backend not redeployed;
+`net::ERR_CONNECTION_REFUSED` → wrong `NEXT_PUBLIC_VBS_BASE_URL` or VBS not running.
+
+### 2.7 Troubleshoot
+
+| Symptom | Diagnose | Fix |
+|---|---|---|
+| API calls fail / blocked (CORS) | DevTools Network: missing `Access-Control-Allow-Origin` | Add the Dashboard origin to VBS `CORS_ALLOW_LIST`, restart VBS. |
+| Login 401 | DevTools Network: `/api/v1/auth/login` → 401 | Verify creds; check VBS health. |
+| New endpoint 404 from the UI | DevTools Network: `404` on `/api/v1/…` | Redeploy backend (GCP §4.4); confirm `main` is current. |
+| `ERR_CONNECTION_REFUSED` | wrong base URL / VBS down | Fix `NEXT_PUBLIC_VBS_BASE_URL`; start VBS on `:8000`. |
+| Coverage gate fails | vitest report; `abac/`+`finance/` <100% | Add tests; those paths require 100%. |
+| Old UI after deploy | browser bundle cache | Hard refresh (Ctrl/Cmd‑Shift‑R); confirm `frontend` image was pulled. |
+| Next downgraded to 9.x | `npm audit fix --force` was run | Revert `package.json`/lock, `npm ci`. |
+
+---
+
+## 3. TTIS Field App
+
+A **standalone native app** (`H:\Projects\ttis-field-app`, Expo `~54` / React Native, iOS+Android) —
+**not** a browser page. Per ADR‑0001 a native app was chosen over PWA for reliable push (P1 safety
+alerts) and durable on‑device storage of unsynced DCAA timecards. Crews use the installed app; it is
+a thin client over the **same VBS API** (`https://app.tti-solutions.com`, set in `app.json` →
+`extra.apiBaseUrl`). Scope doc: `ttis-ai/docs/MOBILE_FIELD_APP_SCOPE.md`.
+
+### 3.1 Setup & run (dev)
+
+```powershell
+cd H:\Projects\ttis-field-app
+npm install
+npm run start                # Expo dev server + QR (open in Expo Go)
+npm run ios                  # iOS simulator
+npm run android              # Android emulator
+npm run web                  # react-native-web preview
+```
+
+### 3.2 What a field user gets
+
+- **Login** with VBS credentials (`field_crew` role); JWT stored in `expo-secure-store` (Keychain/Keystore).
+- **Tabs:** Home, Time, Schedule, Pay, Assistant (FIELDAIDE — a read‑only field agent).
+- **Submit forms:** timecard, daily log, incident (with tappable body‑map), travel — all exactly‑once
+  (Idempotency‑Key). All reads are server‑scoped to the caller's `user_id` (a tech only sees their own).
+- **Backend endpoints:** `/api/v1/timecards/summary`, `/api/v1/payroll/next-payday`,
+  `/api/v1/schedule/me`, `/api/v1/field/assistant`, `/api/v1/projects/assigned`, plus the standard
+  `/timecards`, `/daily-logs`, `/incidents`, `/travel/requests` submits.
+
+### 3.3 Build & distribute (EAS)
+
+```powershell
+npm install -g eas-cli
+eas login
+eas build --platform ios       # → TestFlight
+eas build --platform android   # → Play Internal Testing
+eas update                     # OTA JS update (expo-updates)
+```
+
+> Status: P0 (auth + tab shell + live data) and P1 (submit forms) shipped. Pending: P3 push
+> (device registry + mission‑critical inbox) and P4 hardening (offline queue, biometric unlock, EAS pilot).
+
+### 3.4 Troubleshoot
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Can't reach API in dev | pointing at prod by default | App uses `app.tti-solutions.com`; for local VBS, override `extra.apiBaseUrl` / `lib/config.ts`. |
+| Login fails | VBS down or wrong role | Verify VBS health; user must have `field_crew` role. |
+| Expo Go won't connect | phone/PC not same LAN | Same network, or use a tunnel (`expo start --tunnel`). |
+
+---
+
+## 4. GCP, Deploy & Domains
+
+### 4.1 Production host
+
+- GCP project `tti-solutions-ai`, VM `ttis-prod` (zone `us-central1-a`, Ubuntu). Repo at `~/ttis-ai`.
+- **Live IP: `34.27.180.8`** (static). `dig +short tti-solutions.com @8.8.8.8` → `34.27.180.8`.
+- Cloud SQL (Postgres) via `DATABASE_URL`. Payroll field‑encryption key lives on a **separate**
+  `/app/secrets` volume (never in DB backups), GUI‑rotated.
+- Compose for prod is always the **two‑file overlay**: `-f docker-compose.yml -f docker-compose.prod.yml`.
+- Infra/cutover notes: `ttis-ai/docs/PRODUCTION_HOSTING.md`, `ttis-ai/docs/LMS_DEPLOY_AND_SEED_RUNBOOK.md`.
+
+> **⏰ Action by 2026‑08‑01 — Cloud SQL export IAM change.** Google is removing the
+> `cloudsql.instances.export` permission from the **Viewer** (`roles/cloudsql.viewer`) and legacy
+> **Reader** roles. After that date, anyone (or any service account) holding only those roles can no
+> longer export the database — via console, `gcloud sql export`, or the API. If a person or job exports
+> the prod DB to Cloud Storage, grant them **`roles/cloudsql.editor`** (or a custom role that includes
+> `cloudsql.instances.export`) **before the date**. Automated Cloud SQL **backups are unaffected** —
+> this only touches the export‑to‑GCS path, so if you rely solely on managed backups, no action is needed.
+> ```bash
+> # Who currently has only Viewer / legacy Reader?
+> gcloud projects get-iam-policy tti-solutions-ai --flatten="bindings[].members" \
+>   --filter="bindings.role=roles/cloudsql.viewer OR bindings.role=roles/cloudsql.legacyReader" \
+>   --format="table(bindings.role, bindings.members)"
+> # Grant export capability to whoever needs it:
+> gcloud projects add-iam-policy-binding tti-solutions-ai \
+>   --member="user:charles@tti-solutions.com" --role="roles/cloudsql.editor"
+> ```
+
+### 4.2 Connect to the prod VM
+
+```bash
+gcloud config set project tti-solutions-ai
+gcloud compute ssh ttis-prod --zone=us-central1-a
+cd ~/ttis-ai
+```
+
+### 4.3 Deploy — orchestrated (the safe default)
+
+```bash
+cd ~/ttis-ai
+./scripts/deploy_prod.sh
+```
+
+Stages (aborts safely before any cutover if a check fails): **preflight** (docker + required `.env`
+keys) → **repo sync** (`git pull --ff-only` — ⚠️ watch the **`it pull` typo**, it silently no‑ops and
+leaves the backend stale) → **Caddyfile validation** (throwaway `caddy validate` with the domain env,
+incl. `WEBHOOK_DOMAIN`; a missing one fails validation — fixed in #196) → **build+start** app services
+(website stays live) → **pull frontend** from GHCR (bare `up -d` reuses cached `:latest`) →
+**health‑gate** `/health` → **seed** LMS catalog + policy‑ack (idempotent) → **cutover** Caddy (first
+run provisions Let's Encrypt; port 80 reachable).
+
+### 4.4 Deploy — manual per‑service (the everyday path)
+
+When you just need to ship the latest `main` for one service:
+
+```bash
+# Backend (dashboard) — pull + rebuild the image, recreate the container
+git pull --ff-only origin main
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build dashboard
+
+# Verify the new backend is serving (any 2xx/3xx is "up"; this endpoint is a quick probe)
+curl -s -o /dev/null -w "%{http_code}\n" localhost:8000/api/v1/projects/timeline
+
+# Frontend — pull the CI-built GHCR image, recreate the container
+docker compose -f docker-compose.yml -f docker-compose.prod.yml pull frontend
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d frontend
+
+# Force-recreate a service if a config/env change isn't picked up
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate dashboard
+```
+
+> ⚠️ **After every RAG ingest you must rebuild the dashboard** (the ingest writes to ChromaDB, but the
+> running container won't reflect it until rebuilt) — see §7.5.
+
+**Rollback:** `docker compose stop caddy && docker start ttis-web`.
+
+### 4.5 Post‑deploy verification & precheck
+
+```bash
+# DNS resolves to the prod IP
+dig +short tti-solutions.com @8.8.8.8                 # → 34.27.180.8
+
+# Edge / TLS (run from anywhere)
+curl -sI https://tti-solutions.com/                   # 200, Server: Caddy
+curl -sI https://www.tti-solutions.com/               # 301 → https://tti-solutions.com
+curl -sI https://app.tti-solutions.com/               # 307 → /vbs   (dashboard root redirects)
+curl -sI https://app.tti-solutions.com/api/v1/health  # API health
+
+# On the VM — container health (ttis-dashboard should read "(healthy)")
+docker ps --format 'table {{.Names}}\t{{.Status}}'
+
+# On the VM — certificate provisioning / renewal
+docker logs ttis-caddy 2>&1 | grep -iE 'certificate obtained|obtaining|error' | tail -20
+
+# On the VM — are any users provisioned? 0 ⇒ seed/create one (see §4.6), then restart dashboard
+grep -c '^DASHBOARD_USERS=' config/.env
+# if 0:
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d dashboard
+```
+
+### 4.6 Create a login on prod (on the VM)
+
+User identities live in `auth.db` (not `.env` after first boot). Create/upsert a CEO login in place —
+the password hash is `sha256(DASHBOARD_PWD_SALT + plaintext)`:
+
+```bash
+docker exec -e NU='charles' -e NP='ChangeThisPassword' ttis-dashboard python -c "
+import os, hashlib
+from dashboard import users
+from dashboard.abac import Role
+users.init_users_db()
+pw = hashlib.sha256((os.environ['DASHBOARD_PWD_SALT'] + os.environ['NP']).encode()).hexdigest()
+users.upsert_user(user_id='U-001', username=os.environ['NU'], password_sha256=pw,
+                  role=Role.CEO, domain='tti-solutions.com')
+print('created user:', os.environ['NU'], '(role ceo)')
+"
+# → created user: charles (role ceo)
+```
+
+Pass the password via the `-e NP=` env (don't bake it into the command history where avoidable), and
+change it on first login.
+
+### 4.7 Caddy & domain routing (`config/Caddyfile`)
+
+| Domain | Routes to | Notes |
+|---|---|---|
+| `tti-solutions.com` | static `file_server` (the built `website/www`) | marketing apex |
+| `www.tti-solutions.com` | `301` → apex | canonical redirect |
+| `app.tti-solutions.com` | `/api/*,/health,/workflows/*,…` → `dashboard:8000`; else → `frontend:3000` | `flush_interval -1` keeps SSE/WS (Ask‑LYNNE) unbuffered |
+| `webhook.tti-solutions.com` | `webhook:8001` | Pursuite + Telegram inbound; DNS must point here |
+
+Validate after any edit:
+
+```bash
+caddy validate --config config/Caddyfile --adapter caddyfile \
+  -e APP_DOMAIN=app.tti-solutions.com -e WEBSITE_DOMAIN=tti-solutions.com \
+  -e ACME_EMAIL=admin@tti-solutions.com -e FRONTEND_UPSTREAM=frontend:3000 \
+  -e WEBHOOK_DOMAIN=webhook.tti-solutions.com
+```
+
+### 4.8 Staging
+
+```powershell
+python scripts/setup_staging_env.py        # writes config/.env.staging + 5 test logins (--force to regen)
+# set ANTHROPIC_API_KEY in config/.env.staging, then:
+docker compose -p ttis-staging -f docker-compose.yml -f docker-compose.staging.yml up -d
+```
+
+Staging runs on shifted host ports (dashboard `8100`, webhook `8101`, redis `6380`, chromadb `8102`)
+with isolated volumes — it never touches dev `:8000`. Logins e.g. `staging_admin` / `Staging!CEO#2026`.
+
+### 4.9 Troubleshoot (prod)
+
+| Symptom | Diagnose | Fix |
+|---|---|---|
+| Deploy aborts at Caddy validation | re‑read the validate error; usually a domain var | Set `WEBHOOK_DOMAIN`/`APP_DOMAIN`/… in `config/.env`; re‑run. |
+| New UI not visible after deploy | `docker inspect ttis-frontend --format '{{.Image}}'` vs GHCR digest; browser cache | `docker compose -f … -f docker-compose.prod.yml pull frontend && … up -d frontend`; hard‑refresh (Ctrl/Cmd‑Shift‑R). |
+| New backend endpoints 404 | `git -C ~/ttis-ai log -1 --oneline` (is `main` current?) | `git pull --ff-only origin main` (beware `it pull`), then `… up -d --build dashboard`. |
+| RAG results stale after ingest | ingest ran but dashboard not rebuilt | Rebuild: `… up -d --build dashboard` (see §7.5). |
+| `app.tti-solutions.com` not 307→/vbs | dashboard down / unhealthy | `docker ps` → check `ttis-dashboard (healthy)`; `docker logs ttis-dashboard --tail 80`. |
+| Login fails for everyone / 0 users | `grep -c '^DASHBOARD_USERS=' config/.env` = 0 and `auth.db` empty | Create a user (§4.6); restart dashboard. |
+| TLS cert errors on first cutover | `docker logs ttis-caddy 2>&1 \| grep -iE 'obtain\|error'` | Open ports 80/443 to the VM; wait for ACME challenge; re‑try. |
+| Site serves old Squarespace / wrong IP | `dig +short tti-solutions.com @8.8.8.8` ≠ `34.27.180.8` | Repoint DNS A records to `34.27.180.8`; lower TTL ahead of changes. |
+| Container unhealthy after deploy | `docker logs <name> --tail 120`; check `.env` keys, Redis/Cloud SQL reachability | Fix the missing env/dependency; `… up -d --force-recreate <svc>`. |
+| Worker not draining jobs | `docker logs ttis-worker --tail 80`; `redis-cli llen queue:workflow_jobs` | Restart worker; ensure `WORKFLOW_EXECUTION_MODE=queue` + `REDIS_URL` correct. |
+| Need to roll back the edge | — | `docker compose stop caddy && docker start ttis-web`. |
+
+### 4.10 Publish a confidential corpus doc to prod (e.g. the founder/company fact sheet)
+
+`corp_confidential` corpus docs (the founder/company **fact sheet**, sensitive org docs) are **gitignored
+by design** — they never go to GitHub or the name‑scrubbed public corpus. So they ride to prod
+**separately** from the code, then get ingested + the dashboard rebuilt so LYNNE / the RESEARCHER agent
+ground on them. (The ingest handles `.md`, `.docx`, and `.pdf` in `corp_confidential`.)
+
+**Environment facts that bite (verified 2026‑06‑17):**
+- GCP project is **`tti-solutions-ai`** (not `ttis-ai` — that's a different, empty project). VM `ttis-prod`, zone `us-central1-a`.
+- You SSH in as **`echar`**, but the app is deployed under user **`charles`** at **`/home/charles/ttis-ai`** (your `~` is `/home/echar`, which has *no* repo). So git/docker run as `charles`, and file ops into the repo need `sudo`.
+- The confidential dir is **`data/documents/corp_confidential/`** — **not** `…/library/corp_confidential/`. The ingest globs `…/corp_confidential/**/*.md` and the container mounts `./data/documents:/app/data/documents:ro`, so a file under a `library/` subdir is silently skipped.
+- The ingest script is **baked into the dashboard image** (only `data/documents` is mounted, not `scripts/`). So you **must `build dashboard` _before_ ingesting** or an older image runs the old script (e.g. one with no `.md` support).
+- On Windows, `gcloud compute scp` shells out to PuTTY's `pscp`, which reads a `H:\…` source as a *remote* host (the drive‑letter colon). **`cd` into the file's folder and pass the bare filename.** Close the file in any editor first (an Office `~$…` lock → "Cannot open file").
+
+```bash
+# 0) (on the VM, as echar) make the real target dir, owned by charles
+gcloud compute ssh ttis-prod --project=tti-solutions-ai --zone=us-central1-a
+sudo install -d -o charles -g charles /home/charles/ttis-ai/data/documents/corp_confidential
+
+# 1) (LOCAL, new PowerShell window — the SSH session holds the other) copy the gitignored doc to /tmp.
+#    cd into the folder so pscp doesn't treat the H: drive letter as a remote host.
+#    >>> run on your workstation, not the VM <<<
+#    cd H:\Projects\TTI-S_VBS\ttis-ai\data\documents\corp_confidential
+#    gcloud compute scp FOUNDER_COMPANY_FACT_SHEET.md ttis-prod:/tmp/ \
+#        --project=tti-solutions-ai --zone=us-central1-a
+
+# 2) (on the VM, as echar) move it into the repo with charles ownership
+sudo install -o charles -g charles -m 644 \
+  /tmp/FOUNDER_COMPANY_FACT_SHEET.md \
+  /home/charles/ttis-ai/data/documents/corp_confidential/
+
+# 3) (on the VM) switch to the charles user — owns the repo + can run docker/git
+sudo -u charles -H bash -l
+cd ~/ttis-ai
+git pull --ff-only origin main                                  # get the .md‑capable ingest script
+C="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
+$C build dashboard                                              # re‑bake the new ingest script INTO the image
+$C run --rm --no-deps dashboard python scripts/ingest_rag_corpus.py   # ingest → live chromadb
+#   look for:  corp_confidential   FOUNDER_COMPANY_FACT_SHEET.md → N chunks (md)
+$C up -d dashboard                                              # restart on the rebuilt image
+```
+
+> Verify: ask LYNNE a question only the sheet answers (e.g. *"what year was TTIS founded?"* → 2026, or
+> *"TTIS's initial commercial area of emphasis?"* → data center infrastructure). LYNNE cites it as a
+> `REF‑n` source. `corp_confidential` is CEO‑only and **not** name‑scrubbed, so personal facts are
+> preserved. See the **Corpus & RAG** tab for the full ingest reference.
+>
+> Notes: if `git pull` reports a dirty tree (an older root‑owned `ingest_rag_corpus.py`), `git stash`
+> first. If `docker` says `permission denied … docker.sock` even as `charles`, prefix the `$C` commands
+> with `sudo`. Chroma is a separate persisted service and the dashboard queries it live, so the ingest
+> alone makes the doc searchable — the `up -d dashboard` just rolls onto the rebuilt image.
+
+---
+
+## 5. Marketing Site (`www.tti-solutions.com`)
+
+Pure static site built from Markdown — no server, no framework. Source in `ttis-ai/website/`.
+
+### 5.1 Build (produce the committed `www/`)
+
+```powershell
+cd H:\Projects\TTI-S_VBS\ttis-ai\website
+pip install -r requirements.txt
+python build.py              # content/*.md (+ templates/base.html) → www/*.html, copies static/
+```
+
+### 5.2 Preview locally
+
+Run the dev server **from the repo root** (not from `website/`):
+
+```powershell
+cd H:\Projects\TTI-S_VBS\ttis-ai
+py website\serve.py 8745
+```
+
+Open <http://localhost:8745/>. It **rebuilds on each page navigation**, so after editing
+`content/*.md`, `templates/`, or `static/` just **refresh** the browser. `Ctrl+C` stops it.
+
+**Restart cleanly** (free the port first, then start):
+
+```powershell
+Get-NetTCPConnection -LocalPort 8745 -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty OwningProcess -Unique |
+  ForEach-Object { Stop-Process -Id $_ -Force }
+py website\serve.py 8745
+```
+
+### 5.3 Edit content
+
+- Pages are `website/content/*.md` with YAML front matter (`title`, `slug`, `nav_order`,
+  `description`, `hero_*`, …). Layout helpers: `::: grid cols-3 …`, `::: card`, `::: cta-panel`.
+- Add a page = add a `content/<slug>.md` with `nav_order`, run `build.py`, commit the rebuilt `www/`.
+- **Before publishing**, fill placeholders — see `website/PLACEHOLDERS.md` (CAGE, UEI, phone, email,
+  capability‑statement PDF, Formspree endpoint). Check none remain:
+  `grep -rn "\[\[" website/content website/templates`.
+
+### 5.4 Production
+
+Caddy serves the pre‑built `www/` via `file_server` on the apex; `www.` 301‑redirects to it. The
+site migrated off Squarespace — deploy is just rebuilding `www/` and shipping it with the stack (§4).
+
+### 5.5 Troubleshoot
+
+| Symptom | Diagnose | Fix |
+|---|---|---|
+| `serve.py` errors / no pages | run from `website/` instead of repo root | Run `py website\serve.py 8745` from the **repo root**. |
+| Port 8745 already in use | another `serve.py` still running | Free the port (the restart recipe in §5.2), then start again. |
+| Edits not showing | browser cached the page | It rebuilds per navigation — **refresh**; hard‑refresh (Ctrl+F5) if needed. |
+| Build fails: `No module named markdown` | deps not installed | `pip install -r website/requirements.txt`. |
+| Placeholders visible on the live site | `[[…]]` tokens not filled | `grep -rn "\[\[" website/content website/templates`; fill per `website/PLACEHOLDERS.md`. |
+
+---
+
+## 6. LMS
+
+The LMS is a VBS module (`dashboard/lms.py`, `dashboard/lms_db.py`) surfaced through the Dashboard's
+LMS tabs (Courses, Review, Enrollments, Credentials, Escalations). Architecture/schema:
+`docs/LMS_QMS_ARCHITECTURE.md`; scope/decisions: `docs/LMS_SCOPE.md`.
+
+### 6.1 Seed the catalog (idempotent)
+
+```bash
+docker exec ttis-dashboard python scripts/seed_lms_catalog.py            # seed if empty
+docker exec ttis-dashboard python scripts/seed_lms_catalog.py --force    # re-apply (conflict-tolerant)
+docker exec ttis-dashboard python scripts/seed_lms_catalog.py --print    # emit dialect SQL (pipe to psql)
+```
+
+Seeds courses, rubrics, certifications, curricula, the role→cert matrix, and registered competencies.
+Dialect‑portable (SQLite `INSERT OR IGNORE` / Postgres `ON CONFLICT DO NOTHING`). `deploy_prod.sh`
+runs this automatically.
+
+### 6.2 Policy‑acknowledgment course (R‑ACK‑01/02)
+
+```bash
+docker exec ttis-dashboard python scripts/seed_policy_ack.py
+```
+
+Creates the `POL-ACK` course: a module + attestation quiz per company policy letter, plus a
+**comprehension read‑gate** for policies that have a question bank
+(`scripts/policy_lessons/comprehension_banks.json`): **5 random questions, 80% to pass**; on fail the
+learner re‑reads and gets a different 5; **3 failures lock the quiz and escalate to a supervisor**.
+Earns `CERT-POLACK` (365‑day). Idempotent (skips if `POL-ACK` exists).
+
+**Supervisor escalation / reset:**
+- List open escalations: `GET /api/v1/lms/quiz-escalations?status=open` (also the **Escalations** tab).
+- Reset a locked learner: `POST /api/v1/lms/enrollments/{enrollment_id}/quizzes/{quiz_id}/reset-lock`.
+
+### 6.3 Verify the LMS is live
+
+- After deploy/seed: the Dashboard **Courses** tab lists courses; the **Review** tab is present; a
+  learner can open `POL-ACK`. If Courses is empty → run the catalog seed (§6.1). If the UI looks old →
+  confirm the frontend image was pulled and hard‑refresh.
+
+### 6.4 Corpus for the LMS
+
+LMS authoring content is grounded in the same RAG corpus (the `policies` + `corp_confidential`
+collections) — see **§7**. The LMS authoring agent (P4b) drafts lessons grounded in the **approved**
+corpus and stages them through a three‑stage gate (competent reviewer → CEO release); it is unblocked
+once the policy `.docx` set is signed and ingested. Authoring guidance:
+`docs/templates/CORPUS_AUTHORING_GUIDE.md`; coverage: `docs/LMS_CORPUS_COVERAGE_CHECKLIST.md`.
+
+---
+
+## 7. Corpus & RAG Ingestion (VBS + LMS)
+
+The RAG corpus grounds agent answers, LYNNE, and LMS authoring. Storage is **ChromaDB** (port 8002,
+`data/chroma_db/`) with **hybrid retrieval** (vector embeddings `all-MiniLM-L6-v2` + BM25, fused by
+reciprocal‑rank). Query layer: `dashboard/rag.py` (access is enforced server‑side by ABAC capability).
+
+### 7.1 Collections
+
+| Collection | Source | Visibility |
+|---|---|---|
+| `far_dfars` | FAR/DFARS DITA‑HTML (`H:/Projects/Library/FARHTML`, `DFARSHTML`) | all (name‑scrubbed) |
+| `sdvosb_regs` | 13 CFR Part 128 PDF (`H:/Projects/Library/…`) | all (name‑scrubbed) |
+| `policies` | `data/documents/policies/**/*.docx` (+ allow‑listed `.xlsx`) | all (name‑scrubbed) |
+| `corp_confidential` | `data/documents/corp_confidential/**` | CEO‑only (not scrubbed) |
+
+### 7.2 Where corpus files go
+
+```
+ttis-ai/data/documents/
+  policies/                 → policies collection (TTIS policy .docx, curriculum subfolders)
+    Compliance/ Quality/ Safety/ Technical/ Travel/ curriculum/…
+  corp_confidential/        → corp_confidential collection (CEO-only, not scrubbed)
+```
+
+Authoring a TTIS interpretive `.docx`: structure per `docs/templates/CORPUS_AUTHORING_GUIDE.md`
+(Policy Number header, numbered Heading‑1 sections). **Do not** paste verbatim OSHA/TIA/NEC/BICSI
+text (copyright wall) — those are external/attested credentials.
+
+### 7.3 Ingest (idempotent)
+
+The canonical run (throwaway container writing to the shared `ttis-chromadb`):
+
+```bash
+docker compose run --rm --no-deps \
+  -e CHROMA_HOST=ttis-chromadb -e CHROMA_PORT=8000 \
+  -v "H:/Projects/Library:/library:ro" \
+  -v "H:/Projects/TTI-S_VBS/ttis-ai/data/documents:/app/data/documents:ro" \
+  -v "H:/Projects/TTI-S_VBS/ttis-ai/tools:/app/tools:ro" \
+  -v "H:/Projects/TTI-S_VBS/ttis-ai/dashboard:/app/dashboard:ro" \
+  -v "H:/Projects/TTI-S_VBS/ttis-ai/scripts:/app/scripts:ro" \
+  dashboard python scripts/ingest_rag_corpus.py
+```
+
+(Local non‑Docker equivalent: `python main.py --ingest-docs`.) Output logs per collection, e.g.
+`policies  120 sections → 980 chunks ingested` and a final total across collections.
+
+**Idempotent / re‑ingest:** chunk IDs are deterministic (`source_ref#chunk`), so re‑running upserts
+in place — changed text gets new embeddings, unchanged chunks are silent overwrites. To update: edit
+the source doc, re‑run the same command. (Deleted docs leave orphan chunks until cleaned via the
+ChromaDB API.) FAR and DFARS share `far_dfars`, so always ingest in one pass.
+
+Custom paths via env: `RAG_LIBRARY_DIR` (default `/library`), `RAG_DOCS_DIR` (default
+`/app/data/documents`), `CHROMA_HOST`/`CHROMA_PORT`.
+
+### 7.4 Ingest on prod (background) + the mandatory rebuild
+
+On the VM the corpus library is **inside the container** at `/app/data/documents/library`. Run the
+ingest detached (it's long‑running) and watch the log:
+
+```bash
+# Start the full ingest in the background
+nohup docker exec -e RAG_LIBRARY_DIR=/app/data/documents/library ttis-dashboard \
+  python scripts/ingest_rag_corpus.py > ~/ingest.log 2>&1 &
+
+tail -f ~/ingest.log                     # watch progress (Ctrl-C to stop watching)
+tail -n 15 ~/ingest.log                  # last lines
+pgrep -af ingest_rag_corpus | grep -v grep || echo "ingest finished"
+```
+
+Ingest a **single collection** (e.g. re‑load the SDVOSB CFR PDF) without a full run:
+
+```bash
+docker exec ttis-dashboard python -c "from tools.rag_ingest import load_cfr_pdf; from dashboard.rag import chunk_sections, ingest_chunks; s=list(load_cfr_pdf('/app/data/documents/library/13 CFR Part 125.pdf','13 CFR Part 125')); print('sdvosb_regs:', ingest_chunks('sdvosb_regs', chunk_sections(s,'sdvosb_regs')), 'chunks')"
+```
+
+### 7.5 Rebuild the dashboard after EVERY ingest
+
+Ingest writes to ChromaDB, but the running dashboard caches its retrievers and won't serve the new
+corpus until rebuilt:
+
+```bash
+cd ~/ttis-ai && git pull --ff-only origin main
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build dashboard
+```
+
+### 7.6 Verify
+
+After ingest **and** the rebuild, run a RAG search from the Dashboard **Knowledge** tab (or the
+LYNNE/agent path) and confirm citations resolve to the new sections.
+
+---
+
+## 8. Ask‑LYNNE
+
+LYNNE is the CEO‑facing conversational EAA (Claude Opus), with grounded RAG citations, tool use, and
+propose→confirm workflow initiation. Code: `dashboard/lynne_stream.py` (orchestrator),
+`dashboard/lynne_tools.py`, `dashboard/lynne_actions.py`, `dashboard/lynne_projects.py`.
+
+### 8.1 Access
+
+- **Dashboard:** the **Ask‑LYNNE** tab (streaming chat + citations).
+- **SSE endpoint:** `POST /api/v1/lynne/stream` (events: `start`, `citations`, `token…`, `done`).
+- **Telegram:** the LYNNE bot (same backend via the webhook receiver).
+
+### 8.2 Configuration (env)
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `LYNNE_ALLOWED_PRINCIPALS` | unset | Allow‑list of principals (opt‑in restriction). |
+| `LYNNE_WEB_SEARCH` | `1` | Live web search tool. |
+| `LYNNE_PROJECTS` | `1` | GRID executive‑project tools. |
+| `LYNNE_MEMORY` | `1` | Rich cross‑turn memory (recall earlier research/docs). |
+| `LYNNE_OUTPUT_FORMAT` / `LYNNE_OUTPUT_EMAIL` | `gdoc` / unset | Save‑to‑Drive format / email recipient. |
+| `GOOGLE_DRIVE_LYNNE_FOLDER` / `GOOGLE_DRIVE_SHARED_ID` | unset | Drive target for saved runs. |
+| Durable runs | — | `LYNNE_STEP_GATES`, `LYNNE_STEP_GATE_TIMEOUT`, `LYNNE_RUN_TTL_SECONDS`, `LYNNE_SEQ_COMPACTION`, `LYNNE_SEQ_COMPACT_TOKENS`, `LYNNE_DIGEST_MODEL`. |
+| Tool keys | unset | `GOOGLE_MAPS_API_KEY` (maps/places), `TICKETMASTER_API_KEY` (events), `DUFFEL_API_TOKEN` (travel). Tool appears only if its key is set; weather (Weather.gov) needs none. |
+
+### 8.3 Google Workspace (Gmail/Calendar/Drive) for LYNNE
+
+```bash
+python scripts/setup_google_workspace.py     # interactive: GCP project, enable APIs, service account,
+                                             # domain-wide delegation, env vars, Docker mount
+```
+
+It configures a service account + domain‑wide delegation and prints the env vars to add
+(`GOOGLE_SERVICE_ACCOUNT_JSON`, `GOOGLE_IMPERSONATED_USER`, Drive folder IDs). Mount `./secrets`
+read‑only into the container. Verify:
+
+```bash
+docker exec ttis-dashboard python -c "from tools.google_gmail import GoogleGmail; print(len(GoogleGmail().list_emails(max_results=3)))"
+```
+
+### 8.4 Capabilities
+
+- **Read tools (inline):** weather, directions/places (Maps), travel search (Duffel), Drive/Gmail/Calendar read, web search.
+- **Propose→confirm:** initiate workflow, sync deadlines to calendar, delegate research.
+- **Direct (audit‑logged):** GRID project create/update/delete, calendar event cleanup.
+- **Playbooks:** savable templated multi‑step tasks (Ask‑LYNNE + Telegram).
+- **Durable runs:** Redis‑buffered, survive disconnect, optional save‑to‑Drive; mid‑run confirm gates.
+- **Integrity guardrails** (`agents/integrity_policy.py`): anti‑assumption (no unsourced identity/authority
+  claims), confidence scoring, `needs_review` flag below threshold.
+
+### 8.5 Troubleshoot
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| "Save to Drive" fails | Workspace not configured | Re‑run `setup_google_workspace.py`; check `GOOGLE_*` env + Drive folder ID. |
+| A tool isn't offered | its API key is unset | Set `GOOGLE_MAPS_API_KEY` / `DUFFEL_API_TOKEN` / etc.; restart. |
+| Web search missing | `LYNNE_WEB_SEARCH=0` | Set `=1`, restart. |
+| Streaming arrives in bursts | Caddy buffering | Ensure `flush_interval -1` on the dashboard proxy in `config/Caddyfile`. |
+| 429 rate‑limit | Anthropic tier/limit | LYNNE auto‑retries with back‑off; raise the org token‑per‑minute limit if persistent. |
+
+---
+
+## 9. Pursuite (GovCon capture/proposal platform)
+
+Separate product at `H:\Projects\Pursuite\app` — an npm‑workspaces monorepo (`apps/api`, `apps/web`;
+internally codenamed **BidCommandPro**). It feeds the TTIS VBS through the **Pursuite webhook** (CRM
+events → port 8001). Local dev runs in Docker; config is injected via `env_file: .env` (see the
+**Docker Desktop / WSL2 `.env` gotcha** in §1.4). Prod images are tagged `pursuite/api:YYYYMMDD`. The
+admin/troubleshooting CLI lives in `apps/api/src/db/scripts/` and **all helper scripts run from
+`apps/api/`** (they read the monorepo‑root `.env` automatically). **When in doubt, run
+`npm run check-health` first** (§9.7).
+
+> Two sibling dirs, easy to confuse: `src/db/seeds/` = **seeding** scripts (run once to populate a
+> demo/dev env); `src/db/scripts/` = **admin CLI** tools (run on‑demand to inspect/modify existing data).
+
+### 9.1 Local run & container control (Docker)
+
+```powershell
+cd H:\Projects\Pursuite\app
+docker compose -f docker-compose.yml -f docker-compose.localtest.yml up -d --force-recreate
+docker compose ps
+
+# Per-container control
+docker compose up -d --force-recreate web    # recreate the web container
+docker compose restart api                    # restart the API
+docker compose logs api -f                     # follow API logs
+docker compose logs api --tail=5               # confirm API status
+```
+
+> Always **recreate** rather than restart (`… up -d --force-recreate`, or `down --remove-orphans` then
+> `up`). Restarting a stale container replays the old single‑file `.env` mount and fails — see §1.4.
+
+**Log in via the web UI (local-auth):** there is no separate username field. Set **Organization**
+to `default`, click **"Admin only? Use local login"**, then enter the admin **email** and local-admin
+password. On a clean standalone install Pursuite Manager auto-creates `admin@pursuite.local` in org
+`default` and writes the first-run password to `%APPDATA%\Pursuite\first-run-admin.txt`. Use that
+first-run password once, then create a named admin account and rotate/clear the temporary local password
+(see section 9.9).
+
+**Running CLI scripts against local infra** needs the DB + Redis env present in the shell:
+
+```powershell
+$env:DATABASE_URL = 'postgresql://bidcommand:devpassword@localhost:5432/bidcommand'   # local dev only
+$env:REDIS_URL    = 'redis://localhost:6379'
+```
+
+### 9.2 Seed TTI‑Solutions' own tenant (telecom bootstrap + market intel)
+
+The seed scripts live in the `apps/api` workspace, so run them from there (or add `-w apps/api` from
+the monorepo root):
+
+```powershell
+cd H:\Projects\Pursuite\app\apps\api
+
+# 1) Bootstrap company data — NAICS 238210 (wiring), 517919 (telecom), 561621 (security systems)
+npm run seed:tti -- --org tti-solutions --email charles@tti-solutions.com --password "YourPW" `
+  --naics 238210,517919,561621 --opportunities 6
+
+# 2) Pull real market intelligence from USASpending.gov for that org
+npm run seed:enrich -- --org tti-solutions
+
+# 3) Refresh market data periodically
+npm run seed:enrich -- --org tti-solutions --reset
+```
+
+Direct equivalent: `npx tsx src/db/seeds/telecom-bootstrap.ts --org tti-solutions …`.
+
+### 9.3 Demo seeds (sales / AI‑positioning demos)
+
+```powershell
+cd H:\Projects\Pursuite\app\apps\api
+
+# Simplest — named org with a local-auth login
+npm run seed:ai-demo -- --org demo-ai --email admin@example.com --password "Demo@2026!" --naics 541512
+
+# Reset an existing named org (purge + re-seed)
+npm run seed:ai-demo -- --org demo-ai --reset --email admin@example.com --password "Demo@2026!"
+
+# No flags = auto-generated unique slug, default email, no local-auth password
+npm run seed:ai-demo
+```
+
+Flags: `--org <slug>` (named; omit → auto unique slug), `--email`/`--password` (local‑auth login; omit
+→ none), `--reset` (purge the named `--org` then re‑seed; omitting `--org` always creates fresh),
+`--naics <csv>`. Direct: `npx tsx src/db/seeds/ai-positioning-demo.ts …`.
+
+**What the AI demo builds** — a 3‑bid / 2‑agency story arc that exercises the three AI initiatives:
+CISA CDM Phase 4 (**LOSS** to Booz Allen, with a written debrief) → Army DEVCOM MCADE (**WIN** $12.8M,
+banked win themes) → CISA ZTA Advisory (**ACTIVE**, due in 28 days, the test bed) → NIH IT
+Modernization (**QUALIFYING**). It demonstrates (1) **Capture‑Context Injection** (win themes,
+debriefs, CRM hot buttons, bid/no‑bid rationale, compliance scan, content library), (2) **Agentic
+Content Research** (real agency DHS CISA + real NAICS 541512 → live USASpending.gov awarded‑contract
+queries), and (3) **Section‑Type Intelligent Pipelines** (six section types, each with type‑specific
+context; Price/Cost links to the CPQ quote). Using a real agency + NAICS is what makes USASpending
+return actual awards in the demo.
+
+**Generic CRM test data** (separate from the tenant/demo seeds — bulk accounts + contacts for load/UX
+testing). Two scripts in `G:\BidCommandPro\seed\`: run `generate.js` first (→ `accounts.csv` 100 rows
++ `contacts.csv` ~1,615 rows; 10 "anchor" accounts get a 5‑level org chart), then `seed.js` to POST
+them to a running API:
+
+```powershell
+node generate.js
+node seed.js --url http://localhost:3001 --token <jwt>   # --dry to preview, --delay 50 to throttle
+```
+
+`--token` is a JWT from `POST /api/v1/auth/login`. `seed.js` imports in dependency order (accounts →
+contacts → wire `reportsTo` hierarchy) with a live progress bar.
+
+### 9.4 Reset a local‑auth password
+
+```powershell
+npm run reset-local-pw -- --email david.chen@meridianfed.example `
+  --org meridian-federal-solutions --password "Demo@Pursuite2026!"
+```
+
+### 9.5 Demo playbooks (sales enablement)
+
+| Playbook | Location | Contents |
+|---|---|---|
+| **Sales Demo** | `G:\Pursuite\marketing\Pursuite_Sales_Demo_Playbook.docx` / `.pdf` | 10 modules, ~64 min — talking points, discovery questions, objection handling, pricing‑tier table, demo setup checklist. |
+| **AI Demo** | `G:\Pursuite\marketing\Pursuite_AI_Demo_Playbook.docx` / `.pdf` | 3 initiative deep‑dives (color‑coded banners), live proof‑point boxes, competitive positioning table, pre‑seeded checklist tied to the seed script. |
+
+### 9.6 Build & deliver (customer packaging)
+
+```powershell
+cd H:\Projects\Pursuite\app
+.\scripts\build-and-deliver.ps1
+```
+
+**Interactive menu** (before build): APP URL (required), Admin email (required), Org slug (default
+`default`), Temp password (**auto‑generated**, 16 random chars). **Five stages:**
+
+1. Write `APP_URL` + `APP_VERSION` to `.env.production`.
+2. `docker compose build` — prod images tagged `pursuite/api:YYYYMMDD`.
+3. **Delivery gate** — `bootstrap-admin` + the vitest regression suite. *If this fails, no package is produced.*
+4. Package assembly → `delivery/pursuite-YYYYMMDD-HHMMSS.zip`: `docker-compose.production.yml`,
+   pre‑configured `.env.production`, `migrations/` (26 SQL files), `images/` (docker‑save tarballs of
+   both images), `MANIFEST.txt`.
+5. Verdict banner — App URL, admin username, org slug, **temp password (shown once — capture it)**,
+   "pw expires 3 days after first login", package path, size (~842 MB), SHA‑256.
+
+### 9.7 Health check (run this first)
+
+```powershell
+cd H:\Projects\Pursuite\app\apps\api
+npm run check-health
+```
+
+One command checks DB connectivity, the critical schema columns, Redis ping, and BullMQ queue depths.
+Exit `0` = all clear, `1` = one or more failures (safe for CI/monitoring). A red
+`❌ Schema: <table>.<column>` line means a migration didn't run — go to §9.10.
+
+### 9.8 Helper / admin scripts (`apps/api/src/db/scripts/`)
+
+Run from `apps/api/`. Full option reference is in each script's JSDoc header.
+
+| Script | Purpose |
+|---|---|
+| `npm run check-health` | DB + schema + Redis + BullMQ health (exit 0/1). |
+| `npm run list-orgs` | Table of every org: slug, plan, Stripe status, trial expiry, user count. |
+| `npm run inspect-org -- --org <slug>` | Deep‑inspect one org — billing, full user table (roles/active/SSO), anomaly warnings. |
+| `npm run create-user -- --email <e> --org <slug> --role <role> [--name "…"]` | Create a user. |
+| `npm run set-user-role -- --email <e> --org <slug> --role <role>` | Change a user's role. |
+| `npm run reset-local-pw -- --email <e> --org <slug> --password <pw>` | Set/reset the bcrypt local‑auth password (admin only). |
+| `npm run clear-session -- --email <e> --org <slug>` | Force‑logout (writes Redis blocklist). |
+| `npm run set-plan -- --org <slug> --plan <plan> [opts]` | Override an org's plan/billing for testing. |
+| `npm run purge:org -- [--pattern <pre>\|--org <slug>\|--keep <csv>] [--dry-run]` | Targeted org purge. |
+| `npm run purge:test` | Purge `test-*` orgs + clear business data from the bootstrap org. |
+| `npm run db:generate` / `npm run db:migrate` | Generate / apply Drizzle migrations. |
+
+### 9.9 Users, roles & sessions
+
+```powershell
+cd H:\Projects\Pursuite\app\apps\api
+npm run create-user -- --email admin@pursuite.local --org pursuite --role admin
+npm run create-user -- --email writer@example.com --org pursuite --role writer --name "Jane Doe"
+npm run set-user-role -- --email charles@pursuite.io --org pursuite --role admin
+npm run reset-local-pw -- --email admin@pursuite.local --org pursuite --password "<password>"
+```
+
+Valid roles: `admin · proposal_manager · writer · executive_approver · read_only`. Only `admin` can
+use local‑auth login. First‑time **SSO** users are auto‑provisioned `read_only` — upgrade via Admin → Users.
+
+**Bootstrap an admin from env** (fresh org, dev/source via `tsx`):
+
+```powershell
+$env:ADMIN_EMAIL='admin@pursuite.local'; $env:ADMIN_PASSWORD='<password>'
+$env:ORG_SLUG='pursuite'; $env:ORG_NAME='Pursuite'
+npx tsx apps/api/src/db/seeds/bootstrap-admin.ts
+```
+
+**Standalone delivered app login and named-admin handoff.** The standalone login form has no separate
+`username` field. Use:
+
+- **Org:** `default`
+- **Email:** admin email
+- **Password:** local admin password
+
+On a clean standalone install, Pursuite Manager auto-creates:
+
+```text
+Email: admin@pursuite.local
+Org: default
+Password file: %APPDATA%\Pursuite\first-run-admin.txt
+```
+
+Use that first-run password to sign in, then create your named admin account.
+
+To create/set a named admin from PowerShell against the standalone container:
+
+```powershell
+docker exec pursuite-api node dist/db/scripts/create-user.js --email "you@company.com" --org default --role admin --name "Your Name"
+
+docker exec pursuite-api node dist/db/scripts/reset-local-pw.js --email "you@company.com" --org default --password "Use-A-Strong-Password-Here"
+```
+
+If the user already exists, promote them and set/reset the password:
+
+```powershell
+docker exec pursuite-api node dist/db/scripts/set-user-role.js --email "you@company.com" --org default --role admin
+
+docker exec pursuite-api node dist/db/scripts/reset-local-pw.js --email "you@company.com" --org default --password "Use-A-Strong-Password-Here"
+```
+
+After confirming the named admin can log in, disable the temporary/default local password:
+
+```powershell
+docker exec pursuite-api node dist/db/scripts/reset-local-pw.js --email admin@pursuite.local --org default --clear
+```
+
+**Gotcha:** `standalone-admin.js` only creates the first admin if the org has no existing admin. Once
+`admin@pursuite.local` exists, use `create-user`, `set-user-role`, and `reset-local-pw`; rerunning
+`standalone-admin.js` will not reset the password.
+
+**`reset-local-pw` specifics:** local‑auth is admin‑only (`systemRole = "admin"`); the password is a
+bcrypt hash (12 rounds) stored in Redis at `local_pw:<userId>`. `--clear` deletes it (disables local
+auth for that user); does not affect SSO.
+
+**Force‑logout / "Token revoked":** `clear-session` writes blocklist entries for the access token
+(`blocklist:<userId>`, 8 h) **and** refresh token (`blocklist:<userId>:refresh`, 30 d); the next request
+returns `401 Token revoked`. A normal login clears them automatically. It accepts `--email <e> --org
+<slug>` **or** `--user-id <uuid>`. Stale entries after re‑login:
+`redis-cli DEL blocklist:<userId> blocklist:<userId>:refresh`.
+
+### 9.10 Schema drift & migrations (the #1 login‑500 cause)
+
+**Symptom:** `500` on `POST /api/v1/auth/local` with `column "X" does not exist` (e.g.
+`onboarding_completed_at`, `settings`, `system_roles`, `notification_prefs`). A migration added columns
+but didn't run against this DB.
+
+```powershell
+# Apply pending migrations
+cd H:\Projects\Pursuite\app\apps\api
+npm run db:migrate                       # or: npm run db:migrate --workspace=@bidcommand/api
+npm run check-health                     # all Schema rows should be green
+```
+
+Emergency manual fix (CI down / first deploy) via `psql`:
+
+```sql
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS onboarding_completed_at timestamp;
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS settings jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE organizations ADD COLUMN IF NOT EXISTS plan text NOT NULL DEFAULT 'free';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS system_roles text[];
+ALTER TABLE users ADD COLUMN IF NOT EXISTS sso_subject text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS notification_prefs jsonb NOT NULL DEFAULT '{}';
+```
+
+**Prevent:** run `db:migrate` in the deploy pipeline **before** the API process starts.
+
+### 9.11 Onboarding wizard & org cleanup
+
+```powershell
+# Onboarding wizard (clears/sets onboardingCompletedAt) — run from monorepo root
+node --env-file=.env node_modules/.bin/tsx apps/api/src/db/scripts/reset-onboarding.ts            # force reappear
+node --env-file=.env node_modules/.bin/tsx apps/api/src/db/scripts/reset-onboarding.ts --org acme  # specific org
+node --env-file=.env node_modules/.bin/tsx apps/api/src/db/scripts/reset-onboarding.ts --complete  # suppress wizard
+
+# Purge orgs (from apps/api) — ALWAYS --dry-run first
+npm run purge:org -- --pattern test- --dry-run
+npm run purge:org -- --pattern test-
+npm run purge:org -- --pattern tti-solutions-17            # all timestamp-suffixed TTI seeds
+npm run purge:org -- --keep default,meridian-federal-solutions --dry-run
+npm run purge:org -- --org tti-solutions-1716300000000     # one exact slug
+npm run purge:test                                          # test-* + clear bootstrap-org business data
+```
+
+### 9.12 Billing / plan overrides (testing)
+
+```powershell
+cd H:\Projects\Pursuite\app\apps\api
+npm run set-plan -- --plan enterprise
+npm run set-plan -- --plan pro --status active --period-end +30d
+npm run set-plan -- --plan starter --status trialing --trial-ends +3d   # trial banner
+npm run set-plan -- --plan free --status canceled --trial-ends -1d      # red "upgrade required"
+npm run set-plan -- --plan free --clear-stripe                          # reset / unsubscribe
+npm run set-plan -- --org <slug> --plan pro                             # target a specific org
+```
+
+**Plan not updating after Stripe checkout?** Check: webhook delivered (`checkout.session.completed`)?
+`STRIPE_WEBHOOK_SECRET` correct (a wrong secret fails signature verify silently)? `STRIPE_STARTER_PRICE_ID`
++ `STRIPE_PRO_PRICE_ID` both set and matching the dashboard? Inspect with `npm run inspect-org -- --org <slug>`.
+
+### 9.13 Redis & background jobs
+
+```powershell
+redis-cli ping                                   # → PONG (else Redis down / wrong REDIS_URL)
+redis-cli KEYS "bull:*:wait"                      # waiting BullMQ jobs
+redis-cli ZCARD "bull:sam-monitor:delayed"         # scheduled SAM.gov monitors
+redis-cli LMOVE "bull:<q>:failed" "bull:<q>:wait" LEFT RIGHT   # retry a failed job
+```
+
+SAM.gov monitors run as BullMQ scheduled jobs; each org supplies its **own** SAM.gov API key
+(Admin → Integrations, expires annually). For managed Redis use `rediss://` (TLS) and check VPC rules.
+
+### 9.14 Environment variables (reference)
+
+All belong in the monorepo‑root `.env` (or your secrets manager).
+
+| Variable | Required | Notes |
+|---|---|---|
+| `APP_URL` | ✅ | Public base URL users type to reach the app, **no trailing slash**. See the callout below. |
+| `DATABASE_URL` | ✅ | `postgres://user:pass@host/db`. |
+| `REDIS_URL` | ✅ | `redis://…` or `rediss://…` (TLS). |
+| `JWT_SECRET` | ✅ | ≥32 random chars. |
+| `TOKEN_ENCRYPTION_KEY` | ✅ | **Distinct** 64‑char hex (`openssl rand -hex 32`), ≠ `JWT_SECRET`; server fails closed if missing/dup. |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | ✅ | `sk_…` / `whsec_…`. |
+| `STRIPE_STARTER_PRICE_ID` / `STRIPE_PRO_PRICE_ID` | ✅ | Must match the Stripe dashboard exactly. |
+| `EMAIL_PROVIDER` (+ provider keys) | ✅ | `ses` (`SES_FROM_ADDRESS`, `AWS_*`) or `sendgrid` (`SENDGRID_*`). |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | push | `npx web-push generate-vapid-keys` (changing them forces re‑subscribe). |
+| `AWS_S3_BUCKET` / `AWS_S3_REGION` / `AWS_*` | uploads | S3 file storage. |
+| `OIDC_ISSUER` / `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` / `OIDC_REDIRECT_URI` | SSO | `SSO_PROVIDER=auth0` or generic. |
+
+> **`APP_URL` — the most delivery‑critical setting.** It's the public base URL the API uses to build
+> absolute links/redirects in **five** places: user‑invitation accept links, Stripe checkout
+> `success_url`/`cancel_url`, the Stripe billing‑portal `return_url`, Nylas calendar/email OAuth
+> callbacks, and "View Report" links in scheduled‑report emails (plus the desktop tray's open‑in‑browser).
+> Set it to exactly what users type to reach the app — **no trailing slash**. If it's wrong, invite
+> emails contain broken links, Stripe redirects fail after checkout, and OAuth redirects go to the wrong
+> host. Examples: `http://localhost` (local), `http://192.168.1.100` (LAN/office — most common
+> self‑hosted), `http://bidcommandpro.local` (custom DNS/hosts), `https://bids.yourcompany.com` (Internet + TLS).
+
+### 9.15 Error‑code quick reference
+
+| HTTP | Message | Likely cause | See |
+|---|---|---|---|
+| 401 | `Token revoked` | force‑logout / stale blocklist | §9.9 |
+| 401 | `Invalid credentials` | wrong pw, user inactive, or not admin | §9.9 |
+| 400 | `Invalid or expired state` | SSO state TTL (60 s) expired | §9.13 |
+| 400 | `Organization 'X' not found` | bad `?org=` slug on `/auth/login` | `list-orgs` |
+| 403 | `Plan limit exceeded` | free/starter hitting a gated feature | §9.12 |
+| 500 | `column "X" does not exist` | migration not applied | §9.10 |
+| 500 | `TOKEN_ENCRYPTION_KEY` error | missing/duplicate key | §9.14 |
+| 500 | `connect ECONNREFUSED` | Redis/Postgres not reachable | §9.13 |
+
+### 9.16 Troubleshoot (operations + product)
+
+| Symptom | Diagnose | Fix |
+|---|---|---|
+| OCI `not a directory` on `.env` mount | stale container replaying old single‑file mount | `down --remove-orphans` then `up -d --force-recreate` (§1.4). |
+| Login `500` | read the API log stack trace (`docker compose logs api --tail=50`) | Almost always schema drift (§9.10) or a missing env key (§9.14). |
+| Login `401` despite correct password | `inspect-org` — user inactive / not admin? | Reactivate (`UPDATE users SET active=true …`); only `admin` does local‑auth (§9.9). |
+| Seed says org already exists | named `--org` already seeded | Add `--reset` (or omit `--org` for a fresh slug). |
+| USASpending returns nothing | unreal agency/NAICS, or org not seeded | Seed first; use real agency + NAICS (demo uses DHS CISA + 541512). |
+| Delivery gate fails in `build-and-deliver.ps1` | `bootstrap-admin`/vitest failed | Fix the failing test before packaging — the gate is intentional. |
+| Can't log in after delivery | temp password expired (3 days) / not captured | Shown once in the verdict banner; re‑issue via `reset-local-pw`. |
+| "MFA code required" but never enrolled | account is TOTP‑enrolled | Enter the authenticator code; Admin can reset MFA (Admin → Users), then re‑enroll. |
+| MFA code rejected repeatedly | device clock drift | Wait for the next 30‑s code; set phone time to automatic. |
+| Document blocked — "clearance required" (403) | clearance below the item minimum | Set under Profile → Security (Admin‑assigned); the denial is audited. |
+| RFP Shredder finds no requirements | scanned/image‑only PDF, OCR layer absent | OCR runs automatically; re‑upload a clearer scan or add requirements manually (air‑gap bundles the OCR layer). |
+| Compliance Matrix export stuck "Generating" | DOCX/PDF renders in the background | Wait for **Complete** (CSV is instant); ensure `soffice` (LibreOffice) is on the worker for PDF. |
+| No emails sent / going to spam | check `EMAIL_PROVIDER` + keys; SPF/DKIM/DMARC | SES sandbox only sends to verified addresses — request production access. |
+
+### 9.17 Mutative Test Harness & regression
+
+**MTH** (`testing/mutative-harness/`; ref `MTH_User_Guide_v4`) — adversarial input mutation against the
+Pursuite API. **Never run against prod** — it creates/deletes users and edits org config; use a
+dedicated test/staging instance.
+
+```powershell
+cd H:\Projects\Pursuite\testing\mutative-harness
+npm install ; copy .env.example .env     # add tokens + API URL (DRY_RUN=true by default)
+npm run run:dry                          # plan + results/latest.html, no requests sent
+# set DRY_RUN=false in .env, then a scope:
+npm run run:all                          # or run:auth / run:rbac / run:compliance / run:admin
+```
+
+Mutation types: Structural (remove_field / empty_object / extra_fields / nesting), Type (invalid_enum
+SQLi / binary), Value (sql / xss / path‑traversal / long‑string), Semantic (cross_org_id), Protocol
+(missing_auth / wrong_role_token / `alg=none` / malformed), Chaos (duplicate / concurrent /
+large_payload), Fuzz. Findings → `results/latest.{json,html}`; severities CRITICAL/HIGH/MEDIUM/LOW;
+exit **0** clean / **1** CRITICAL (block) / **2** fatal. **Add an endpoint = append a baseline in
+`src/input-generator/baseline-payloads.ts`** (the engine auto‑generates all groups).
+
+**17‑step regression pipeline** — `scripts/run-regression.ps1` (ref `TestPlan_Regression_v6.docx`;
+301 documented TCs, 258 active):
+
+```powershell
+.\scripts\run-regression.ps1                  # full 17-step run
+.\scripts\run-regression.ps1 -Filter "BUG-"   # bug-fix regression only
+.\scripts\run-regression.ps1 -Filter "NEG-" -ApiOnly
+.\scripts\run-regression.ps1 -AirGap -AirGapApiUrl http://airgap-host:3000 -AirGapEmail admin@company.gov
+```
+
+Steps: prereqs → container health → credentials → `tsc` → API vitest → web vitest → BUG‑/NEG‑
+regression → CPQ → debrief/WLA → RFP shredder → A‑series stubs → phase 1–4 suites → air‑gap smoke
+(25 checks) → summary (`test-results/regression-*.txt`). Flags: `-ApiOnly` / `-WebOnly` / `-Filter` /
+`-AirGap`. Filter aliases: `BUG-`, `NEG-`, `TC-CPQ-`, `TC-DB-`, `TC-RFP-`, `TC-WLA-`, …
+
+> The TTIS VBS port of this methodology lives on the **TTI‑VBS** tab §1.11 (`tools/mth/`,
+> `scripts/run_regression.py`) — same oracle/strategy model, adapted to FastAPI + the ABAC PDP.
+
+---
+
+## Appendix
+
+### A · Kill a stuck listening port (Windows / PowerShell)
+
+```powershell
+Get-NetTCPConnection -LocalPort 8081 -State Listen |
+  Select-Object -ExpandProperty OwningProcess -Unique |
+  ForEach-Object { Stop-Process -Id $_ -Force }
+```
+
+(Swap `8081` for `8000`/`3000`/etc. as needed.)
+
+### B · Quick command index
+
+| Task | Command |
+|---|---|
+| Connect to prod | `gcloud config set project tti-solutions-ai` → `gcloud compute ssh ttis-prod --zone=us-central1-a` |
+| Prod deploy backend | `git pull --ff-only origin main` → `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build dashboard` |
+| Prod deploy frontend | `docker compose -f … -f docker-compose.prod.yml pull frontend` → `… up -d frontend` |
+| Prod verify edge | `curl -sI https://app.tti-solutions.com/` (307→/vbs) · `dig +short tti-solutions.com @8.8.8.8` (34.27.180.8) |
+| Prod health | `docker ps --format 'table {{.Names}}\t{{.Status}}'` |
+| Create prod user | `docker exec -e NU=… -e NP=… ttis-dashboard python -c "…upsert_user…"` (§4.6) |
+| VBS dev up | `python main.py` + `uvicorn dashboard.main:app --port 8000 --env-file config\.env` + `uvicorn tools.pursuite_webhook:webhook_app --port 8001` |
+| Reset CEO password (local) | `…python.exe -c "…set_password/upsert_user…"` (§1.8) |
+| VBS docker up | `docker-compose up -d` |
+| VBS tests | `pytest tests/ -q` |
+| Verify audit chain | `python main.py --verify-chain` |
+| Dashboard dev | `npm run dev` (`:3000`) |
+| Dashboard checks | `npm run typecheck && npm run lint && npm run test:cov && npm run build` |
+| Field app dev | `npm run start` (Expo) |
+| Field app build | `eas build --platform ios|android` |
+| Deploy prod | `./scripts/deploy_prod.sh` (on the VM) |
+| Validate Caddy | `caddy validate --config config/Caddyfile --adapter caddyfile -e …` |
+| Staging up | `docker compose -p ttis-staging -f docker-compose.yml -f docker-compose.staging.yml up -d` |
+| Build website | `python website/build.py` → preview `python website/serve.py` |
+| Seed LMS | `docker exec ttis-dashboard python scripts/seed_lms_catalog.py` |
+| Seed policy‑ack | `docker exec ttis-dashboard python scripts/seed_policy_ack.py` |
+| Ingest corpus | `docker compose run --rm … dashboard python scripts/ingest_rag_corpus.py` |
+| LYNNE Workspace setup | `python scripts/setup_google_workspace.py` |

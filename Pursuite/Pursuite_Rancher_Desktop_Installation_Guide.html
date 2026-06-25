@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite Rancher Desktop Installation Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+.doc-nav{max-width:920px; margin:-18px auto 24px; padding:0 24px;}
+.doc-nav-inner{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 16px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+.doc-nav a{display:inline-block; margin:.15rem .8rem .15rem 0; font-size:.92rem; font-weight:600;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .doc-nav{display:none}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+  .doc-nav{padding:0 12px}
+}
+.doc-footer{max-width:920px; margin:24px auto 0; padding:0 24px 48px; color:var(--muted); font-size:.9rem;}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite Rancher Desktop Installation Guide</h1>
+    <p>Standalone 1.0 installation and validation guide for Rancher Desktop runtime.</p>
+  </div>
+</header>
+<nav class="doc-nav" aria-label="Document navigation">
+  <div class="doc-nav-inner">
+    <a href="#introduction">Introduction</a><a href="#prerequisites">Prerequisites</a><a href="#installation">Installation</a><a href="#configuration">Configuration</a><a href="#troubleshooting">Troubleshooting</a><a href="#validation-checklist-results">Validation</a>
+  </div>
+</nav>
+<div class="wrap">
+  <main>
+    <section aria-label="Document content">
+      <article>
+<h1 id="pursuite-installation-guide---rancher-desktop-runtime">Pursuite Installation Guide - Rancher Desktop Runtime</h1>
+<p>Product Name: Pursuite<br>
+Version: 1.0.0 Standalone Pilot<br>
+Revision Number: 1<br>
+Publication Date: June 22, 2026<br>
+Classification: Internal / Pilot Release Documentation<br>
+Author: Codex<br>
+Approver: Information Not Yet Available</p>
+<hr>
+<h2 id="document-control">Document Control</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document ID</td>
+<td>PUR-INSTALL-RANCHER-1.0</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>1.0.0</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Draft for RC QA</td>
+</tr>
+<tr>
+<td>Author</td>
+<td>Codex</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Information Not Yet Available</td>
+</tr>
+<tr>
+<td>Approver</td>
+<td>Information Not Yet Available</td>
+</tr>
+<tr>
+<td>Release Date</td>
+<td>Information Not Yet Available</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="revision-history">Revision History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>June 22, 2026</td>
+<td>Codex</td>
+<td>Initial Pursuite standalone installation guide for environments using Rancher Desktop instead of Docker Desktop.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#preparation-analysis">Preparation Analysis</a></li>
+<li><a href="#audience-definition">Audience Definition</a></li>
+<li><a href="#scope-definition">Scope Definition</a></li>
+<li><a href="#system-overview">System Overview</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#rancher-desktop-configuration-requirements">Rancher Desktop Configuration Requirements</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#usage-procedures">Usage Procedures</a></li>
+<li><a href="#administration">Administration</a></li>
+<li><a href="#api-section">API Section</a></li>
+<li><a href="#security">Security</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#frequently-asked-questions">Frequently Asked Questions</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#appendix">Appendix</a></li>
+<li><a href="#validation-checklist-results">Validation Checklist Results</a></li>
+<li><a href="#open-questions--missing-information">Open Questions / Missing Information</a></li>
+<li><a href="#recommended-next-documentation-artifacts">Recommended Next Documentation Artifacts</a></li>
+</ol>
+<hr>
+<h2 id="introduction">Introduction</h2>
+<h3 id="purpose">Purpose</h3>
+<p>This guide explains how to install Pursuite 1.0 standalone on Windows when Rancher Desktop is used as the local container runtime instead of Docker Desktop. It covers Rancher Desktop prerequisites, required engine settings, Pursuite installer and portable launcher procedures, first-run access, validation, rollback, and troubleshooting.</p>
+<h3 id="scope">Scope</h3>
+<p>This guide applies to Pursuite standalone RC QA and pilot environments that intentionally use Rancher Desktop for local container management. The current Pursuite Manager startup path uses Docker-compatible commands and Docker Compose, so Rancher Desktop must expose the Docker CLI and compose workflow.</p>
+<h3 id="intended-audience">Intended Audience</h3>
+<p>The primary audience is administrators, support engineers, release QA testers, and technically capable SMB pilot users who install Pursuite on Windows with Rancher Desktop.</p>
+<h3 id="document-conventions">Document Conventions</h3>
+<ul>
+<li>Procedures use numbered steps.</li>
+<li>File paths use Windows path syntax.</li>
+<li>Commands are written for PowerShell unless otherwise noted.</li>
+<li>Values marked <code>Information Not Yet Available</code> require confirmation before final publication.</li>
+<li>Rancher Desktop references are based on official Rancher Desktop documentation current on June 22, 2026.</li>
+</ul>
+<h3 id="related-documentation">Related Documentation</h3>
+<ul>
+<li><code>Pursuite_Installation_Guide.md</code></li>
+<li><code>Pursuite_Admin_User_Guide.md</code></li>
+<li><code>Pursuite_End_User_Guide.md</code></li>
+<li><code>Standalone_1.0_Release_Checklist.md</code></li>
+<li>Rancher Desktop official documentation</li>
+</ul>
+<hr>
+<h2 id="preparation-analysis">Preparation Analysis</h2>
+<h3 id="product-name">Product Name</h3>
+<p>Pursuite.</p>
+<h3 id="product-purpose">Product Purpose</h3>
+<p>Pursuite is a proposal and pursuit management platform for teams that manage accounts, contacts, opportunities, proposals, RFP ingestion, compliance context, proposal workspaces, content, reporting, and operational workflows.</p>
+<h3 id="target-audience">Target Audience</h3>
+<p>The initial release target is small and medium-sized businesses that need a local standalone deployment rather than a hosted SaaS or air-gapped environment. This guide is for customers or QA environments where Rancher Desktop is the selected local container runtime.</p>
+<h3 id="user-roles">User Roles</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Installation Relevance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin</td>
+<td>Installs Rancher Desktop, validates runtime settings, installs Pursuite, and administers first-run access.</td>
+</tr>
+<tr>
+<td>Proposal Manager</td>
+<td>Uses installed Pursuite to manage opportunities, proposals, RFP Shredder workflows, and proposal teams.</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>Uses installed Pursuite to contribute proposal content.</td>
+</tr>
+<tr>
+<td>Reviewer / Executive Approver</td>
+<td>Uses installed Pursuite for review and approval activities where configured.</td>
+</tr>
+<tr>
+<td>Support Engineer</td>
+<td>Collects logs, diagnostics, runtime configuration details, and backup status.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="supported-platforms">Supported Platforms</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows 11 with Rancher Desktop configured for Moby/dockerd</td>
+<td>Alternate RC QA target; validate before release support.</td>
+</tr>
+<tr>
+<td>Windows 10 with Rancher Desktop configured for Moby/dockerd</td>
+<td>Information Not Yet Available for final support status.</td>
+</tr>
+<tr>
+<td>Windows 2025 Server with Rancher Desktop</td>
+<td>Information Not Yet Available for Pursuite support status.</td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td>Covered in the standard Pursuite Installation Guide.</td>
+</tr>
+<tr>
+<td>SaaS / Cloud hosted deployment</td>
+<td>Roadmap, not a supported 1.0 installation path.</td>
+</tr>
+<tr>
+<td>Air-gapped / SCIF deployment</td>
+<td>Roadmap, not a supported 1.0 installation path.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dependencies">Dependencies</h3>
+<ul>
+<li>Windows with virtualization support.</li>
+<li>Windows Subsystem for Linux installed before Rancher Desktop setup.</li>
+<li>Rancher Desktop installed and configured with the Moby/dockerd container engine.</li>
+<li>Docker CLI and Docker Compose available through Rancher Desktop.</li>
+<li>Pursuite standalone installer or portable launcher.</li>
+<li>Bundled Docker images for web, API, PostgreSQL, and Redis.</li>
+</ul>
+<h3 id="external-integrations">External Integrations</h3>
+<p>The standalone installation does not require external SaaS services to start. Optional integrations such as SSO, email providers, AI providers, billing, or external storage may exist in the application, but they are not required for baseline standalone installation.</p>
+<h3 id="security-requirements">Security Requirements</h3>
+<ul>
+<li>Generated local secrets must remain in <code>%APPDATA%\Pursuite\.env.production</code>.</li>
+<li>Local admin credentials must be rotated after first sign-in.</li>
+<li>Release binaries must be signed before production distribution.</li>
+<li>Backups must be protected as sensitive business data.</li>
+<li>Rancher Desktop runtime access must be limited to trusted local users.</li>
+</ul>
+<h3 id="operational-requirements">Operational Requirements</h3>
+<ul>
+<li>Rancher Desktop must be running before Pursuite Manager starts the stack.</li>
+<li>Rancher Desktop must expose the Docker-compatible engine and compose workflow.</li>
+<li>The configured Pursuite web port must be available.</li>
+<li>Local container volumes must persist across restarts, reinstall, and backup/restore testing.</li>
+<li>Administrators must collect logs from <code>%APPDATA%\Pursuite\launcher.log</code> when troubleshooting.</li>
+</ul>
+<h3 id="assumptions">Assumptions</h3>
+<ul>
+<li>Pursuite 1.0 release scope is standalone Windows operation.</li>
+<li>Rancher Desktop is an alternate runtime path for QA validation unless final support is explicitly approved.</li>
+<li>Moby/dockerd is required because Pursuite Manager currently invokes Docker-compatible commands.</li>
+<li>The exact minimum CPU, RAM, and disk sizing for Pursuite with Rancher Desktop is Information Not Yet Available.</li>
+<li>Code signing is pending during RC QA and remains required for release approval.</li>
+</ul>
+<hr>
+<h2 id="audience-definition">Audience Definition</h2>
+<h3 id="primary-audience">Primary Audience</h3>
+<p>Administrators and support engineers responsible for installing Pursuite and validating that the local standalone stack starts correctly with Rancher Desktop.</p>
+<h3 id="skill-level">Skill Level</h3>
+<p>Intermediate. Readers should be comfortable installing Windows applications, configuring Rancher Desktop, using PowerShell, validating container runtime behavior, reviewing logs, and troubleshooting service status.</p>
+<hr>
+<h2 id="scope-definition">Scope Definition</h2>
+<h3 id="included">Included</h3>
+<ul>
+<li>Installing and configuring Rancher Desktop for Pursuite.</li>
+<li>Verifying Docker-compatible CLI and compose behavior.</li>
+<li>Installing Pursuite from the standalone Windows installer.</li>
+<li>Running Pursuite from the portable launcher.</li>
+<li>Preparing local application data.</li>
+<li>Loading bundled Docker images.</li>
+<li>Starting and stopping the local Pursuite stack.</li>
+<li>Verifying service health.</li>
+<li>First-run admin access.</li>
+<li>Backup and restore entry points.</li>
+<li>Uninstall and rollback considerations.</li>
+<li>Troubleshooting Rancher Desktop-specific installation issues.</li>
+</ul>
+<h3 id="excluded">Excluded</h3>
+<ul>
+<li>Docker Desktop installation procedures.</li>
+<li>SaaS tenant operations.</li>
+<li>Hosted billing setup.</li>
+<li>Air-gapped or SCIF deployment.</li>
+<li>Production MinIO/S3 storage setup.</li>
+<li>Enterprise update channels.</li>
+<li>Full API reference.</li>
+<li>Full end-user workflow training.</li>
+</ul>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Access to a supported Windows machine.</li>
+<li>Rancher Desktop installed and running.</li>
+<li>Rancher Desktop configured for Moby/dockerd.</li>
+<li>Access to the Pursuite installer or portable launcher.</li>
+<li>Permission to run local executables and container workloads.</li>
+<li>Basic PowerShell familiarity for troubleshooting.</li>
+</ul>
+<hr>
+<h2 id="system-overview">System Overview</h2>
+<h3 id="architecture">Architecture</h3>
+<p>Pursuite standalone uses a desktop manager plus a local Docker-compatible stack. With Rancher Desktop, the Docker-compatible commands are provided through Rancher Desktop when Moby/dockerd is selected as the container engine.</p>
+<pre><code class="language-text">User
+  |
+  v
+Pursuite Manager
+  |
+  +-- prepares %APPDATA%\Pursuite
+  +-- creates/backfills .env.production
+  +-- loads bundled image tarballs through the Docker-compatible CLI
+  +-- runs docker compose with --no-build
+  +-- monitors service health
+  +-- opens the local Pursuite web app
+  |
+  v
+Rancher Desktop Runtime
+  |
+  +-- Moby/dockerd engine
+  +-- Docker CLI
+  +-- Docker Compose
+  |
+  v
+Pursuite Stack
+  |
+  +-- Web / nginx
+  +-- API Server
+  +-- PostgreSQL
+  +-- Redis
+  +-- Local uploads volume
+</code></pre>
+<h3 id="components">Components</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pursuite Manager</td>
+<td>Desktop application that controls the local stack, logs, backups, and diagnostics.</td>
+</tr>
+<tr>
+<td>Rancher Desktop</td>
+<td>Local container management platform used instead of Docker Desktop.</td>
+</tr>
+<tr>
+<td>Moby/dockerd</td>
+<td>Rancher Desktop engine mode required for Docker CLI compatibility.</td>
+</tr>
+<tr>
+<td>Docker Compose</td>
+<td>Compose workflow used by Pursuite Manager to start the local stack.</td>
+</tr>
+<tr>
+<td>Web / nginx</td>
+<td>Serves the Pursuite web user interface.</td>
+</tr>
+<tr>
+<td>API Server</td>
+<td>Provides application APIs and background processing services.</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>Stores application data.</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>Stores cache/session-related data and local password hashes.</td>
+</tr>
+<tr>
+<td>Container volumes</td>
+<td>Persist database, Redis data, and uploads across restarts.</td>
+</tr>
+<tr>
+<td><code>%APPDATA%\Pursuite</code></td>
+<td>Stores environment file, launcher log, backups, and local manager data.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="features">Features</h3>
+<ul>
+<li>Local installation through installer or portable launcher.</li>
+<li>Manager-driven stack control.</li>
+<li>Local image loading through Rancher Desktop's Docker-compatible runtime.</li>
+<li>First-run admin credential file for clean installs.</li>
+<li>Backup and restore through Pursuite Manager.</li>
+<li>Diagnostic copy support from Manager.</li>
+</ul>
+<h3 id="capabilities">Capabilities</h3>
+<ul>
+<li>Runs the Pursuite web application locally.</li>
+<li>Preserves data through local container volumes.</li>
+<li>Supports local backup and restore.</li>
+<li>Supports proposal workflows and RFP Shredder after login.</li>
+</ul>
+<h3 id="limitations">Limitations</h3>
+<ul>
+<li>Rancher Desktop must use Moby/dockerd; containerd-only mode is not compatible with the current Pursuite Manager startup flow.</li>
+<li>Release signing is required before production distribution.</li>
+<li>SaaS/cloud and air-gapped deployments are roadmap items.</li>
+<li>The standalone stack requires an available local web port.</li>
+<li>Rancher Desktop support must be validated before being advertised as a final 1.0 support target.</li>
+</ul>
+<hr>
+<h2 id="prerequisites-1">Prerequisites</h2>
+<h3 id="hardware-requirements">Hardware Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td>Virtualization-capable CPU.</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>Rancher Desktop recommends 8 GB for its runtime; Pursuite-specific sizing is Information Not Yet Available.</td>
+</tr>
+<tr>
+<td>CPU allocation</td>
+<td>Rancher Desktop recommends 4 CPU for its runtime; Pursuite-specific sizing is Information Not Yet Available.</td>
+</tr>
+<tr>
+<td>Disk</td>
+<td>Information Not Yet Available</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Rancher Desktop installation and first-run runtime image downloads may require internet access. Pursuite packaged images are bundled for standalone use.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="software-requirements">Software Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating system</td>
+<td>Windows 11 is the primary Rancher Desktop target for this guide. Windows 10 support status for this Pursuite path is Information Not Yet Available.</td>
+</tr>
+<tr>
+<td>Windows Subsystem for Linux</td>
+<td>Required before running Rancher Desktop on Windows.</td>
+</tr>
+<tr>
+<td>Container runtime</td>
+<td>Rancher Desktop configured with Moby/dockerd.</td>
+</tr>
+<tr>
+<td>Docker CLI</td>
+<td>Must be available from PowerShell.</td>
+</tr>
+<tr>
+<td>Docker Compose</td>
+<td>Must be available from PowerShell.</td>
+</tr>
+<tr>
+<td>Browser</td>
+<td>A modern browser available on the workstation.</td>
+</tr>
+<tr>
+<td>PowerShell</td>
+<td>Windows PowerShell or PowerShell 7 for troubleshooting.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="permissions">Permissions</h3>
+<ul>
+<li>Permission to install Rancher Desktop.</li>
+<li>Administrator assistance may be required for Rancher Desktop privileged service installation.</li>
+<li>Permission to run the Pursuite installer or portable launcher.</li>
+<li>Permission to run local container workloads.</li>
+<li>Permission to create files under <code>%APPDATA%\Pursuite</code>.</li>
+<li>Permission to bind the configured Pursuite web port.</li>
+</ul>
+<h3 id="dependencies-1">Dependencies</h3>
+<p>The packaged standalone bundle must include:</p>
+<ul>
+<li><code>pursuite/api:1.0.0</code></li>
+<li><code>pursuite/web:1.0.0</code></li>
+<li><code>postgres:16-alpine</code></li>
+<li><code>redis:7-alpine</code></li>
+</ul>
+<h3 id="network-requirements">Network Requirements</h3>
+<p>Baseline Pursuite operation uses local browser access to the local Pursuite web app. Rancher Desktop installation and initial runtime setup may require internet access. Optional Pursuite integrations may require external network access depending on configuration.</p>
+<hr>
+<h2 id="rancher-desktop-configuration-requirements">Rancher Desktop Configuration Requirements</h2>
+<h3 id="required-engine-mode">Required Engine Mode</h3>
+<p>Configure Rancher Desktop to use <strong>Moby/dockerd</strong>, not containerd-only mode.</p>
+<p>Reason: Pursuite Manager currently starts the stack by calling Docker-compatible commands, including image loading and Docker Compose. Rancher Desktop provides Docker CLI behavior when Moby/dockerd is selected. In containerd mode, Rancher Desktop uses nerdctl for container management, which is not the current Pursuite Manager startup path.</p>
+<h3 id="required-command-verification">Required Command Verification</h3>
+<p>After Rancher Desktop starts, open PowerShell and run:</p>
+<pre><code class="language-powershell">docker version
+docker compose version
+docker ps
+</code></pre>
+<p>Expected result:</p>
+<ul>
+<li><code>docker version</code> returns client and server information.</li>
+<li><code>docker compose version</code> returns a compose version.</li>
+<li><code>docker ps</code> returns an empty or populated container list without a daemon connection error.</li>
+</ul>
+<h3 id="privileged-service-consideration">Privileged Service Consideration</h3>
+<p>Rancher Desktop documentation notes that the privileged service is required to expose container services on all host interfaces. Install Rancher Desktop in a mode that supports the Pursuite web port binding required by the local stack. If the privileged service is not installed, port exposure may be limited and Pursuite startup may fail until the port configuration is adjusted or the service is installed.</p>
+<h3 id="kubernetes-setting">Kubernetes Setting</h3>
+<p>Pursuite standalone does not require Kubernetes for baseline operation. If Rancher Desktop allows Kubernetes to be disabled while preserving Moby/dockerd and Docker Compose functionality, disabling Kubernetes may reduce resource usage. Validate this in the target environment before documenting it as a required setting.</p>
+<hr>
+<h2 id="installation">Installation</h2>
+<h3 id="overview">Overview</h3>
+<p>Pursuite can be installed in two ways after Rancher Desktop is configured:</p>
+<ol>
+<li>Installer: <code>Pursuite-Standalone-Setup-1.0.0.exe</code></li>
+<li>Portable launcher: <code>Pursuite-Standalone-Launcher-1.0.0.exe</code></li>
+</ol>
+<p>For RC QA, artifact names may include an <code>rc</code> suffix. RC artifacts are unsigned unless explicitly signed for testing.</p>
+<h3 id="install-rancher-desktop">Install Rancher Desktop</h3>
+<ol>
+<li>Confirm Windows Subsystem for Linux is installed.</li>
+<li>Download the Rancher Desktop Windows installer from the official Rancher Desktop releases page.</li>
+<li>Run the <code>Rancher.Desktop.Setup.X.Y.Z.msi</code> installer.</li>
+<li>Review and accept the license agreement.</li>
+<li>If prompted, choose the installation scope required by your organization.</li>
+<li>Prefer an installation mode that includes the Rancher Desktop privileged service when Pursuite needs host port exposure.</li>
+<li>Finish the installation wizard.</li>
+<li>Launch Rancher Desktop.</li>
+<li>Configure the container engine as Moby/dockerd.</li>
+<li>Wait until Rancher Desktop reports ready.</li>
+</ol>
+<p>Expected result: PowerShell can run <code>docker version</code>, <code>docker compose version</code>, and <code>docker ps</code> successfully.</p>
+<h3 id="verify-the-pursuite-artifact">Verify The Pursuite Artifact</h3>
+<p>Use the release manifest when available. For RC QA, compare the provided SHA256 hash.</p>
+<pre><code class="language-powershell">Get-FileHash &quot;Pursuite-Standalone-Setup-1.0.0.exe&quot; -Algorithm SHA256
+Get-FileHash &quot;Pursuite-Standalone-Launcher-1.0.0.exe&quot; -Algorithm SHA256
+</code></pre>
+<p>Expected result: the displayed hash matches the hash published for the build under test.</p>
+<h3 id="install-with-the-windows-installer">Install With The Windows Installer</h3>
+<ol>
+<li>Confirm Rancher Desktop is running and configured for Moby/dockerd.</li>
+<li>Confirm Docker-compatible commands work from PowerShell.</li>
+<li>Locate the Pursuite installer artifact.</li>
+<li>Right-click the installer and select <strong>Run as administrator</strong> if local policy requires elevated installation.</li>
+<li>Follow the installer prompts.</li>
+<li>Select the installation directory if prompted.</li>
+<li>Finish the installer.</li>
+<li>Start Pursuite from the Start Menu or desktop shortcut.</li>
+</ol>
+<p>Expected result: Pursuite Manager opens or starts in the tray, prepares the local environment, starts the stack when requested, and opens the local Pursuite web app after services become healthy.</p>
+<h3 id="run-the-portable-launcher">Run The Portable Launcher</h3>
+<ol>
+<li>Confirm Rancher Desktop is running and configured for Moby/dockerd.</li>
+<li>Copy the portable launcher to a local folder.</li>
+<li>Double-click the launcher.</li>
+<li>If Windows warns that the app is unsigned during RC QA, confirm only if you intentionally trust the RC build.</li>
+<li>Wait for Pursuite Manager to open.</li>
+<li>Click <strong>Launch Pursuite</strong> if the stack does not start automatically.</li>
+</ol>
+<p>Expected result: Pursuite Manager starts the local stack through Rancher Desktop and opens the local Pursuite web app.</p>
+<h3 id="first-run-admin-access">First-Run Admin Access</h3>
+<p>On a clean standalone install, Pursuite Manager creates a first-run credential file after the stack becomes healthy.</p>
+<p>Path:</p>
+<pre><code class="language-text">%APPDATA%\Pursuite\first-run-admin.txt
+</code></pre>
+<p>Use:</p>
+<ul>
+<li>Organization: <code>default</code></li>
+<li>Email: <code>admin@pursuite.local</code></li>
+<li>Temporary password: value shown in <code>first-run-admin.txt</code></li>
+</ul>
+<p>After first sign-in:</p>
+<ol>
+<li>Create a named admin user.</li>
+<li>Confirm the named admin can sign in.</li>
+<li>Rotate or clear the temporary local admin password.</li>
+<li>Store installation evidence in the pilot QA record.</li>
+</ol>
+<h3 id="validate-installation">Validate Installation</h3>
+<ol>
+<li>Open Pursuite Manager.</li>
+<li>Confirm the Dashboard shows version <code>v1.0.0</code>.</li>
+<li>Confirm the services show healthy or running status:
+<ul>
+<li>PostgreSQL</li>
+<li>Redis</li>
+<li>API Server</li>
+<li>Web / nginx</li>
+</ul>
+</li>
+<li>Click <strong>Open App</strong>.</li>
+<li>Sign in with the first-run admin account.</li>
+<li>Create or confirm a backup admin account.</li>
+<li>Create a test account, contact, opportunity, and proposal.</li>
+<li>Run a backup from <strong>Manager -&gt; Backups</strong>.</li>
+</ol>
+<p>Expected result: the local stack is healthy, login works, core objects can be created, and a backup completes.</p>
+<h3 id="rollback-procedure">Rollback Procedure</h3>
+<p>If installation fails:</p>
+<ol>
+<li>Close Pursuite Manager.</li>
+<li>Stop the Pursuite stack from Manager if available.</li>
+<li>Preserve <code>%APPDATA%\Pursuite</code> for troubleshooting.</li>
+<li>Export or copy <code>launcher.log</code>.</li>
+<li>Do not delete container volumes unless data removal is intentional and approved.</li>
+<li>Reinstall the prior working RC or build if required.</li>
+</ol>
+<h3 id="uninstall-procedure">Uninstall Procedure</h3>
+<ol>
+<li>Use Windows <strong>Apps &amp; features</strong> or the Start Menu uninstaller if installed through the setup executable.</li>
+<li>Confirm whether application data should be preserved.</li>
+<li>Do not remove container volumes unless explicitly requested.</li>
+<li>Preserve backups before removing local data.</li>
+</ol>
+<p>Expected result: the application is removed, and local proposal data remains available unless intentionally removed.</p>
+<h3 id="uninstall-rancher-desktop">Uninstall Rancher Desktop</h3>
+<p>Uninstall Rancher Desktop only after confirming that no Pursuite data or local container volumes are required. Removing or resetting Rancher Desktop may remove local runtime state depending on the selected options.</p>
+<hr>
+<h2 id="configuration">Configuration</h2>
+<h3 id="configuration-files">Configuration Files</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%APPDATA%\Pursuite\.env.production</code></td>
+<td>Local production environment variables and generated secrets.</td>
+</tr>
+<tr>
+<td><code>%APPDATA%\Pursuite\launcher.log</code></td>
+<td>Manager startup and diagnostic log.</td>
+</tr>
+<tr>
+<td><code>%APPDATA%\Pursuite\first-run-admin.txt</code></td>
+<td>First-run admin credential file for clean installs.</td>
+</tr>
+<tr>
+<td><code>%APPDATA%\Pursuite\backups</code></td>
+<td>Local backup directory.</td>
+</tr>
+<tr>
+<td>Packaged <code>docker-compose.production.yml</code></td>
+<td>Defines the standalone container stack.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-variables">Environment Variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Purpose</th>
+<th>Recommended Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>APP_VERSION</code></td>
+<td>Image tag and app version alignment.</td>
+<td><code>1.0.0</code></td>
+</tr>
+<tr>
+<td><code>APP_URL</code></td>
+<td>Local web application URL.</td>
+<td>Generated by Manager; review if port changes.</td>
+</tr>
+<tr>
+<td><code>HTTP_PORT</code></td>
+<td>Host web port.</td>
+<td><code>80</code> unless the port is already used.</td>
+</tr>
+<tr>
+<td><code>POSTGRES_DB</code></td>
+<td>Local database name.</td>
+<td>Generated/default value.</td>
+</tr>
+<tr>
+<td><code>POSTGRES_USER</code></td>
+<td>Local database user.</td>
+<td>Generated/default value.</td>
+</tr>
+<tr>
+<td><code>POSTGRES_PASSWORD</code></td>
+<td>Local database password.</td>
+<td>Generated secret.</td>
+</tr>
+<tr>
+<td><code>JWT_SECRET</code></td>
+<td>Token signing secret.</td>
+<td>Generated secret.</td>
+</tr>
+<tr>
+<td><code>COOKIE_SECRET</code></td>
+<td>Cookie secret.</td>
+<td>Generated secret.</td>
+</tr>
+<tr>
+<td><code>TOKEN_ENCRYPTION_KEY</code></td>
+<td>Local token encryption key.</td>
+<td>Generated secret.</td>
+</tr>
+<tr>
+<td><code>AI_CONFIG_ENCRYPTION_KEY</code></td>
+<td>AI configuration encryption key.</td>
+<td>Generated secret.</td>
+</tr>
+<tr>
+<td><code>STORAGE_PROVIDER</code></td>
+<td>File storage provider.</td>
+<td><code>local</code> for standalone 1.0.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rancher-desktop-settings">Rancher Desktop Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Required Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Container engine</td>
+<td>Moby/dockerd</td>
+</tr>
+<tr>
+<td>Docker CLI availability</td>
+<td>Enabled and accessible from PowerShell</td>
+</tr>
+<tr>
+<td>Docker Compose availability</td>
+<td>Enabled and accessible from PowerShell</td>
+</tr>
+<tr>
+<td>Privileged service</td>
+<td>Recommended when host port exposure is required</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Not required for Pursuite baseline operation; validate before disabling</td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-options">Security Options</h3>
+<ul>
+<li>Keep generated secrets local to the workstation.</li>
+<li>Restrict access to <code>%APPDATA%\Pursuite</code>.</li>
+<li>Protect backups as sensitive business records.</li>
+<li>Rotate the first-run admin password after initial access.</li>
+<li>Restrict Rancher Desktop runtime access to trusted local users.</li>
+</ul>
+<h3 id="recommended-values">Recommended Values</h3>
+<p>For standalone 1.0 with Rancher Desktop, use Moby/dockerd, local volume storage, and bundled images. Do not configure SaaS, air-gapped, or S3 production profiles unless a separate validated deployment path is created.</p>
+<hr>
+<h2 id="usage-procedures">Usage Procedures</h2>
+<h3 id="start-pursuite">Start Pursuite</h3>
+<h4 id="purpose-1">Purpose</h4>
+<p>Start the local container stack and open the Pursuite web application.</p>
+<h4 id="when-to-use">When To Use</h4>
+<p>Use this procedure after installation, reboot, Rancher Desktop restart, or stack shutdown.</p>
+<h4 id="step-by-step-instructions">Step-By-Step Instructions</h4>
+<ol>
+<li>Start Rancher Desktop.</li>
+<li>Wait until Rancher Desktop reports ready.</li>
+<li>Open PowerShell and confirm <code>docker ps</code> succeeds.</li>
+<li>Open Pursuite Manager.</li>
+<li>Click <strong>Launch Pursuite</strong>.</li>
+<li>Wait for services to become healthy.</li>
+<li>Click <strong>Open App</strong> if the browser does not open automatically.</li>
+</ol>
+<h4 id="expected-results">Expected Results</h4>
+<p>The local Pursuite web app opens and the Manager shows healthy services.</p>
+<h4 id="verification">Verification</h4>
+<p>Confirm all services are healthy in Manager and sign in successfully.</p>
+<h4 id="troubleshooting">Troubleshooting</h4>
+<p>If services do not start, open <strong>Manager -&gt; Logs</strong>, review <code>launcher.log</code>, and confirm Rancher Desktop is still using Moby/dockerd.</p>
+<h3 id="stop-pursuite">Stop Pursuite</h3>
+<ol>
+<li>Open Pursuite Manager.</li>
+<li>Click <strong>Stop Stack</strong>.</li>
+<li>Wait for services to stop.</li>
+</ol>
+<p>Expected result: the stack stops without deleting local volumes.</p>
+<h3 id="run-a-backup">Run A Backup</h3>
+<ol>
+<li>Open Pursuite Manager.</li>
+<li>Select <strong>Backups</strong>.</li>
+<li>Click the backup action.</li>
+<li>Wait for completion.</li>
+<li>Confirm the backup file appears in the backup directory.</li>
+</ol>
+<p>Expected result: backup completes and is available under <code>%APPDATA%\Pursuite\backups</code>.</p>
+<h3 id="restore-a-backup">Restore A Backup</h3>
+<ol>
+<li>Open Pursuite Manager.</li>
+<li>Select <strong>Backups</strong>.</li>
+<li>Choose the restore action.</li>
+<li>Select the backup file.</li>
+<li>Confirm the restore.</li>
+<li>Restart the stack.</li>
+</ol>
+<p>Expected result: users, proposals, uploads, and content from the backup are available after restart.</p>
+<h3 id="collect-diagnostics">Collect Diagnostics</h3>
+<ol>
+<li>Open Pursuite Manager.</li>
+<li>Open the Dashboard.</li>
+<li>Click <strong>Copy Diagnostics</strong>.</li>
+<li>Save the copied text with the QA issue or support ticket.</li>
+<li>Attach <code>%APPDATA%\Pursuite\launcher.log</code> when escalation is required.</li>
+<li>Include Rancher Desktop version and engine mode in the ticket.</li>
+</ol>
+<p>Expected result: support receives version, paths, runtime setting, service status, and environment details.</p>
+<hr>
+<h2 id="administration">Administration</h2>
+<h3 id="user-management">User Management</h3>
+<p>After installation, create named user accounts from the application admin interface. Maintain at least two active admin users.</p>
+<h3 id="roles">Roles</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Installation Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin</td>
+<td>Required for initial tenant administration and support.</td>
+</tr>
+<tr>
+<td>Proposal Manager</td>
+<td>Required for proposal and RFP Shredder management workflows.</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>Can contribute to proposal content after access is granted.</td>
+</tr>
+<tr>
+<td>Reviewer / Executive Approver</td>
+<td>Can participate in review workflows where configured.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="permissions-1">Permissions</h3>
+<p>Assign least-privilege roles. Do not use the first-run admin account as a shared long-term operating account.</p>
+<h3 id="policies">Policies</h3>
+<ul>
+<li>Rotate first-run credentials.</li>
+<li>Back up before reinstall or restore testing.</li>
+<li>Preserve logs for installation issues.</li>
+<li>Document Rancher Desktop version and engine mode for each QA run.</li>
+<li>Do not delete local volumes during uninstall unless data destruction is intended.</li>
+</ul>
+<h3 id="monitoring">Monitoring</h3>
+<p>Use Pursuite Manager to monitor service status. Use Rancher Desktop for runtime-level container inspection when needed.</p>
+<h3 id="maintenance">Maintenance</h3>
+<ul>
+<li>Apply updates only from trusted Pursuite artifacts.</li>
+<li>Validate checksums before installing.</li>
+<li>Confirm backup success before major changes.</li>
+<li>Re-run installation validation after Rancher Desktop updates, Pursuite reinstall, or upgrade.</li>
+</ul>
+<hr>
+<h2 id="api-section">API Section</h2>
+<h3 id="applicability">Applicability</h3>
+<p>This installation guide does not replace the API reference. It includes only API checks relevant to installation validation.</p>
+<h3 id="health-check">Health Check</h3>
+<h4 id="endpoint-name">Endpoint Name</h4>
+<p>Application health check.</p>
+<h4 id="description">Description</h4>
+<p>Verifies that the API service is reachable through the local stack.</p>
+<h4 id="method">Method</h4>
+<p><code>GET</code></p>
+<h4 id="url">URL</h4>
+<p>Information Not Yet Available for public documentation. Use the local deployment URL shown in Pursuite Manager and the documented health path for the installed build.</p>
+<h4 id="authentication">Authentication</h4>
+<p>Health checks do not require user login when exposed through the local service health configuration.</p>
+<h4 id="request-parameters">Request Parameters</h4>
+<p>None.</p>
+<h4 id="headers">Headers</h4>
+<p>None required.</p>
+<h4 id="request-example">Request Example</h4>
+<pre><code class="language-powershell">Invoke-WebRequest -UseBasicParsing &quot;&lt;local-health-url&gt;&quot;
+</code></pre>
+<h4 id="response-example">Response Example</h4>
+<p>Information Not Yet Available.</p>
+<h4 id="error-codes">Error Codes</h4>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection refused</td>
+<td>Web/API service is not running, Rancher Desktop is unavailable, or the port is blocked.</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Service is starting, unhealthy, or the runtime is unavailable.</td>
+</tr>
+<tr>
+<td>5xx</td>
+<td>API service started but encountered an internal error.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="usage-notes">Usage Notes</h4>
+<p>For routine installation validation, prefer Pursuite Manager health status over direct API calls.</p>
+<hr>
+<h2 id="security">Security</h2>
+<h3 id="authentication-1">Authentication</h3>
+<p>Initial local access uses a generated first-run admin credential for clean installs. The temporary credential must be rotated after first sign-in.</p>
+<h3 id="authorization">Authorization</h3>
+<p>Pursuite uses role-based access. Assign roles according to job responsibility.</p>
+<h3 id="encryption">Encryption</h3>
+<p>Generated local encryption keys are stored in <code>%APPDATA%\Pursuite\.env.production</code>. Additional encryption behavior is Information Not Yet Available for this installation guide.</p>
+<h3 id="audit-logging">Audit Logging</h3>
+<p>Application-level audit logging is outside the scope of installation. Installation logs are available in <code>%APPDATA%\Pursuite\launcher.log</code>.</p>
+<h3 id="data-handling">Data Handling</h3>
+<p>Local data is stored in container volumes and local backup files. Backups may contain sensitive customer, proposal, and uploaded document data.</p>
+<h3 id="security-recommendations">Security Recommendations</h3>
+<ul>
+<li>Use signed release artifacts for production.</li>
+<li>Validate SHA256 hashes before installing.</li>
+<li>Restrict access to backups and local environment files.</li>
+<li>Do not email first-run credentials or backup archives without approved protection.</li>
+<li>Rotate the first-run admin credential immediately.</li>
+<li>Limit Rancher Desktop runtime access to trusted users.</li>
+</ul>
+<hr>
+<h2 id="troubleshooting-1">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Docker command fails</td>
+<td>Rancher Desktop is not running, not ready, or not configured for Moby/dockerd.</td>
+<td>Start Rancher Desktop, switch to Moby/dockerd, and retry <code>docker ps</code>.</td>
+</tr>
+<tr>
+<td>Compose command fails</td>
+<td>Docker Compose is unavailable or Rancher Desktop engine mode is incompatible.</td>
+<td>Confirm <code>docker compose version</code> works from PowerShell.</td>
+</tr>
+<tr>
+<td>Stack does not start</td>
+<td>Runtime unavailable, image load failure, port conflict, or compose error.</td>
+<td>Open Manager logs, review <code>launcher.log</code>, confirm Rancher Desktop readiness, and retry.</td>
+</tr>
+<tr>
+<td>Port conflict</td>
+<td>Another service is using the configured web port.</td>
+<td>Stop the other service or change <code>HTTP_PORT</code> in <code>.env.production</code>.</td>
+</tr>
+<tr>
+<td>Port exposure fails</td>
+<td>Rancher Desktop privileged service is missing or host port exposure is restricted.</td>
+<td>Reinstall or repair Rancher Desktop with privileged service support, or adjust the Pursuite port configuration.</td>
+</tr>
+<tr>
+<td>Browser shows stale UI</td>
+<td>Browser cache or service worker retained older assets.</td>
+<td>Hard refresh the browser and clear local site data if required.</td>
+</tr>
+<tr>
+<td>First-run admin file missing</td>
+<td>Stack has not become healthy or an admin already exists.</td>
+<td>Wait for stack health, then check <code>%APPDATA%\Pursuite\launcher.log</code>.</td>
+</tr>
+<tr>
+<td>Login fails</td>
+<td>Wrong organization, email, or temporary password.</td>
+<td>Use organization <code>default</code>, email <code>admin@pursuite.local</code>, and the generated credential file.</td>
+</tr>
+<tr>
+<td>Containers unhealthy</td>
+<td>API, database, Redis, or web service failed health checks.</td>
+<td>Review Manager logs and Rancher Desktop container logs.</td>
+</tr>
+<tr>
+<td>Backup fails</td>
+<td>Stack is unhealthy, storage unavailable, or runtime operation failed.</td>
+<td>Confirm services are running and retry from Manager.</td>
+</tr>
+<tr>
+<td>Restore fails</td>
+<td>Invalid backup, stack conflict, or storage issue.</td>
+<td>Preserve logs, restart stack, and retry with a known-good backup.</td>
+</tr>
+<tr>
+<td>Installer warning appears</td>
+<td>RC build is unsigned or SmartScreen has not established reputation.</td>
+<td>For QA, proceed only with trusted RC artifacts. For release, use signed binaries only.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="diagnostic-procedures">Diagnostic Procedures</h3>
+<ol>
+<li>Copy Manager diagnostics.</li>
+<li>Save <code>%APPDATA%\Pursuite\launcher.log</code>.</li>
+<li>Record artifact filename and SHA256 hash.</li>
+<li>Record Windows version.</li>
+<li>Record Rancher Desktop version.</li>
+<li>Record Rancher Desktop engine mode.</li>
+<li>Record whether installer or portable launcher was used.</li>
+</ol>
+<h3 id="log-locations">Log Locations</h3>
+<table>
+<thead>
+<tr>
+<th>Log</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Launcher log</td>
+<td><code>%APPDATA%\Pursuite\launcher.log</code></td>
+</tr>
+<tr>
+<td>Runtime logs</td>
+<td>Rancher Desktop container/runtime interface</td>
+</tr>
+<tr>
+<td>Backup output</td>
+<td>Manager backup workflow and backup directory</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recovery-actions">Recovery Actions</h3>
+<ul>
+<li>Restart Rancher Desktop.</li>
+<li>Confirm Moby/dockerd is selected.</li>
+<li>Restart Pursuite Manager.</li>
+<li>Stop and start the Pursuite stack.</li>
+<li>Reinstall over existing data after taking a backup.</li>
+<li>Restore from a known-good backup.</li>
+</ul>
+<hr>
+<h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
+<h3 id="can-pursuite-run-with-rancher-desktop">Can Pursuite run with Rancher Desktop?</h3>
+<p>Yes for QA when Rancher Desktop is configured with Moby/dockerd and Docker Compose works from PowerShell. Final release support status must be validated before publication.</p>
+<h3 id="can-pursuite-run-with-rancher-desktop-containerd-mode">Can Pursuite run with Rancher Desktop containerd mode?</h3>
+<p>Not with the current Pursuite Manager startup path. Pursuite Manager expects Docker-compatible commands and Docker Compose.</p>
+<h3 id="is-kubernetes-required">Is Kubernetes required?</h3>
+<p>No. Pursuite standalone does not require Kubernetes for baseline operation. Validate the final Rancher Desktop configuration before disabling Kubernetes in a pilot environment.</p>
+<h3 id="can-i-use-the-portable-launcher-instead-of-the-installer">Can I use the portable launcher instead of the installer?</h3>
+<p>Yes. The portable launcher is a first-class RC and release artifact for standalone validation.</p>
+<h3 id="where-is-local-data-stored">Where is local data stored?</h3>
+<p>Configuration and logs are stored under <code>%APPDATA%\Pursuite</code>. Application data and uploads are stored in local container volumes managed by the runtime.</p>
+<h3 id="does-uninstall-delete-proposal-data">Does uninstall delete proposal data?</h3>
+<p>Uninstall must not silently delete proposal data. Container volumes should be preserved unless data removal is explicitly requested.</p>
+<h3 id="why-does-windows-show-a-warning-for-rc-builds">Why does Windows show a warning for RC builds?</h3>
+<p>RC artifacts may be unsigned while the code-signing certificate is pending. Production release artifacts must be signed.</p>
+<hr>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="operational-recommendations">Operational Recommendations</h3>
+<ul>
+<li>Confirm Rancher Desktop is healthy before launching Pursuite.</li>
+<li>Confirm <code>docker ps</code> and <code>docker compose version</code> work before testing.</li>
+<li>Keep at least one recent backup before reinstall or restore testing.</li>
+<li>Record artifact hashes for every QA build.</li>
+<li>Use the installer and portable launcher in separate QA passes.</li>
+</ul>
+<h3 id="performance-optimization">Performance Optimization</h3>
+<ul>
+<li>Allocate adequate Rancher Desktop resources.</li>
+<li>Avoid running other services on the configured Pursuite web port.</li>
+<li>Ensure adequate disk space for images, database volumes, uploads, and backups.</li>
+<li>Disable optional runtime features only after validation.</li>
+</ul>
+<h3 id="security-recommendations-1">Security Recommendations</h3>
+<ul>
+<li>Use only trusted artifacts.</li>
+<li>Require signed binaries for release distribution.</li>
+<li>Rotate first-run credentials.</li>
+<li>Restrict access to backup files and local environment files.</li>
+<li>Restrict access to Rancher Desktop runtime controls.</li>
+</ul>
+<h3 id="maintenance-guidance">Maintenance Guidance</h3>
+<ul>
+<li>Review logs after failed starts.</li>
+<li>Keep backup evidence with release QA records.</li>
+<li>Re-run link/resource scans after packaging.</li>
+<li>Validate reinstall-over-existing-data before release.</li>
+<li>Revalidate Pursuite after Rancher Desktop upgrades.</li>
+</ul>
+<hr>
+<h2 id="appendix">Appendix</h2>
+<h3 id="acronyms">Acronyms</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td>Application Programming Interface</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>Command-Line Interface</td>
+</tr>
+<tr>
+<td>CORS</td>
+<td>Cross-Origin Resource Sharing</td>
+</tr>
+<tr>
+<td>EXE</td>
+<td>Windows executable file</td>
+</tr>
+<tr>
+<td>RC</td>
+<td>Release Candidate</td>
+</tr>
+<tr>
+<td>SHA256</td>
+<td>Cryptographic hash algorithm used for artifact verification</td>
+</tr>
+<tr>
+<td>SMB</td>
+<td>Small and medium-sized business</td>
+</tr>
+<tr>
+<td>SSO</td>
+<td>Single Sign-On</td>
+</tr>
+<tr>
+<td>WSL</td>
+<td>Windows Subsystem for Linux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="definitions">Definitions</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pursuite Manager</td>
+<td>Desktop application that manages the local standalone stack.</td>
+</tr>
+<tr>
+<td>Standalone stack</td>
+<td>Compose-managed stack containing Pursuite services and local data stores.</td>
+</tr>
+<tr>
+<td>Portable launcher</td>
+<td>Self-contained launcher executable that starts Pursuite Manager without a traditional installation flow.</td>
+</tr>
+<tr>
+<td>Installer</td>
+<td>Windows setup executable that installs Pursuite Manager and shortcuts.</td>
+</tr>
+<tr>
+<td>First-run admin</td>
+<td>Temporary admin credential created for clean standalone installs.</td>
+</tr>
+<tr>
+<td>Moby/dockerd</td>
+<td>Rancher Desktop container engine mode that provides Docker-compatible behavior.</td>
+</tr>
+<tr>
+<td>nerdctl</td>
+<td>Docker-compatible CLI for containerd; not the current Pursuite Manager startup path.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="references">References</h3>
+<ul>
+<li>Pursuite Admin User Guide</li>
+<li>Pursuite End User Guide</li>
+<li>Pursuite Standalone 1.0 Release Checklist</li>
+<li>Rancher Desktop official documentation</li>
+<li>Microsoft Authenticode signing documentation</li>
+</ul>
+<h3 id="external-links">External Links</h3>
+<ul>
+<li>Rancher Desktop documentation: <code>https://docs.rancherdesktop.io/</code></li>
+<li>Rancher Desktop releases: <code>https://github.com/rancher-sandbox/rancher-desktop/releases</code></li>
+</ul>
+<h3 id="support-information">Support Information</h3>
+<p>Support contact: Information Not Yet Available.</p>
+<hr>
+<h2 id="validation-checklist-results">Validation Checklist Results</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All sections complete</td>
+<td>Complete</td>
+<td>Sections are included. Unknown facts are marked.</td>
+</tr>
+<tr>
+<td>Terminology consistent</td>
+<td>Complete</td>
+<td>Uses Pursuite, Pursuite Manager, standalone, Rancher Desktop, Moby/dockerd, installer, and portable launcher consistently.</td>
+</tr>
+<tr>
+<td>Procedures tested</td>
+<td>Partial</td>
+<td>Rancher Desktop-specific clean-machine validation is pending.</td>
+</tr>
+<tr>
+<td>Links valid</td>
+<td>Partial</td>
+<td>External links are listed for publication review.</td>
+</tr>
+<tr>
+<td>Examples correct</td>
+<td>Partial</td>
+<td>Commands are based on current repository behavior and official Rancher Desktop runtime model.</td>
+</tr>
+<tr>
+<td>Screenshots referenced</td>
+<td>Not applicable</td>
+<td>No screenshots are referenced.</td>
+</tr>
+<tr>
+<td>Version numbers consistent</td>
+<td>Complete</td>
+<td>Uses 1.0.0 standalone pilot.</td>
+</tr>
+<tr>
+<td>Formatting validated</td>
+<td>Complete</td>
+<td>Markdown structure uses headings, tables, lists, and code fences.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="open-questions--missing-information">Open Questions / Missing Information</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Required Information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Approver</td>
+<td>Named document approver for publication.</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Named technical reviewer.</td>
+</tr>
+<tr>
+<td>Release Date</td>
+<td>Final signed release date.</td>
+</tr>
+<tr>
+<td>Hardware sizing</td>
+<td>Minimum and recommended CPU, RAM, and disk for Pursuite with Rancher Desktop.</td>
+</tr>
+<tr>
+<td>Rancher Desktop version</td>
+<td>Minimum validated Rancher Desktop version.</td>
+</tr>
+<tr>
+<td>Windows 10 support</td>
+<td>Whether Rancher Desktop-based Pursuite install is supported on Windows 10.</td>
+</tr>
+<tr>
+<td>Kubernetes setting</td>
+<td>Whether Kubernetes should be disabled by default for Pursuite installs.</td>
+</tr>
+<tr>
+<td>Privileged service policy</td>
+<td>Whether Pursuite requires the Rancher Desktop privileged service in all supported environments.</td>
+</tr>
+<tr>
+<td>Support contact</td>
+<td>Email, portal, or phone support channel.</td>
+</tr>
+<tr>
+<td>Health endpoint response</td>
+<td>Official response body for installation validation.</td>
+</tr>
+<tr>
+<td>Screenshots</td>
+<td>Whether the published guide should include installation screenshots.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="recommended-next-documentation-artifacts">Recommended Next Documentation Artifacts</h2>
+<ol>
+<li>Rancher Desktop QA Validation Matrix.</li>
+<li>Runtime Selection Guide: Docker Desktop vs Rancher Desktop.</li>
+<li>Backup and Restore Runbook.</li>
+<li>Admin Password Reset Runbook.</li>
+<li>Signed Release Verification Guide.</li>
+<li>Troubleshooting Quick Reference.</li>
+<li>Upgrade from RC to 1.0 Guide.</li>
+<li>Support Evidence Collection Checklist.</li>
+</ol>
+
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <p>Generated from Pursuite_Rancher_Desktop_Installation_Guide.md. Review all Information Not Yet Available items before publication.</p>
+</footer>
+</body>
+</html>

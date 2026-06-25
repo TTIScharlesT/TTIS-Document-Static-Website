@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite - Admin User Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite - Admin User Guide</h1>
+    <p>Administrative setup, security, governance, and operations guide for Pursuite tenants.</p>
+  </div>
+</header>
+<div class="wrap">
+  <main>
+<h1 id="pursuite-admin-user-guide">Pursuite Admin User Guide</h1>
+<p>Version: 2.0<br>
+Last updated: June 21, 2026<br>
+Audience: Pursuite system administrators, proposal operations leads, security administrators, compliance owners, and tenant implementation teams.</p>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#document-purpose">Document Purpose</a></li>
+<li><a href="#administrator-operating-model">Administrator Operating Model</a></li>
+<li><a href="#administrative-roles-and-access-boundaries">Administrative Roles and Access Boundaries</a></li>
+<li><a href="#initial-tenant-implementation">Initial Tenant Implementation</a></li>
+<li><a href="#organization-profile-and-tenant-settings">Organization Profile and Tenant Settings</a></li>
+<li><a href="#user-lifecycle-management">User Lifecycle Management</a></li>
+<li><a href="#role-and-permission-governance">Role and Permission Governance</a></li>
+<li><a href="#proposal-workspace-administration">Proposal Workspace Administration</a></li>
+<li><a href="#security-administration">Security Administration</a></li>
+<li><a href="#sso-and-mfa-administration">SSO and MFA Administration</a></li>
+<li><a href="#cui-itar-and-data-classification-administration">CUI, ITAR, and Data Classification Administration</a></li>
+<li><a href="#ai-provider-administration">AI Provider Administration</a></li>
+<li><a href="#rfp-shredder-administration">RFP Shredder Administration</a></li>
+<li><a href="#compliance-and-audit-administration">Compliance and Audit Administration</a></li>
+<li><a href="#integration-administration">Integration Administration</a></li>
+<li><a href="#templates-and-content-library-governance">Templates and Content Library Governance</a></li>
+<li><a href="#dashboards-reports-and-scheduled-exports">Dashboards, Reports, and Scheduled Exports</a></li>
+<li><a href="#billing-plans-feature-entitlements-and-usage">Billing, Plans, Feature Entitlements, and Usage</a></li>
+<li><a href="#data-retention-archiving-and-records-management">Data Retention, Archiving, and Records Management</a></li>
+<li><a href="#operational-runbooks">Operational Runbooks</a></li>
+<li><a href="#administrative-checklists">Administrative Checklists</a></li>
+<li><a href="#troubleshooting-and-escalation">Troubleshooting and Escalation</a></li>
+<li><a href="#appendix-a-recommended-governance-cadence">Appendix A: Recommended Governance Cadence</a></li>
+<li><a href="#appendix-b-evidence-and-audit-export-handling">Appendix B: Evidence and Audit Export Handling</a></li>
+</ol>
+<hr>
+<h2 id="document-purpose">Document Purpose</h2>
+<p>This guide explains how to administer Pursuite in a professional, controlled, and audit-ready manner. It is written for users who have responsibility for the tenant itself rather than only one pursuit, proposal, opportunity, or workspace.</p>
+<p>Use this guide to:</p>
+<ul>
+<li>Configure a new Pursuite tenant.</li>
+<li>Manage users, roles, workspace access, and offboarding.</li>
+<li>Configure organization-level security controls.</li>
+<li>Administer SSO, MFA, AI providers, integrations, and usage guardrails.</li>
+<li>Govern RFP Shredder, CUI handling, templates, content, reports, and audit evidence.</li>
+<li>Operate Pursuite in a way that supports proposal quality, compliance, and repeatable business processes.</li>
+</ul>
+<p>This guide does not replace company policy. Where your internal cybersecurity, legal, contracts, records-management, or export-control policies are stricter than this guide, follow your internal policy.</p>
+<hr>
+<h2 id="administrator-operating-model">Administrator Operating Model</h2>
+<p>Pursuite administrators own the operating environment. They do not need to perform every proposal action, but they are accountable for ensuring that the platform is configured correctly and that the right users can perform the right work at the right time.</p>
+<h3 id="administrative-principles">Administrative Principles</h3>
+<p>Use these principles when making tenant changes:</p>
+<ol>
+<li><strong>Least privilege.</strong> Give users the minimum role required for their responsibilities.</li>
+<li><strong>Separation of duties.</strong> Avoid concentrating proposal approval, security administration, billing, and audit export responsibilities in one person.</li>
+<li><strong>Traceability.</strong> Prefer actions that preserve audit history over destructive cleanup.</li>
+<li><strong>Repeatability.</strong> Use templates, playbooks, and scheduled review cycles instead of ad hoc administration.</li>
+<li><strong>Controlled automation.</strong> Enable AI and integrations only after reviewing data-handling and approval requirements.</li>
+<li><strong>Business continuity.</strong> Maintain more than one active Admin account and document emergency access procedures.</li>
+</ol>
+<h3 id="recommended-admin-team-structure">Recommended Admin Team Structure</h3>
+<table>
+<thead>
+<tr>
+<th>Admin Function</th>
+<th>Primary Owner</th>
+<th>Backup Owner</th>
+<th>Typical Responsibilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tenant Administration</td>
+<td>Platform Admin</td>
+<td>Proposal Operations Lead</td>
+<td>Organization settings, user roles, feature enablement</td>
+</tr>
+<tr>
+<td>Security Administration</td>
+<td>IT/Security Admin</td>
+<td>Platform Admin</td>
+<td>MFA, SSO, access review, incident response</td>
+</tr>
+<tr>
+<td>Compliance Administration</td>
+<td>Compliance Owner</td>
+<td>Security Admin</td>
+<td>Audit exports, CUI/ITAR classification, evidence handling</td>
+</tr>
+<tr>
+<td>AI Administration</td>
+<td>AI Program Owner</td>
+<td>Platform Admin</td>
+<td>Provider credentials, model routing, usage review</td>
+</tr>
+<tr>
+<td>Integration Administration</td>
+<td>Business Systems Owner</td>
+<td>IT Admin</td>
+<td>CRM, SharePoint, Teams, SAM.gov, CPQ, webhooks</td>
+</tr>
+<tr>
+<td>Proposal Operations</td>
+<td>Proposal Operations Lead</td>
+<td>Senior Proposal Manager</td>
+<td>Templates, content library, workspace governance</td>
+</tr>
+</tbody>
+</table>
+<p>Small organizations may combine these responsibilities, but the duties should still be reviewed separately.</p>
+<hr>
+<h2 id="administrative-roles-and-access-boundaries">Administrative Roles and Access Boundaries</h2>
+<p>Pursuite uses system-level roles and proposal workspace roles. System roles govern broad platform capabilities. Workspace roles govern what a user can do inside a specific proposal.</p>
+<h3 id="system-roles">System Roles</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Purpose</th>
+<th>Typical Capabilities</th>
+<th>Administrative Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin</td>
+<td>Full tenant administrator</td>
+<td>User management, tenant settings, security settings, integrations, audit exports, billing, broad access to business records</td>
+<td>Use sparingly; review quarterly</td>
+</tr>
+<tr>
+<td>Proposal Manager</td>
+<td>Capture/proposal lead</td>
+<td>Create and manage opportunities and proposals, manage workspace teams, upload and confirm RFP requirements, run proposal workflows</td>
+<td>Appropriate for proposal leads and capture managers</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>Contributor</td>
+<td>Draft assigned sections, view proposal context, use permitted AI drafting tools</td>
+<td>Should not administer RFP requirement sets or tenant settings</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Review participant</td>
+<td>Review content, comment, participate in review workflows</td>
+<td>Often used for SMEs, color team reviewers, and quality reviewers</td>
+</tr>
+<tr>
+<td>Executive Approver</td>
+<td>Leadership approver</td>
+<td>Bid/no-bid approval and executive-level review</td>
+<td>Should be limited to users with decision authority</td>
+</tr>
+<tr>
+<td>Read Only</td>
+<td>Observer/auditor</td>
+<td>View permitted records without editing</td>
+<td>Useful for auditors, temporary observers, and management visibility</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workspace-roles">Workspace Roles</h3>
+<p>Workspace roles are scoped to an individual proposal. A user may be a Writer on one proposal, a Reviewer on another, and have no access to a third.</p>
+<p>Typical workspace administration tasks:</p>
+<ol>
+<li>Add team members to a proposal.</li>
+<li>Assign the appropriate workspace role.</li>
+<li>Assign section ownership.</li>
+<li>Review membership before major gates such as color reviews or final export.</li>
+<li>Remove users when they no longer need access.</li>
+</ol>
+<h3 id="access-review-standard">Access Review Standard</h3>
+<p>Perform an access review at least monthly and before each major proposal deadline. Confirm:</p>
+<ul>
+<li>Admin list is still accurate.</li>
+<li>Proposal Managers still need manager-level access.</li>
+<li>Writers and Reviewers are assigned only to active work.</li>
+<li>Former employees or subcontractors are deactivated.</li>
+<li>Read-only access is still justified.</li>
+<li>SSO group mappings still reflect approved role assignments.</li>
+</ul>
+<hr>
+<h2 id="initial-tenant-implementation">Initial Tenant Implementation</h2>
+<p>This section provides a complete step-by-step setup procedure for a new tenant.</p>
+<h3 id="phase-1-establish-administrative-control">Phase 1: Establish Administrative Control</h3>
+<ol>
+<li>Sign in with the initial Admin account.</li>
+<li>Confirm the tenant name and organization identifier.</li>
+<li>Add at least one backup Admin.</li>
+<li>Confirm both Admins can sign in.</li>
+<li>Record the Admin owners in your internal system inventory or operations runbook.</li>
+</ol>
+<p>Success criteria:</p>
+<ul>
+<li>At least two Admins exist.</li>
+<li>Admin accounts are associated with named employees, not shared mailboxes.</li>
+<li>Emergency access handling is documented.</li>
+</ul>
+<h3 id="phase-2-configure-organization-defaults">Phase 2: Configure Organization Defaults</h3>
+<ol>
+<li>Open organization settings.</li>
+<li>Confirm organization display name.</li>
+<li>Confirm primary domain.</li>
+<li>Set default timezone.</li>
+<li>Confirm currency, date, and number formatting where available.</li>
+<li>Review enabled feature flags and plan entitlements.</li>
+<li>Save changes.</li>
+</ol>
+<p>Success criteria:</p>
+<ul>
+<li>Tenant settings match company identity.</li>
+<li>Timezone aligns with report schedules and proposal operations.</li>
+<li>Enabled features match purchased plan and approved deployment model.</li>
+</ul>
+<h3 id="phase-3-configure-identity-and-security">Phase 3: Configure Identity and Security</h3>
+<ol>
+<li>Decide whether SSO is required.</li>
+<li>Configure SSO before inviting most users.</li>
+<li>Test SSO with one pilot account.</li>
+<li>Configure MFA policy.</li>
+<li>Confirm Admins and Proposal Managers are enrolled in MFA.</li>
+<li>Document support steps for MFA reset and locked accounts.</li>
+</ol>
+<p>Success criteria:</p>
+<ul>
+<li>SSO sign-in works for a test user.</li>
+<li>MFA is enforced according to company policy.</li>
+<li>A break-glass procedure exists if SSO becomes unavailable.</li>
+</ul>
+<h3 id="phase-4-configure-ai-and-data-controls">Phase 4: Configure AI and Data Controls</h3>
+<ol>
+<li>Identify approved AI provider or providers.</li>
+<li>Add provider credentials.</li>
+<li>Test provider connectivity.</li>
+<li>Confirm approved use cases.</li>
+<li>Confirm CUI/ITAR data handling policy.</li>
+<li>Configure CUI external-processing approval only if formally approved.</li>
+<li>Review audit logging for AI actions.</li>
+</ol>
+<p>Success criteria:</p>
+<ul>
+<li>AI provider test succeeds.</li>
+<li>AI data-handling policy is documented.</li>
+<li>CUI processing state matches organizational approval.</li>
+</ul>
+<h3 id="phase-5-invite-users-and-establish-governance">Phase 5: Invite Users and Establish Governance</h3>
+<ol>
+<li>Create or invite Admins, Proposal Managers, Writers, Reviewers, and Executive Approvers.</li>
+<li>Verify users can sign in.</li>
+<li>Publish baseline templates.</li>
+<li>Approve core content library items.</li>
+<li>Configure integrations.</li>
+<li>Create scheduled reports.</li>
+<li>Review audit export procedure.</li>
+</ol>
+<p>Success criteria:</p>
+<ul>
+<li>Users have correct roles.</li>
+<li>Proposal Managers can create workspaces.</li>
+<li>Core templates and content are available.</li>
+<li>Integrations are tested before operational use.</li>
+</ul>
+<hr>
+<h2 id="organization-profile-and-tenant-settings">Organization Profile and Tenant Settings</h2>
+<p>Organization settings affect how Pursuite behaves across the tenant.</p>
+<h3 id="step-by-step-review-organization-settings">Step-by-Step: Review Organization Settings</h3>
+<ol>
+<li>Open the Admin or Settings area.</li>
+<li>Select Organization or Tenant Settings.</li>
+<li>Review the organization name.</li>
+<li>Review default timezone.</li>
+<li>Review plan and enabled modules.</li>
+<li>Review notification defaults.</li>
+<li>Review any branding or export defaults.</li>
+<li>Save only if changes are required.</li>
+<li>Record major setting changes in your internal change log.</li>
+</ol>
+<h3 id="professional-controls">Professional Controls</h3>
+<p>Maintain the following controls:</p>
+<ul>
+<li>Review tenant settings after plan changes.</li>
+<li>Review timezone before creating scheduled executive reports.</li>
+<li>Confirm display name before sharing exports externally.</li>
+<li>Review feature availability before announcing new workflows to users.</li>
+<li>Avoid changing organization identifiers during active proposal deadlines unless necessary.</li>
+</ul>
+<hr>
+<h2 id="user-lifecycle-management">User Lifecycle Management</h2>
+<p>User lifecycle administration covers onboarding, role changes, temporary access, deactivation, and audit review.</p>
+<h3 id="step-by-step-invite-a-user">Step-by-Step: Invite a User</h3>
+<ol>
+<li>Open the user administration page.</li>
+<li>Click Add User or Invite User.</li>
+<li>Enter the user's full name and email address.</li>
+<li>Select the appropriate system role.</li>
+<li>Add optional notes if your organization tracks request context.</li>
+<li>Send the invitation.</li>
+<li>Confirm the user receives the invitation.</li>
+<li>Confirm the user signs in successfully.</li>
+<li>Add the user to proposal workspaces only where needed.</li>
+</ol>
+<p>Recommended evidence:</p>
+<ul>
+<li>Access request ticket.</li>
+<li>Approver name.</li>
+<li>Assigned role.</li>
+<li>Date access was granted.</li>
+</ul>
+<h3 id="step-by-step-change-a-users-system-role">Step-by-Step: Change a User's System Role</h3>
+<ol>
+<li>Open the user list.</li>
+<li>Search for the user.</li>
+<li>Open the user profile.</li>
+<li>Review current system role.</li>
+<li>Confirm the requested new role has a business justification.</li>
+<li>Change the role.</li>
+<li>Save.</li>
+<li>Review proposal workspace memberships separately.</li>
+<li>Notify the user and requestor.</li>
+</ol>
+<p>Controls:</p>
+<ul>
+<li>Admin role changes should require explicit approval.</li>
+<li>Proposal Manager role changes should be reviewed for active proposal impact.</li>
+<li>Role elevation should be time-bound when access is temporary.</li>
+</ul>
+<h3 id="step-by-step-deactivate-a-user">Step-by-Step: Deactivate a User</h3>
+<ol>
+<li>Confirm the offboarding request.</li>
+<li>Identify active proposal assignments.</li>
+<li>Reassign sections, reviews, reports, templates, and scheduled exports.</li>
+<li>Remove the user from active proposal workspaces.</li>
+<li>Deactivate the user account.</li>
+<li>Confirm the user can no longer sign in.</li>
+<li>Review recent audit activity if required.</li>
+<li>Retain audit history.</li>
+</ol>
+<p>Do not delete audit records for a deactivated user. Deactivation preserves traceability while preventing new access.</p>
+<h3 id="step-by-step-review-user-access">Step-by-Step: Review User Access</h3>
+<ol>
+<li>Export or open the current user list.</li>
+<li>Filter active users.</li>
+<li>Review Admins first.</li>
+<li>Review Proposal Managers.</li>
+<li>Review users with CUI or export-controlled access.</li>
+<li>Review inactive project participants.</li>
+<li>Confirm workspace membership for active proposals.</li>
+<li>Remove unnecessary access.</li>
+<li>Record review completion.</li>
+</ol>
+<hr>
+<h2 id="role-and-permission-governance">Role and Permission Governance</h2>
+<p>Role governance ensures users have appropriate access for their duties.</p>
+<h3 id="role-assignment-guidance">Role Assignment Guidance</h3>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Recommended Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manage tenant, integrations, billing, security, audit exports</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>Lead capture/proposal work and manage proposal team</td>
+<td>Proposal Manager</td>
+</tr>
+<tr>
+<td>Draft proposal sections</td>
+<td>Writer</td>
+</tr>
+<tr>
+<td>Review proposal content without editing tenant settings</td>
+<td>Reviewer</td>
+</tr>
+<tr>
+<td>Approve bid/no-bid decisions</td>
+<td>Executive Approver</td>
+</tr>
+<tr>
+<td>Observe work or support audit review</td>
+<td>Read Only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common-anti-patterns">Common Anti-Patterns</h3>
+<p>Avoid these patterns:</p>
+<ul>
+<li>Making every senior user an Admin.</li>
+<li>Keeping former subcontractors active after proposal closeout.</li>
+<li>Granting Proposal Manager access only to allow one-time edits.</li>
+<li>Using shared accounts for proposal or admin work.</li>
+<li>Letting SSO groups drift from approved role assignments.</li>
+</ul>
+<h3 id="emergency-access">Emergency Access</h3>
+<p>If emergency Admin access is needed:</p>
+<ol>
+<li>Document the reason.</li>
+<li>Obtain approval according to company policy.</li>
+<li>Grant the minimum required role.</li>
+<li>Perform the required action.</li>
+<li>Remove elevated access when complete.</li>
+<li>Review audit logs after the event.</li>
+</ol>
+<hr>
+<h2 id="proposal-workspace-administration">Proposal Workspace Administration</h2>
+<p>Admins usually do not manage every proposal day to day, but they support governance and recovery when workspace access or gates are blocked.</p>
+<h3 id="step-by-step-add-a-user-to-a-proposal-workspace">Step-by-Step: Add a User to a Proposal Workspace</h3>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Open the Team panel.</li>
+<li>Click Add Member.</li>
+<li>Select the user.</li>
+<li>Select the workspace role.</li>
+<li>Save.</li>
+<li>Assign sections if applicable.</li>
+<li>Confirm the user can access the workspace.</li>
+</ol>
+<h3 id="step-by-step-correct-a-workspace-role">Step-by-Step: Correct a Workspace Role</h3>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Open the Team panel.</li>
+<li>Locate the user.</li>
+<li>Review current workspace role.</li>
+<li>Select the corrected role.</li>
+<li>Save.</li>
+<li>Confirm the user can perform the required action.</li>
+</ol>
+<h3 id="proposal-gate-governance">Proposal Gate Governance</h3>
+<p>Admins should understand the major gates:</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>What It Controls</th>
+<th>Who Usually Acts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bid/no-bid approval</td>
+<td>Whether pursuit should proceed</td>
+<td>Executive Approver</td>
+</tr>
+<tr>
+<td>RFP requirement confirmation</td>
+<td>Unlocks Compliance Matrix and Autonomous Pipeline</td>
+<td>Proposal Manager or Admin</td>
+</tr>
+<tr>
+<td>Low-confidence RFP review</td>
+<td>Prevents uncertain requirements from being confirmed without human review</td>
+<td>Proposal Manager or Admin</td>
+</tr>
+<tr>
+<td>Pipeline human review gates</td>
+<td>Controls AI pipeline advancement</td>
+<td>Assigned reviewer/approver</td>
+</tr>
+<tr>
+<td>Final export readiness</td>
+<td>Ensures content is approved before delivery</td>
+<td>Proposal Manager</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-intervention-rules">Admin Intervention Rules</h3>
+<p>Admins should intervene only when:</p>
+<ul>
+<li>The assigned Proposal Manager is unavailable.</li>
+<li>Access is misconfigured.</li>
+<li>A compliance or security concern requires action.</li>
+<li>A production workflow is blocked by administrative settings.</li>
+</ul>
+<p>Record the reason for significant interventions.</p>
+<hr>
+<h2 id="security-administration">Security Administration</h2>
+<p>Security administration includes user controls, authentication, data classification, audit monitoring, and incident response.</p>
+<h3 id="security-baseline">Security Baseline</h3>
+<p>Recommended baseline:</p>
+<ul>
+<li>MFA enforced for Admins and Proposal Managers.</li>
+<li>SSO enabled for enterprise tenants.</li>
+<li>At least two Admins, no shared Admin accounts.</li>
+<li>Quarterly access review.</li>
+<li>Immediate deactivation for offboarded users.</li>
+<li>CUI/ITAR controls enabled when controlled data is stored.</li>
+<li>AI provider approval documented.</li>
+<li>Audit exports reviewed and retained according to policy.</li>
+</ul>
+<h3 id="step-by-step-perform-a-security-review">Step-by-Step: Perform a Security Review</h3>
+<ol>
+<li>Review active Admin accounts.</li>
+<li>Review MFA enrollment.</li>
+<li>Review SSO status and recent sign-in issues.</li>
+<li>Review users added since the last review.</li>
+<li>Review role elevations.</li>
+<li>Review CUI classification events.</li>
+<li>Review failed access attempts or unusual activity.</li>
+<li>Review integrations and active credentials.</li>
+<li>Document findings and remediation actions.</li>
+</ol>
+<h3 id="incident-response-support">Incident Response Support</h3>
+<p>If suspicious activity is reported:</p>
+<ol>
+<li>Preserve audit records.</li>
+<li>Identify affected users, proposals, and documents.</li>
+<li>Disable or restrict affected accounts if required.</li>
+<li>Review recent audit events.</li>
+<li>Review integrations and tokens.</li>
+<li>Escalate according to company incident response procedures.</li>
+<li>Document containment and remediation.</li>
+</ol>
+<hr>
+<h2 id="sso-and-mfa-administration">SSO and MFA Administration</h2>
+<h3 id="sso-configuration-procedure">SSO Configuration Procedure</h3>
+<ol>
+<li>Confirm the identity provider owner.</li>
+<li>Confirm required metadata, redirect URLs, and certificate details.</li>
+<li>Configure Pursuite SSO settings.</li>
+<li>Configure the application in the identity provider.</li>
+<li>Test with one pilot user.</li>
+<li>Confirm role mapping behavior.</li>
+<li>Test sign-out and re-authentication.</li>
+<li>Enable SSO for the broader tenant.</li>
+<li>Monitor sign-in errors after rollout.</li>
+</ol>
+<h3 id="mfa-configuration-procedure">MFA Configuration Procedure</h3>
+<ol>
+<li>Open security settings.</li>
+<li>Review current MFA policy.</li>
+<li>Choose the enforcement level.</li>
+<li>Communicate the rollout date.</li>
+<li>Require enrollment for Admins first.</li>
+<li>Require enrollment for Proposal Managers.</li>
+<li>Expand to all users if required.</li>
+<li>Monitor support requests.</li>
+</ol>
+<h3 id="mfa-reset-procedure">MFA Reset Procedure</h3>
+<ol>
+<li>Verify the user's identity through approved internal process.</li>
+<li>Confirm the account email.</li>
+<li>Reset MFA enrollment.</li>
+<li>Ask the user to enroll a new factor.</li>
+<li>Confirm successful sign-in.</li>
+<li>Record the reset if your policy requires it.</li>
+</ol>
+<hr>
+<h2 id="cui-itar-and-data-classification-administration">CUI, ITAR, and Data Classification Administration</h2>
+<p>Pursuite supports classification workflows for controlled information. Admins are responsible for ensuring those controls match organizational policy.</p>
+<h3 id="classification-concepts">Classification Concepts</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INTERNAL</td>
+<td>Default non-CUI business data classification</td>
+</tr>
+<tr>
+<td>CUI</td>
+<td>Controlled Unclassified Information requiring additional handling</td>
+</tr>
+<tr>
+<td>ITAR/EAR</td>
+<td>Export-controlled data requiring strict access and dissemination controls</td>
+</tr>
+<tr>
+<td>CUI category</td>
+<td>Specific CUI category such as controlled, specified, ITAR/EAR, or FOUO legacy</td>
+</tr>
+<tr>
+<td>Minimum clearance</td>
+<td>User clearance threshold required for access when configured</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-classify-an-rfp-document-as-cui">Step-by-Step: Classify an RFP Document as CUI</h3>
+<ol>
+<li>Confirm the document contains CUI or controlled content.</li>
+<li>Confirm the classifier is authorized.</li>
+<li>Open the classification controls for the RFP document.</li>
+<li>Select the appropriate CUI category.</li>
+<li>Enter designator, caveats, reason, and review date when required.</li>
+<li>Save classification.</li>
+<li>Confirm the document classification shows as CUI.</li>
+<li>Confirm access restrictions and audit logging behavior.</li>
+</ol>
+<h3 id="external-ai-processing-gate">External AI Processing Gate</h3>
+<p>When an RFP document is classified as CUI, the RFP Shredder worker checks whether the organization is approved for external CUI processing before sending document text to an AI provider.</p>
+<p>Do not enable external CUI processing unless:</p>
+<ul>
+<li>The AI provider is approved for the data type.</li>
+<li>Contract terms permit that processing.</li>
+<li>Security and compliance owners have approved the configuration.</li>
+<li>The approval is documented.</li>
+</ul>
+<h3 id="step-by-step-remove-cui-classification">Step-by-Step: Remove CUI Classification</h3>
+<ol>
+<li>Confirm the document no longer requires CUI handling.</li>
+<li>Confirm approval to downgrade.</li>
+<li>Open the classification record.</li>
+<li>Remove or downgrade the classification to none.</li>
+<li>Save.</li>
+<li>Confirm the RFP document returns to INTERNAL classification.</li>
+<li>Retain the classification audit history.</li>
+</ol>
+<hr>
+<h2 id="ai-provider-administration">AI Provider Administration</h2>
+<p>AI provider settings power drafting, RFP Shredder, Compliance Matrix, Autonomous Pipeline, Ask, analysis, and related AI features.</p>
+<h3 id="step-by-step-add-or-update-an-ai-provider">Step-by-Step: Add or Update an AI Provider</h3>
+<ol>
+<li>Open AI Provider settings.</li>
+<li>Select provider type.</li>
+<li>Enter endpoint, deployment, model, and API key details as required.</li>
+<li>Save the provider.</li>
+<li>Run the connectivity test.</li>
+<li>Confirm a successful response.</li>
+<li>Configure default routing if multiple providers exist.</li>
+<li>Record approval and key owner.</li>
+</ol>
+<h3 id="provider-governance-checklist">Provider Governance Checklist</h3>
+<ul>
+<li>Provider is approved by security/legal.</li>
+<li>Provider supports required data handling.</li>
+<li>Key owner is documented.</li>
+<li>Key rotation schedule is defined.</li>
+<li>Test result is successful.</li>
+<li>Usage monitoring is enabled where available.</li>
+<li>CUI processing approval matches classification policy.</li>
+</ul>
+<h3 id="step-by-step-rotate-provider-credentials">Step-by-Step: Rotate Provider Credentials</h3>
+<ol>
+<li>Generate a new key in the provider portal.</li>
+<li>Add or update the key in Pursuite.</li>
+<li>Test connectivity.</li>
+<li>Confirm AI workflows run normally.</li>
+<li>Revoke the old key.</li>
+<li>Record the rotation date.</li>
+</ol>
+<hr>
+<h2 id="rfp-shredder-administration">RFP Shredder Administration</h2>
+<p>The RFP Shredder converts solicitation documents into structured requirements. Admins should understand both the user workflow and the controls around it.</p>
+<h3 id="supported-files">Supported Files</h3>
+<ul>
+<li>PDF</li>
+<li>DOCX</li>
+<li>Maximum file size: 50 MB</li>
+</ul>
+<p>PDF files use text extraction with OCR fallback for scanned or image-only PDFs. DOCX files use Word document text extraction and do not use OCR.</p>
+<h3 id="manageradmin-actions">Manager/Admin Actions</h3>
+<p>Proposal Managers and Admins can:</p>
+<ul>
+<li>Upload RFP files.</li>
+<li>Replace RFP files.</li>
+<li>Retry processing.</li>
+<li>Re-process completed documents.</li>
+<li>Add manual requirements.</li>
+<li>Edit extracted requirements.</li>
+<li>Delete false positives.</li>
+<li>Mark low-confidence rows reviewed.</li>
+<li>Confirm requirements.</li>
+</ul>
+<p>Writers can view completed requirements, but they cannot perform write or confirmation actions.</p>
+<h3 id="step-by-step-resolve-a-blocked-rfp-confirmation">Step-by-Step: Resolve a Blocked RFP Confirmation</h3>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Open RFP Shredder.</li>
+<li>Confirm document status is completed.</li>
+<li>Look for rows marked Review required.</li>
+<li>For each flagged row, compare it to the source solicitation.</li>
+<li>Edit the row if the text or classification is wrong.</li>
+<li>Mark the row reviewed if it is correct.</li>
+<li>Confirm requirements.</li>
+<li>Verify Compliance Matrix and Autonomous Pipeline unlock.</li>
+</ol>
+<h3 id="re-process-behavior">Re-Process Behavior</h3>
+<p>Re-processing follows replace-on-success semantics:</p>
+<ol>
+<li>Existing visible requirements remain available while the new run is processing.</li>
+<li>If the new run succeeds, old active rows are soft-deleted and replaced with the new extracted set.</li>
+<li>If the new run fails, old visible rows remain intact.</li>
+<li>Soft-deleted rows remain available for history and audit.</li>
+</ol>
+<p>This behavior protects proposal teams from losing a usable requirement set because of a failed re-processing attempt.</p>
+<hr>
+<h2 id="compliance-and-audit-administration">Compliance and Audit Administration</h2>
+<p>Audit and compliance administration supports SOC 2, CMMC, internal control reviews, and customer-driven evidence requests.</p>
+<h3 id="audit-event-categories">Audit Event Categories</h3>
+<p>Common audited actions include:</p>
+<ul>
+<li>User sign-in and access-sensitive events.</li>
+<li>User and role administration.</li>
+<li>Proposal and opportunity changes.</li>
+<li>RFP upload, shredding, confirmation, and requirement edits.</li>
+<li>CUI classification and CUI access.</li>
+<li>AI provider usage and AI workflow events.</li>
+<li>Integration and export activity.</li>
+</ul>
+<h3 id="step-by-step-export-audit-evidence">Step-by-Step: Export Audit Evidence</h3>
+<ol>
+<li>Open the audit or compliance area.</li>
+<li>Select the date range.</li>
+<li>Select action categories if available.</li>
+<li>Filter by user, target, or module if needed.</li>
+<li>Generate the export.</li>
+<li>Confirm the export opens correctly.</li>
+<li>Save it to the approved evidence repository.</li>
+<li>Record the export purpose and requestor.</li>
+</ol>
+<h3 id="evidence-handling-rules">Evidence Handling Rules</h3>
+<ul>
+<li>Export only the scope needed.</li>
+<li>Do not edit raw evidence files.</li>
+<li>Store exports in approved locations.</li>
+<li>Restrict access to evidence containing CUI or sensitive proposal data.</li>
+<li>Retain exports according to company policy.</li>
+</ul>
+<hr>
+<h2 id="integration-administration">Integration Administration</h2>
+<p>Integrations connect Pursuite to external systems. Admins should treat integration changes as controlled configuration changes.</p>
+<h3 id="common-integration-types">Common Integration Types</h3>
+<table>
+<thead>
+<tr>
+<th>Integration</th>
+<th>Purpose</th>
+<th>Admin Considerations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAM.gov</td>
+<td>Opportunity monitoring and import</td>
+<td>API access, search configuration, monitor ownership</td>
+</tr>
+<tr>
+<td>CRM</td>
+<td>Account, contact, opportunity, and activity synchronization</td>
+<td>OAuth scopes, sync direction, duplicate handling</td>
+</tr>
+<tr>
+<td>SharePoint/OneDrive</td>
+<td>Attach files from Microsoft document stores</td>
+<td>Tenant consent, document access scope</td>
+</tr>
+<tr>
+<td>Teams</td>
+<td>Notifications and workflow cards</td>
+<td>Channel ownership, notification routing</td>
+</tr>
+<tr>
+<td>ProPricer/CPQ</td>
+<td>Pricing and quote integration</td>
+<td>Bridge health, credentials, data mapping</td>
+</tr>
+<tr>
+<td>Email/SMS</td>
+<td>Notifications and communication</td>
+<td>Sender identity, compliance, delivery monitoring</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-add-an-integration">Step-by-Step: Add an Integration</h3>
+<ol>
+<li>Identify the business owner.</li>
+<li>Confirm security approval.</li>
+<li>Confirm required credentials or OAuth access.</li>
+<li>Open Integrations.</li>
+<li>Select the integration.</li>
+<li>Enter connection details.</li>
+<li>Test the connection.</li>
+<li>Configure sync or notification settings.</li>
+<li>Run a limited pilot.</li>
+<li>Review audit and sync logs.</li>
+<li>Communicate availability to users.</li>
+</ol>
+<h3 id="step-by-step-disable-an-integration">Step-by-Step: Disable an Integration</h3>
+<ol>
+<li>Notify impacted users.</li>
+<li>Pause scheduled jobs if available.</li>
+<li>Disable the integration.</li>
+<li>Revoke external credentials if appropriate.</li>
+<li>Confirm no new sync jobs run.</li>
+<li>Record the change.</li>
+</ol>
+<hr>
+<h2 id="templates-and-content-library-governance">Templates and Content Library Governance</h2>
+<p>Templates and approved content are central to repeatable proposal operations.</p>
+<h3 id="template-governance">Template Governance</h3>
+<p>Admin responsibilities:</p>
+<ul>
+<li>Publish standard templates.</li>
+<li>Approve or reject publish requests.</li>
+<li>Archive obsolete templates.</li>
+<li>Maintain bid-type and section metadata.</li>
+<li>Review template usage and quality.</li>
+</ul>
+<p>Step-by-step publish review:</p>
+<ol>
+<li>Open Templates.</li>
+<li>Filter to pending review if applicable.</li>
+<li>Open the requested template.</li>
+<li>Review title, bid type, volumes, sections, instructions, and metadata.</li>
+<li>Confirm it follows company proposal standards.</li>
+<li>Approve and publish, or reject with a clear reason.</li>
+<li>Notify the requester if additional changes are needed.</li>
+</ol>
+<h3 id="content-library-governance">Content Library Governance</h3>
+<p>Admin responsibilities:</p>
+<ul>
+<li>Approve high-quality reusable content.</li>
+<li>Reject or return incomplete content.</li>
+<li>Retire outdated content.</li>
+<li>Maintain tags and freshness indicators.</li>
+<li>Ensure regulated claims are reviewed.</li>
+</ul>
+<p>Recommended content review questions:</p>
+<ul>
+<li>Is the content accurate?</li>
+<li>Is it approved for reuse?</li>
+<li>Does it contain customer-sensitive data?</li>
+<li>Does it require CUI or export-control marking?</li>
+<li>Does it have a clear owner?</li>
+<li>Is it current?</li>
+</ul>
+<hr>
+<h2 id="dashboards-reports-and-scheduled-exports">Dashboards, Reports, and Scheduled Exports</h2>
+<p>Admins govern reporting so leadership receives accurate information without exposing restricted data unnecessarily.</p>
+<h3 id="step-by-step-create-a-scheduled-report">Step-by-Step: Create a Scheduled Report</h3>
+<ol>
+<li>Open Scheduled Reports.</li>
+<li>Click New Schedule.</li>
+<li>Select report type.</li>
+<li>Set frequency and timezone.</li>
+<li>Add recipients.</li>
+<li>Review whether the report contains sensitive data.</li>
+<li>Save.</li>
+<li>Confirm the first run completes.</li>
+<li>Review recipient feedback.</li>
+</ol>
+<h3 id="report-governance">Report Governance</h3>
+<p>Review scheduled reports monthly:</p>
+<ul>
+<li>Confirm recipients still need the report.</li>
+<li>Confirm departed users are removed.</li>
+<li>Confirm report frequency is appropriate.</li>
+<li>Confirm reports containing CUI or sensitive data have approved distribution.</li>
+<li>Disable stale schedules.</li>
+</ul>
+<hr>
+<h2 id="billing-plans-feature-entitlements-and-usage">Billing, Plans, Feature Entitlements, and Usage</h2>
+<p>Billing and entitlement administration varies by deployment, but Admins should understand the available controls.</p>
+<p>Admin tasks may include:</p>
+<ul>
+<li>Review plan and enabled modules.</li>
+<li>Monitor user counts.</li>
+<li>Monitor AI usage.</li>
+<li>Monitor storage usage.</li>
+<li>Review billing contact information.</li>
+<li>Download invoices where applicable.</li>
+<li>Coordinate upgrades or feature enablement.</li>
+</ul>
+<p>If users report missing functionality, check:</p>
+<ol>
+<li>User role.</li>
+<li>Workspace role.</li>
+<li>Feature entitlement.</li>
+<li>Plan limits.</li>
+<li>Deployment mode.</li>
+<li>Configuration dependencies.</li>
+</ol>
+<hr>
+<h2 id="data-retention-archiving-and-records-management">Data Retention, Archiving, and Records Management</h2>
+<p>Pursuite data may include proposal drafts, solicitation files, pricing information, customer data, CUI, audit events, AI outputs, and exports.</p>
+<h3 id="recommended-retention-controls">Recommended Retention Controls</h3>
+<ul>
+<li>Archive proposals after closeout.</li>
+<li>Retain audit logs according to compliance policy.</li>
+<li>Retain CUI classification history.</li>
+<li>Remove unnecessary user access instead of deleting business records.</li>
+<li>Export required records before contract closeout if the customer or contract requires it.</li>
+<li>Coordinate purge requests with legal, compliance, and IT.</li>
+</ul>
+<h3 id="step-by-step-archive-a-proposal">Step-by-Step: Archive a Proposal</h3>
+<ol>
+<li>Confirm the proposal is complete or no longer active.</li>
+<li>Confirm required exports have been saved.</li>
+<li>Confirm final status and opportunity outcome are recorded.</li>
+<li>Remove unnecessary workspace users.</li>
+<li>Archive the proposal.</li>
+<li>Record archive date if required.</li>
+</ol>
+<hr>
+<h2 id="operational-runbooks">Operational Runbooks</h2>
+<h3 id="runbook-new-tenant-launch">Runbook: New Tenant Launch</h3>
+<ol>
+<li>Add backup Admin.</li>
+<li>Configure organization profile.</li>
+<li>Configure SSO and MFA.</li>
+<li>Configure AI provider.</li>
+<li>Configure CUI policy.</li>
+<li>Invite pilot users.</li>
+<li>Publish starter templates.</li>
+<li>Approve starter content library items.</li>
+<li>Configure integrations.</li>
+<li>Test one opportunity-to-proposal workflow.</li>
+<li>Export one audit sample.</li>
+<li>Announce production readiness.</li>
+</ol>
+<h3 id="runbook-quarterly-access-review">Runbook: Quarterly Access Review</h3>
+<ol>
+<li>Export active users.</li>
+<li>Review Admins.</li>
+<li>Review Proposal Managers.</li>
+<li>Review CUI-authorized users.</li>
+<li>Review inactive users.</li>
+<li>Review workspace access for active proposals.</li>
+<li>Remove unnecessary access.</li>
+<li>Record review completion.</li>
+</ol>
+<h3 id="runbook-ai-provider-rotation">Runbook: AI Provider Rotation</h3>
+<ol>
+<li>Generate new provider key.</li>
+<li>Update Pursuite provider settings.</li>
+<li>Test connectivity.</li>
+<li>Run a low-risk AI workflow.</li>
+<li>Revoke old key.</li>
+<li>Record rotation.</li>
+</ol>
+<h3 id="runbook-cui-processing-review">Runbook: CUI Processing Review</h3>
+<ol>
+<li>Review CUI external-processing approval.</li>
+<li>Review classified RFP documents.</li>
+<li>Review CUI access events.</li>
+<li>Review AI provider approval status.</li>
+<li>Confirm user clearance attributes.</li>
+<li>Record findings.</li>
+</ol>
+<hr>
+<h2 id="administrative-checklists">Administrative Checklists</h2>
+<h3 id="weekly-checklist">Weekly Checklist</h3>
+<ul>
+<li>Review failed integrations or sync jobs.</li>
+<li>Review new user requests.</li>
+<li>Review proposal workflows blocked by permissions.</li>
+<li>Review AI provider health if AI workflows are active.</li>
+<li>Review critical support issues.</li>
+</ul>
+<h3 id="monthly-checklist">Monthly Checklist</h3>
+<ul>
+<li>Review active Admins and Proposal Managers.</li>
+<li>Review scheduled reports.</li>
+<li>Review stale proposal workspaces.</li>
+<li>Review template and content library pending items.</li>
+<li>Review integration health.</li>
+<li>Review audit export process.</li>
+</ul>
+<h3 id="quarterly-checklist">Quarterly Checklist</h3>
+<ul>
+<li>Perform formal access review.</li>
+<li>Review SSO and MFA policy.</li>
+<li>Review AI provider approval and key rotation status.</li>
+<li>Review CUI/ITAR policy.</li>
+<li>Review data retention and archive status.</li>
+<li>Review plan, usage, and entitlements.</li>
+</ul>
+<h3 id="pre-proposal-deadline-checklist">Pre-Proposal Deadline Checklist</h3>
+<ul>
+<li>Confirm proposal team membership.</li>
+<li>Confirm Proposal Manager ownership.</li>
+<li>Confirm RFP requirements are processed and confirmed.</li>
+<li>Confirm Compliance Matrix is generated.</li>
+<li>Confirm writers can access assigned sections.</li>
+<li>Confirm exports and scheduled reports will not expose restricted data.</li>
+</ul>
+<hr>
+<h2 id="troubleshooting-and-escalation">Troubleshooting and Escalation</h2>
+<h3 id="users-cannot-sign-in">Users Cannot Sign In</h3>
+<p>Check:</p>
+<ol>
+<li>Account is active.</li>
+<li>Email address is correct.</li>
+<li>SSO is healthy.</li>
+<li>MFA enrollment is valid.</li>
+<li>User belongs to the correct tenant.</li>
+<li>Identity provider group mapping is correct.</li>
+</ol>
+<p>Escalate to IT/security if SSO or MFA is failing for multiple users.</p>
+<h3 id="user-cannot-access-a-proposal">User Cannot Access a Proposal</h3>
+<p>Check:</p>
+<ol>
+<li>User has an active account.</li>
+<li>User belongs to the proposal workspace.</li>
+<li>Workspace role is correct.</li>
+<li>System role is sufficient.</li>
+<li>Proposal is not archived.</li>
+<li>The user is opening the correct tenant.</li>
+</ol>
+<h3 id="user-cannot-edit-a-section">User Cannot Edit a Section</h3>
+<p>Check:</p>
+<ol>
+<li>Section is assigned to the user or role permits editing.</li>
+<li>Section is not locked.</li>
+<li>Proposal status permits edits.</li>
+<li>User has correct workspace role.</li>
+<li>User is not in read-only mode.</li>
+</ol>
+<h3 id="rfp-upload-or-processing-fails">RFP Upload or Processing Fails</h3>
+<p>Check:</p>
+<ol>
+<li>File type is PDF or DOCX.</li>
+<li>File is under 50 MB.</li>
+<li>User is Proposal Manager or Admin.</li>
+<li>AI provider is configured.</li>
+<li>CUI external-processing gate is not blocking the document.</li>
+<li>Worker and queue services are healthy.</li>
+</ol>
+<h3 id="rfp-confirmation-is-blocked">RFP Confirmation Is Blocked</h3>
+<p>Check:</p>
+<ol>
+<li>Document status is completed.</li>
+<li>User has confirmation permission.</li>
+<li>Low-confidence requirements are edited or marked reviewed.</li>
+<li>No processing run is currently active.</li>
+</ol>
+<h3 id="cui-processing-is-blocked">CUI Processing Is Blocked</h3>
+<p>Check:</p>
+<ol>
+<li>RFP document classification.</li>
+<li>Organization external CUI processing approval.</li>
+<li>AI provider approval for CUI.</li>
+<li>User clearance and access settings.</li>
+<li>Audit event details.</li>
+</ol>
+<h3 id="ai-features-are-unavailable">AI Features Are Unavailable</h3>
+<p>Check:</p>
+<ol>
+<li>Feature entitlement.</li>
+<li>AI provider configuration.</li>
+<li>Provider connectivity test.</li>
+<li>Usage or budget limits.</li>
+<li>Required prerequisite gates.</li>
+<li>CUI policy.</li>
+</ol>
+<h3 id="integration-sync-fails">Integration Sync Fails</h3>
+<p>Check:</p>
+<ol>
+<li>Integration credentials.</li>
+<li>OAuth scope or consent.</li>
+<li>Remote service status.</li>
+<li>Firewall or air-gap restrictions.</li>
+<li>Sync schedule.</li>
+<li>Recent sync logs.</li>
+</ol>
+<hr>
+<h2 id="appendix-a-recommended-governance-cadence">Appendix A: Recommended Governance Cadence</h2>
+<table>
+<thead>
+<tr>
+<th>Cadence</th>
+<th>Activity</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weekly</td>
+<td>Review support issues, failed syncs, blocked proposal workflows</td>
+<td>Platform Admin</td>
+</tr>
+<tr>
+<td>Monthly</td>
+<td>Review users, scheduled reports, stale workspaces, integration health</td>
+<td>Platform Admin</td>
+</tr>
+<tr>
+<td>Quarterly</td>
+<td>Formal access review, AI approval review, CUI policy review</td>
+<td>Security/Compliance Owner</td>
+</tr>
+<tr>
+<td>Semiannual</td>
+<td>Template and content library governance review</td>
+<td>Proposal Operations</td>
+</tr>
+<tr>
+<td>Annual</td>
+<td>Full tenant configuration and records-retention review</td>
+<td>Admin Team</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="appendix-b-evidence-and-audit-export-handling">Appendix B: Evidence and Audit Export Handling</h2>
+<p>When exporting evidence:</p>
+<ol>
+<li>Confirm the requester and purpose.</li>
+<li>Limit the date range.</li>
+<li>Filter to relevant users, actions, or objects when possible.</li>
+<li>Generate the export.</li>
+<li>Store the export in the approved repository.</li>
+<li>Restrict access if the export includes CUI, proposal-sensitive, or customer-sensitive information.</li>
+<li>Record export date, scope, and owner.</li>
+<li>Do not modify raw evidence files.</li>
+</ol>
+<p>Recommended evidence naming pattern:</p>
+<p><code>Pursuite_&lt;EvidenceType&gt;_&lt;YYYY-MM-DD&gt;_&lt;Scope&gt;.&lt;extension&gt;</code></p>
+<p>Examples:</p>
+<ul>
+<li><code>Pursuite_AuditEvents_2026-06-21_Q2AccessReview.csv</code></li>
+<li><code>Pursuite_CUIAccess_2026-06-21_RFPDocuments.csv</code></li>
+<li><code>Pursuite_UserRoles_2026-06-21_QuarterlyReview.csv</code></li>
+</ul>
+<hr>
+<h2 id="related-documents">Related Documents</h2>
+<ul>
+<li><code>Pursuite_End_User_Guide.md</code></li>
+<li><code>Pursuite_Sidebar_User_Guide.md</code></li>
+<li><code>Pursuite_API_Reference.md</code></li>
+<li><code>Pursuite_Integration_Guide.md</code></li>
+</ul>
+
+  </main>
+</div>
+</body>
+</html>

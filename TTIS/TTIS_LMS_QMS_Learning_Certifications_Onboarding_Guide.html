@@ -1,0 +1,2539 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LMS/QMS Learning, Certifications, And Onboarding Guide</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --surface: #ffffff;
+      --soft: #f4f7fb;
+      --accent: #155e75;
+      --accent-2: #7f1d1d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #eef2f7;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 36px 72px;
+      background: var(--surface);
+      min-height: 100vh;
+      box-shadow: 0 0 36px rgba(23, 32, 42, 0.08);
+    }
+    h1, h2, h3 {
+      line-height: 1.2;
+      color: #102033;
+    }
+    h1 {
+      margin: 0 0 18px;
+      padding-bottom: 18px;
+      border-bottom: 4px solid var(--accent);
+      font-size: 2.35rem;
+    }
+    h2 {
+      margin-top: 42px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 1.55rem;
+    }
+    h3 {
+      margin-top: 28px;
+      font-size: 1.15rem;
+    }
+    p { margin: 12px 0; }
+    a { color: var(--accent); }
+    hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 26px;
+      font-size: 0.94rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+    th {
+      background: var(--soft);
+      text-align: left;
+      color: #12233a;
+    }
+    tr:nth-child(even) td { background: #fbfcfe; }
+    code {
+      background: #edf2f7;
+      border: 1px solid #d5dde8;
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      overflow-x: auto;
+      padding: 16px;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 6px;
+    }
+    pre code {
+      background: transparent;
+      border: 0;
+      color: inherit;
+      padding: 0;
+    }
+    ul, ol { padding-left: 1.45rem; }
+    li { margin: 5px 0; }
+    p:has(code:first-child:last-child) {
+      border-left: 4px solid var(--accent-2);
+      padding: 10px 12px;
+      background: #fff7ed;
+    }
+    @media print {
+      body { background: #fff; }
+      main {
+        max-width: none;
+        padding: 0;
+        box-shadow: none;
+      }
+      h2 { break-after: avoid; }
+      table, pre { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="lmsqms-learning-certifications-and-onboarding-guide">LMS/QMS Learning, Certifications, And Onboarding Guide</h1>
+<p><strong>Audience:</strong> Employees, managers, field operations leaders, LMS/QMS administrators, compliance reviewers, trainers, HR/onboarding coordinators <strong>Version:</strong> 1.0 <strong>Last updated:</strong> June 23, 2026 <strong>Classification:</strong> Internal Use Only <strong>Primary systems:</strong> TTIS VBS Dashboard API v3, LMS/QMS competence system of record, onboarding workflows, ABAC authorization, tamper-evident audit trail</p>
+<hr>
+<h2 id="table-of-contents">Table Of Contents</h2>
+<ol>
+<li><a href="#1-purpose-and-scope">Purpose And Scope</a></li>
+<li><a href="#2-how-to-use-this-guide">How To Use This Guide</a></li>
+<li><a href="#3-system-overview">System Overview</a></li>
+<li><a href="#4-roles-and-responsibilities">Roles And Responsibilities</a></li>
+<li><a href="#5-access-security-and-audit-expectations">Access, Security, And Audit Expectations</a></li>
+<li><a href="#6-end-to-end-lmsqms-workflow">End-To-End LMS/QMS Workflow</a></li>
+<li><a href="#7-new-employee-onboarding-workflow">New Employee Onboarding Workflow</a></li>
+<li><a href="#8-learner-step-by-step-guide">Learner Step-By-Step Guide</a></li>
+<li><a href="#9-manager-step-by-step-guide">Manager Step-By-Step Guide</a></li>
+<li><a href="#10-administrator-step-by-step-guide">Administrator Step-By-Step Guide</a></li>
+<li><a href="#11-certification-and-credential-management">Certification And Credential Management</a></li>
+<li><a href="#12-qms-integration-and-competence-evidence">QMS Integration And Competence Evidence</a></li>
+<li><a href="#13-reporting-and-audit-readiness">Reporting And Audit Readiness</a></li>
+<li><a href="#14-exceptions-waivers-corrections-and-capa">Exceptions, Waivers, Corrections, And CAPA</a></li>
+<li><a href="#15-notifications-and-escalations">Notifications And Escalations</a></li>
+<li><a href="#16-data-records-and-retention">Data, Records, And Retention</a></li>
+<li><a href="#17-acceptance-criteria">Acceptance Criteria</a></li>
+<li><a href="#18-troubleshooting">Troubleshooting</a></li>
+<li><a href="#19-appendix-a-common-fields">Appendix A: Common Fields</a></li>
+<li><a href="#20-appendix-b-key-api-surfaces">Appendix B: Key API Surfaces</a></li>
+<li><a href="#21-appendix-c-screenshot-checklist">Appendix C: Screenshot Checklist</a></li>
+<li><a href="#22-revision-history">Revision History</a></li>
+</ol>
+<hr>
+<h2 id="1-purpose-and-scope">1. Purpose And Scope</h2>
+<p>This guide explains how TTIS personnel use the LMS/QMS learning, certification, and onboarding functions inside the TTIS AI Virtual Business System. It is written as an operational guide for real users: learners need to know what to do, managers need to know how to monitor and approve readiness, and administrators need to know how to configure courses, credentials, onboarding records, evidence, and audits.</p>
+<p>The LMS/QMS module is an in-house competence system of record. It is not documented as an external LMS bridge or third-party LMS product. It is integrated with the TTIS VBS identity, authorization, onboarding, evidence, and audit model.</p>
+<p>This guide covers:</p>
+<ul>
+<li>Learning assignment and course completion.</li>
+<li>Written knowledge checks and quiz attempts.</li>
+<li>Practical skill assessment and observed competence evidence.</li>
+<li>Internal certifications earned through LMS requirements.</li>
+<li>External credentials recorded by attestation.</li>
+<li>New employee onboarding activities, acknowledgements, screenings, assets, check-ins, and completion.</li>
+<li>Manager readiness review.</li>
+<li>Administrator course, curriculum, competency, credential, and record management.</li>
+<li>QMS evidence, reporting, audit readiness, waivers, corrections, and CAPA handling.</li>
+</ul>
+<p>This guide does not replace:</p>
+<ul>
+<li>Source-controlled implementation files such as <code>dashboard/lms.py</code>, <code>dashboard/main.py</code>, and <code>dashboard/abac.py</code>.</li>
+<li>The current API reference.</li>
+<li>Company policies, contractual requirements, regulatory obligations, or customer-specific training requirements.</li>
+<li>Legal, HR, safety, or compliance advice.</li>
+</ul>
+<p>Where final business process details, screen labels, policy thresholds, escalation intervals, or owner names are not documented in the repository, this guide uses <code>[TBD: information needed]</code>.</p>
+<hr>
+<h2 id="2-how-to-use-this-guide">2. How To Use This Guide</h2>
+<p>Use the role-based sections first, then refer to the supporting sections when you need details about evidence, audit readiness, troubleshooting, or configuration.</p>
+<table>
+<thead>
+<tr>
+<th>If you are...</th>
+<th>Start with...</th>
+<th>Then review...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A new employee or learner</td>
+<td><a href="#8-learner-step-by-step-guide">Learner Step-By-Step Guide</a></td>
+<td><a href="#7-new-employee-onboarding-workflow">New Employee Onboarding Workflow</a>, <a href="#18-troubleshooting">Troubleshooting</a></td>
+</tr>
+<tr>
+<td>A manager</td>
+<td><a href="#9-manager-step-by-step-guide">Manager Step-By-Step Guide</a></td>
+<td><a href="#11-certification-and-credential-management">Certification And Credential Management</a>, <a href="#13-reporting-and-audit-readiness">Reporting And Audit Readiness</a></td>
+</tr>
+<tr>
+<td>An LMS/QMS administrator</td>
+<td><a href="#10-administrator-step-by-step-guide">Administrator Step-By-Step Guide</a></td>
+<td><a href="#12-qms-integration-and-competence-evidence">QMS Integration And Competence Evidence</a>, <a href="#16-data-records-and-retention">Data, Records, And Retention</a></td>
+</tr>
+<tr>
+<td>An auditor or compliance reviewer</td>
+<td><a href="#13-reporting-and-audit-readiness">Reporting And Audit Readiness</a></td>
+<td><a href="#16-data-records-and-retention">Data, Records, And Retention</a>, <a href="#20-appendix-b-key-api-surfaces">Appendix B</a></td>
+</tr>
+</tbody>
+</table>
+<p>Terminology note:</p>
+<ul>
+<li>&quot;Course&quot; means a learning item with modules, lessons, quizzes, and status controls.</li>
+<li>&quot;Curriculum&quot; means a grouped learning path or required course set.</li>
+<li>&quot;Competency&quot; means a defined skill, knowledge area, or qualification mapped to a role or requirement.</li>
+<li>&quot;Practical assessment&quot; means an observed skill assessment performed by an authorized assessor.</li>
+<li>&quot;Credential&quot; means an issued or recorded proof of qualification.</li>
+<li>&quot;External credential&quot; means a credential earned outside the LMS and recorded by attestation.</li>
+<li>&quot;Readiness&quot; means the learner&#x27;s current status against required competencies, courses, practical assessments, and credentials.</li>
+</ul>
+<hr>
+<h2 id="3-system-overview">3. System Overview</h2>
+<p>The TTIS LMS/QMS capability is part of Dashboard API v3. It uses the same per-user identity and ABAC authorization model as the rest of the TTIS VBS platform.</p>
+<p>Core capabilities include:</p>
+<ul>
+<li>Course catalog, modules, lessons, quizzes, prerequisites, enrollments, and completion records.</li>
+<li>Curriculum and certification definitions.</li>
+<li>Credential issuance, expiration, revocation, and external credential attestation.</li>
+<li>Practical assessment scheduling, results, submission, and assessor workflows.</li>
+<li>Competency registry, competency matrix, learner readiness, and required assignment tracking.</li>
+<li>Course approval and release workflow.</li>
+<li>Record history and integrity status for audit review.</li>
+<li>Onboarding records, tasks, acknowledgements, training, waivers, gates, screenings, assets, check-ins, completion, cancellation, export, and assistant support.</li>
+</ul>
+<p>The system is designed as a QMS competence system of record:</p>
+<ul>
+<li>Competence events are chain-anchored into a tamper-evident audit log.</li>
+<li>Evidence rows are treated as WORM-style records. Corrections should be recorded as new linked evidence rather than overwriting historical evidence.</li>
+<li>Practical assessments lock when submitted.</li>
+<li>Credentials transition forward through states such as active, expired, or revoked.</li>
+<li>Retention defaults to <code>LMS_RETENTION_DAYS=2557</code>, approximately seven years, unless company policy configures a different value.</li>
+</ul>
+<p>[Screenshot: LMS/QMS dashboard landing page showing learner assignments, certification status, and manager/admin navigation]</p>
+<hr>
+<h2 id="4-roles-and-responsibilities">4. Roles And Responsibilities</h2>
+<p>The platform enforces access through ABAC capabilities. Business responsibilities may be assigned to named people or groups, but system access must match the configured role, capability, and per-user grant model.</p>
+<h3 id="41-role-summary">4.1 Role Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Role or responsibility</th>
+<th>Typical duties</th>
+<th>Relevant system access</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learner / employee</td>
+<td>Complete onboarding tasks, training, quizzes, acknowledgements, and assigned learning. Maintain required credentials.</td>
+<td>LMS view access; onboarding self-service access where configured.</td>
+</tr>
+<tr>
+<td>Field crew member</td>
+<td>Complete field role training, safety items, time-sensitive acknowledgements, and required credentials.</td>
+<td><code>field_crew</code> role with own LMS/onboarding views.</td>
+</tr>
+<tr>
+<td>Manager / supervisor</td>
+<td>Assign required training, monitor readiness, review completion status, request waivers, and follow up on overdue items.</td>
+<td>Manager-level LMS/onboarding access as configured.</td>
+</tr>
+<tr>
+<td>Field operations manager</td>
+<td>Conduct or oversee practical assessments, record external credentials, approve policy-anchored course reviews where authorized, monitor field readiness.</td>
+<td><code>field_ops_mgr</code>; <code>lms_assess</code>; <code>lms_extcred</code>; <code>lms_approve_policy</code>.</td>
+</tr>
+<tr>
+<td>Trainer / assessor</td>
+<td>Observe practical skills, enter assessment results, attach evidence references, and submit locked assessment records.</td>
+<td>May require <code>lms_assess</code> or a configured assessor grant. <code>[TBD: information needed - final trainer-to-capability mapping]</code></td>
+</tr>
+<tr>
+<td>Course author</td>
+<td>Draft learning content, modules, lessons, quizzes, rubrics, and competency mappings before approval.</td>
+<td><code>lms_author</code> or CEO authoring access.</td>
+</tr>
+<tr>
+<td>Trade reviewer</td>
+<td>Review trade-technical content only when the reviewer has the required credential authority.</td>
+<td><code>lms_approve_trade</code> per-user grant plus active reviewer credential evidence.</td>
+</tr>
+<tr>
+<td>Compliance reviewer</td>
+<td>Review federal compliance content, policy-sensitive curriculum, or customer/regulatory content.</td>
+<td><code>lms_approve_compliance</code> per-user grant.</td>
+</tr>
+<tr>
+<td>LMS/QMS administrator</td>
+<td>Maintain catalog, curriculum, certifications, credentials, competency registry, record integrity review, reports, and exceptions.</td>
+<td>CEO or delegated administrative capabilities. <code>[TBD: information needed - final delegated admin policy]</code></td>
+</tr>
+<tr>
+<td>HR/onboarding coordinator</td>
+<td>Create onboarding records, track onboarding tasks, acknowledgements, screenings, assets, check-ins, and completion.</td>
+<td>Onboarding admin/manager access as configured. <code>[TBD: information needed - final HR role mapping]</code></td>
+</tr>
+<tr>
+<td>CEO / executive administrator</td>
+<td>Release content, override release with justification, administer access, and review sensitive compliance posture.</td>
+<td>CEO role; release authorization; broad administrative access.</td>
+</tr>
+<tr>
+<td>Auditor / reviewer</td>
+<td>Review evidence, exports, record history, and integrity status without changing records.</td>
+<td>Auditor posture is read-only and denies mutation actions.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-raci-matrix">4.2 RACI Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>Learner</th>
+<th>Manager</th>
+<th>Assessor</th>
+<th>Course author</th>
+<th>Reviewer</th>
+<th>LMS/QMS admin</th>
+<th>CEO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Complete assigned learning</td>
+<td>Responsible</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Informed</td>
+</tr>
+<tr>
+<td>Assign required learning</td>
+<td>Informed</td>
+<td>Responsible</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Accountable</td>
+<td>Informed</td>
+</tr>
+<tr>
+<td>Create course draft</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Responsible</td>
+<td>Consulted</td>
+<td>Accountable</td>
+<td>Informed</td>
+</tr>
+<tr>
+<td>Approve course content</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Responsible</td>
+<td>Accountable</td>
+<td>Accountable for release</td>
+</tr>
+<tr>
+<td>Release course</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Responsible</td>
+</tr>
+<tr>
+<td>Conduct practical assessment</td>
+<td>Responsible to participate</td>
+<td>Consulted</td>
+<td>Responsible</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Accountable</td>
+<td>Informed</td>
+</tr>
+<tr>
+<td>Issue internal credential</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Responsible</td>
+<td>Accountable</td>
+</tr>
+<tr>
+<td>Record external credential</td>
+<td>Responsible to provide evidence</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Informed</td>
+<td>Responsible</td>
+<td>Accountable</td>
+</tr>
+<tr>
+<td>Waive or defer requirement</td>
+<td>Consulted</td>
+<td>Responsible to request</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Accountable</td>
+<td>Approves if policy requires</td>
+</tr>
+<tr>
+<td>Audit evidence export</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Consulted</td>
+<td>Informed</td>
+<td>Consulted</td>
+<td>Responsible</td>
+<td>Accountable</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-access-security-and-audit-expectations">5. Access, Security, And Audit Expectations</h2>
+<h3 id="51-access-model">5.1 Access Model</h3>
+<p>The LMS/QMS module uses Dashboard API v3 identity. Users should sign in with their assigned account. Shared accounts should not be used.</p>
+<p>Access decisions are based on:</p>
+<ul>
+<li>User role, such as <code>field_crew</code>, <code>field_ops_mgr</code>, <code>finance</code>, <code>business_dev</code>, or <code>ceo</code>.</li>
+<li>Resource capability, such as <code>lms</code>, <code>lms_assess</code>, <code>lms_extcred</code>, <code>lms_approve_policy</code>, <code>lms_approve_trade</code>, <code>lms_approve_compliance</code>, <code>lms_release</code>, or <code>lms_author</code>.</li>
+<li>Action, such as view, create, update, delete, approve, or reject.</li>
+<li>Context, such as learner identity, division, auditor posture, reviewer credential status, or per-user grant.</li>
+</ul>
+<h3 id="52-sensitive-actions">5.2 Sensitive Actions</h3>
+<p>Some LMS/QMS actions may require step-up authentication or elevated authority depending on platform configuration. Examples include:</p>
+<ul>
+<li>Course approval or release.</li>
+<li>Credential issuance, revocation, or expiration sweep.</li>
+<li>External credential attestation.</li>
+<li>Waiver, gate release, or record correction.</li>
+<li>Admin export or audit review.</li>
+</ul>
+<p><code>[TBD: information needed - exact step-up prompts and timeout values for LMS/QMS screens]</code></p>
+<h3 id="53-audit-expectations">5.3 Audit Expectations</h3>
+<p>Users should assume the following actions create audit evidence:</p>
+<ul>
+<li>Course creation, update, review, approval, rejection, release, retirement, or status change.</li>
+<li>Enrollment assignment, lesson completion, quiz attempt, and course completion.</li>
+<li>Practical assessment scheduling, scoring, submission, and lock.</li>
+<li>Credential issue, expire, revoke, and external credential attestation.</li>
+<li>Competency creation, ratification, prerequisite mapping, and standard revision.</li>
+<li>Onboarding record creation, task completion, acknowledgement, waiver, gate release, screening update, asset assignment, check-in, completion, cancellation, and export.</li>
+</ul>
+<p>Administrators should never bypass the application to alter evidence rows directly. If a correction is required, create a correction record, linked evidence, waiver, or CAPA entry.</p>
+<hr>
+<h2 id="6-end-to-end-lmsqms-workflow">6. End-To-End LMS/QMS Workflow</h2>
+<p>This section describes the normal lifecycle from requirement definition to learner readiness.</p>
+<h3 id="61-workflow-summary">6.1 Workflow Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Purpose</th>
+<th>Primary actor</th>
+<th>Output evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Define requirement</td>
+<td>Identify role, project, customer, safety, compliance, or quality requirement.</td>
+<td>Manager, QMS admin, compliance owner</td>
+<td>Requirement record or training need.</td>
+</tr>
+<tr>
+<td>2. Define competency</td>
+<td>Map the requirement to a competency or certification.</td>
+<td>LMS/QMS admin</td>
+<td>Competency registry entry.</td>
+</tr>
+<tr>
+<td>3. Build learning</td>
+<td>Create course, modules, lessons, quizzes, and practical rubric if needed.</td>
+<td>Course author</td>
+<td>Draft course and assessment content.</td>
+</tr>
+<tr>
+<td>4. Review content</td>
+<td>Route course through required approval track.</td>
+<td>Authorized reviewer</td>
+<td>Approval or rejection decision.</td>
+</tr>
+<tr>
+<td>5. Release content</td>
+<td>Release approved content for learner use.</td>
+<td>CEO or authorized release owner</td>
+<td>Published course status.</td>
+</tr>
+<tr>
+<td>6. Assign learning</td>
+<td>Assign to individual learners, roles, projects, or onboarding records.</td>
+<td>Manager or admin</td>
+<td>Enrollment or required assignment.</td>
+</tr>
+<tr>
+<td>7. Complete learning</td>
+<td>Learner completes lessons and required quiz.</td>
+<td>Learner</td>
+<td>Completion and attempt evidence.</td>
+</tr>
+<tr>
+<td>8. Assess practical skill</td>
+<td>Authorized assessor observes and records competence.</td>
+<td>Assessor</td>
+<td>Locked practical assessment record.</td>
+</tr>
+<tr>
+<td>9. Issue or record credential</td>
+<td>Internal credential is issued, or external credential is attested.</td>
+<td>LMS/QMS admin or authorized manager</td>
+<td>Credential evidence.</td>
+</tr>
+<tr>
+<td>10. Monitor readiness</td>
+<td>Manager reviews role readiness and exceptions.</td>
+<td>Manager</td>
+<td>Readiness report, matrix, or exception list.</td>
+</tr>
+<tr>
+<td>11. Maintain recertification</td>
+<td>Track expirations, revisions, retraining, and CAPA.</td>
+<td>Manager and admin</td>
+<td>Renewal, waiver, or corrective action evidence.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-workflow-checkpoints">6.2 Workflow Checkpoints</h3>
+<p>Use these checkpoints before marking a learner ready for role, project, or customer work.</p>
+<table>
+<thead>
+<tr>
+<th>Checkpoint</th>
+<th>Required question</th>
+<th>Evidence to verify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identity</td>
+<td>Is the learner the correct user record?</td>
+<td><code>{{Learner ID}}</code>, <code>{{Employee ID}}</code>, user status.</td>
+</tr>
+<tr>
+<td>Assignment</td>
+<td>Was the training assigned by an authorized actor?</td>
+<td>Enrollment or required assignment record.</td>
+</tr>
+<tr>
+<td>Course completion</td>
+<td>Are all required courses complete?</td>
+<td>Enrollment status and completion timestamp.</td>
+</tr>
+<tr>
+<td>Quiz completion</td>
+<td>Were required quizzes passed under the applicable rule?</td>
+<td>Quiz attempt record, score, pass/fail result.</td>
+</tr>
+<tr>
+<td>Practical competence</td>
+<td>Was observed skill assessed by an authorized assessor?</td>
+<td>Practical assessment result and locked submission.</td>
+</tr>
+<tr>
+<td>Internal certification</td>
+<td>Does the learner meet certification eligibility?</td>
+<td>Course, quiz, practical, and certification records.</td>
+</tr>
+<tr>
+<td>External credential</td>
+<td>Was external evidence attested by someone other than the learner?</td>
+<td>External credential record and attestor.</td>
+</tr>
+<tr>
+<td>Expiration</td>
+<td>Are all credentials active and unexpired?</td>
+<td>Credential status and expiration date.</td>
+</tr>
+<tr>
+<td>Waiver</td>
+<td>Are waivers approved, justified, time-bound, and auditable?</td>
+<td>Waiver record, approver, expiration, justification.</td>
+</tr>
+<tr>
+<td>CAPA</td>
+<td>If a gap exists, is corrective action documented?</td>
+<td>CAPA reference or linked corrective evidence.</td>
+</tr>
+</tbody>
+</table>
+<p>[Screenshot: Learner readiness page showing course, quiz, practical, credential, waiver, and expiration checkpoints]</p>
+<h3 id="63-course-approval-workflow">6.3 Course Approval Workflow</h3>
+<p>The documented course approval lifecycle is:</p>
+<ol>
+<li>Create or update course content in draft status.</li>
+<li>Select the approval track:</li>
+</ol>
+<ul>
+<li><code>policy_anchored</code></li>
+<li><code>trade_technical</code></li>
+<li><code>federal_compliance</code></li>
+</ul>
+<ol>
+<li>Submit the course for review.</li>
+<li>Authorized reviewer approves or rejects the course.</li>
+<li>Approved courses move to release-pending status.</li>
+<li>CEO or authorized release owner records the release.</li>
+<li>Released courses become published and available for assignment.</li>
+</ol>
+<p>Important controls:</p>
+<ul>
+<li>Trade-technical approval requires the reviewer to hold an active qualifying credential.</li>
+<li>Reviewer decisions should include reviewer identity, decision, timestamp, and justification when needed.</li>
+<li>CEO release override requires justification.</li>
+<li>Content should not be made available to learners until approval and release are complete.</li>
+</ul>
+<p><code>[TBD: information needed - final UI labels for approval track selection, review queue, and release action]</code></p>
+<hr>
+<h2 id="7-new-employee-onboarding-workflow">7. New Employee Onboarding Workflow</h2>
+<p>The onboarding process combines employment readiness, training assignment, policy acknowledgement, screening, assets, check-ins, and final completion.</p>
+<h3 id="71-onboarding-workflow-summary">7.1 Onboarding Workflow Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Purpose</th>
+<th>Typical owner</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Create onboarding record</td>
+<td>Start the employee onboarding lifecycle.</td>
+<td>HR/onboarding coordinator or manager</td>
+<td>Onboarding record.</td>
+</tr>
+<tr>
+<td>2. Assign onboarding tasks</td>
+<td>Define required administrative, safety, equipment, and training steps.</td>
+<td>HR/onboarding coordinator or manager</td>
+<td>Task records.</td>
+</tr>
+<tr>
+<td>3. Assign required training</td>
+<td>Connect learner to LMS courses, certifications, and acknowledgements.</td>
+<td>Manager or LMS/QMS admin</td>
+<td>Training assignment records.</td>
+</tr>
+<tr>
+<td>4. Collect acknowledgements</td>
+<td>Confirm receipt and acknowledgement of policies or required information.</td>
+<td>Learner</td>
+<td>Acknowledgement record.</td>
+</tr>
+<tr>
+<td>5. Complete screenings</td>
+<td>Record required screening status.</td>
+<td>Authorized coordinator</td>
+<td>Screening record.</td>
+</tr>
+<tr>
+<td>6. Assign assets</td>
+<td>Record issued equipment, credentials, or access items.</td>
+<td>Manager or asset owner</td>
+<td>Asset record.</td>
+</tr>
+<tr>
+<td>7. Review gates</td>
+<td>Confirm required tasks are complete or formally waived.</td>
+<td>Manager or authorized gate releaser</td>
+<td>Gate release or hold.</td>
+</tr>
+<tr>
+<td>8. Perform check-ins</td>
+<td>Document progress conversations and blockers.</td>
+<td>Manager or coordinator</td>
+<td>Check-in record.</td>
+</tr>
+<tr>
+<td>9. Complete onboarding</td>
+<td>Close the onboarding record when all requirements are satisfied.</td>
+<td>Manager or HR/onboarding coordinator</td>
+<td>Completion record.</td>
+</tr>
+</tbody>
+</table>
+<p>[Screenshot: Onboarding record page with tasks, training, acknowledgements, screenings, assets, gates, and check-ins]</p>
+<h3 id="72-create-a-new-onboarding-record">7.2 Create A New Onboarding Record</h3>
+<p>For HR/onboarding coordinators or authorized managers:</p>
+<ol>
+<li>Sign in to the TTIS dashboard.</li>
+<li>Open the onboarding area.</li>
+<li>Select the action to create a new onboarding record.</li>
+<li>Enter the required employee information:</li>
+</ol>
+<ul>
+<li><code>{{Employee Name}}</code></li>
+<li><code>{{Employee ID}}</code></li>
+<li><code>{{Learner ID}}</code></li>
+<li><code>{{Role}}</code></li>
+<li><code>{{Division}}</code></li>
+<li><code>{{Manager}}</code></li>
+<li><code>{{Start Date}}</code></li>
+<li><code>{{Work Location}}</code></li>
+<li><code>{{Project or Customer Assignment}}</code></li>
+</ul>
+<ol>
+<li>Select the onboarding template or requirement set.</li>
+<li>Review generated tasks, training assignments, acknowledgements, gates, screenings, and assets.</li>
+<li>Add any role-specific or project-specific requirements.</li>
+<li>Save the onboarding record.</li>
+<li>Confirm that the learner and manager can see the record.</li>
+</ol>
+<p><code>[TBD: information needed - final onboarding template names and required employee fields]</code></p>
+<h3 id="73-assign-training-during-onboarding">7.3 Assign Training During Onboarding</h3>
+<ol>
+<li>Open the employee onboarding record.</li>
+<li>Review the employee&#x27;s role and work assignment.</li>
+<li>Select required LMS courses or curriculum.</li>
+<li>Enter or confirm:</li>
+</ol>
+<ul>
+<li><code>{{Due Date}}</code></li>
+<li><code>{{Assigned By}}</code></li>
+<li><code>{{Reason or Basis}}</code></li>
+<li><code>{{Required Credential}}</code></li>
+<li><code>{{Practical Assessment Required}}</code></li>
+</ul>
+<ol>
+<li>Save the assignment.</li>
+<li>Verify the training appears on the learner&#x27;s LMS dashboard.</li>
+<li>If a practical assessment is required, schedule the assessment or identify the assessor.</li>
+</ol>
+<h3 id="74-complete-acknowledgements">7.4 Complete Acknowledgements</h3>
+<p>For learners:</p>
+<ol>
+<li>Open the onboarding record.</li>
+<li>Review each acknowledgement item.</li>
+<li>Open the policy, procedure, notice, or document.</li>
+<li>Read the full content.</li>
+<li>Select the acknowledgement action.</li>
+<li>Confirm acknowledgement only if the statement is accurate.</li>
+<li>Record questions or concerns through the manager or assigned coordinator.</li>
+</ol>
+<p>For administrators:</p>
+<ol>
+<li>Confirm the acknowledgement content is current.</li>
+<li>Confirm the acknowledgement record includes learner identity, timestamp, item version, and acknowledgement text or reference.</li>
+<li>Do not alter completed acknowledgement evidence. Use a new version or correction record if a change is required.</li>
+</ol>
+<h3 id="75-release-onboarding-gates">7.5 Release Onboarding Gates</h3>
+<p>Gate release should happen only when the required evidence is complete or a documented waiver exists.</p>
+<ol>
+<li>Open the onboarding record.</li>
+<li>Review each gate condition.</li>
+<li>Verify training completion, acknowledgements, screening status, asset assignment, and manager check-ins.</li>
+<li>Confirm waivers are approved, justified, and time-bound.</li>
+<li>Select the gate release action.</li>
+<li>Enter a release note:</li>
+</ol>
+<ul>
+<li><code>{{Gate Release Justification}}</code></li>
+<li><code>{{Evidence Reviewed}}</code></li>
+<li><code>{{Released By}}</code></li>
+</ul>
+<ol>
+<li>Save the gate release.</li>
+<li>Confirm the record status updates as expected.</li>
+</ol>
+<h3 id="76-complete-or-cancel-onboarding">7.6 Complete Or Cancel Onboarding</h3>
+<p>Complete onboarding when all required items are satisfied:</p>
+<ol>
+<li>Open the onboarding record.</li>
+<li>Confirm no required tasks are open, overdue, blocked, or missing evidence.</li>
+<li>Confirm required learning and credentials are complete.</li>
+<li>Confirm required assets, screenings, and acknowledgements are recorded.</li>
+<li>Add final notes.</li>
+<li>Mark the record complete.</li>
+</ol>
+<p>Cancel onboarding only when the onboarding process should stop:</p>
+<ol>
+<li>Open the onboarding record.</li>
+<li>Confirm cancellation is appropriate.</li>
+<li>Enter the cancellation reason.</li>
+<li>Notify affected managers and administrators.</li>
+<li>Cancel the record.</li>
+</ol>
+<p><code>[TBD: information needed - required approval authority for onboarding cancellation]</code></p>
+<hr>
+<h2 id="8-learner-step-by-step-guide">8. Learner Step-By-Step Guide</h2>
+<p>This section is for employees completing onboarding, required training, certifications, acknowledgements, quizzes, and practical assessments.</p>
+<h3 id="81-sign-in-and-find-your-learning">8.1 Sign In And Find Your Learning</h3>
+<ol>
+<li>Open the TTIS dashboard.</li>
+<li>Sign in with your assigned account.</li>
+<li>Complete MFA or step-up authentication if prompted.</li>
+<li>Open the learning, LMS, or training area.</li>
+<li>Review your assigned courses, due dates, certification requirements, and onboarding tasks.</li>
+<li>Confirm that your name and learner profile are correct.</li>
+</ol>
+<p>[Screenshot: Learner dashboard with assigned learning, due dates, and onboarding status]</p>
+<p>If an expected assignment is missing:</p>
+<ol>
+<li>Refresh the dashboard.</li>
+<li>Confirm you are signed in with the correct account.</li>
+<li>Check whether the assignment is listed under onboarding, curriculum, or certification requirements.</li>
+<li>Contact your manager or LMS/QMS administrator with:</li>
+</ol>
+<ul>
+<li><code>{{Your Name}}</code></li>
+<li><code>{{Employee ID}}</code></li>
+<li><code>{{Expected Course or Credential}}</code></li>
+<li><code>{{Due Date or Work Assignment}}</code></li>
+</ul>
+<h3 id="82-complete-a-course">8.2 Complete A Course</h3>
+<ol>
+<li>Select the assigned course.</li>
+<li>Review the course overview, prerequisites, due date, and completion requirements.</li>
+<li>Complete each module and lesson in order.</li>
+<li>Open all required documents, videos, or native lesson content.</li>
+<li>Mark lessons complete only after completing the required activity.</li>
+<li>Complete the quiz or knowledge check if required.</li>
+<li>Review your course status.</li>
+<li>Confirm the enrollment status shows completed when all requirements are satisfied.</li>
+</ol>
+<p>[Screenshot: Course detail page showing modules, lessons, completion status, quiz, and due date]</p>
+<h3 id="83-complete-a-quiz-or-knowledge-check">8.3 Complete A Quiz Or Knowledge Check</h3>
+<ol>
+<li>Open the course quiz.</li>
+<li>Review any instructions, allowed attempts, passing score, and time limit.</li>
+<li>Start the quiz when ready.</li>
+<li>Answer each question honestly and independently.</li>
+<li>Submit the quiz.</li>
+<li>Review the result shown by the system.</li>
+<li>If you do not pass, follow the displayed retake or lockout instruction.</li>
+<li>If the quiz is locked, contact your manager or administrator.</li>
+</ol>
+<p><code>[TBD: information needed - allowed attempts, lockout policy, passing score defaults, and retake waiting period]</code></p>
+<h3 id="84-complete-a-practical-assessment">8.4 Complete A Practical Assessment</h3>
+<p>Practical assessments document observed skill. They should be conducted by an authorized assessor.</p>
+<ol>
+<li>Confirm the assessment is scheduled or requested.</li>
+<li>Review the practical rubric or expected skill checklist.</li>
+<li>Prepare required tools, PPE, job materials, or practice environment.</li>
+<li>Meet with the assigned assessor.</li>
+<li>Perform the required task or demonstration.</li>
+<li>Ask the assessor for clarification if instructions are unclear.</li>
+<li>Review the result after the assessor submits the assessment.</li>
+<li>If the result is not passing, ask your manager for the retraining or reassessment path.</li>
+</ol>
+<p>[Screenshot: Practical assessment detail page showing rubric criteria and assessment status]</p>
+<h3 id="85-review-your-credentials">8.5 Review Your Credentials</h3>
+<ol>
+<li>Open your credential or competency record.</li>
+<li>Review active credentials, expiration dates, and required renewals.</li>
+<li>Check for expired, revoked, pending, or missing credentials.</li>
+<li>If you hold an external credential, provide evidence to the authorized attestor.</li>
+<li>Do not attest your own external credential. The system requires the attestor to be someone other than the learner.</li>
+</ol>
+<p>Evidence examples may include:</p>
+<ul>
+<li>Certificate image or PDF.</li>
+<li>Issuing body reference.</li>
+<li>Credential number.</li>
+<li>Issue date.</li>
+<li>Expiration date.</li>
+<li>Training provider documentation.</li>
+</ul>
+<p><code>[TBD: information needed - accepted file types and storage location for external credential evidence]</code></p>
+<h3 id="86-complete-onboarding-tasks">8.6 Complete Onboarding Tasks</h3>
+<ol>
+<li>Open your onboarding record.</li>
+<li>Review each assigned task.</li>
+<li>Complete tasks in the requested order.</li>
+<li>Complete required training and acknowledgements.</li>
+<li>Respond promptly to screening or asset requests.</li>
+<li>Attend scheduled check-ins.</li>
+<li>Notify your manager if a task is blocked.</li>
+<li>Confirm onboarding status is complete after all tasks are done and gates are released.</li>
+</ol>
+<h3 id="87-request-help">8.7 Request Help</h3>
+<p>Contact your manager or LMS/QMS administrator when:</p>
+<ul>
+<li>A course is missing.</li>
+<li>A course appears incorrect for your role.</li>
+<li>A quiz is locked.</li>
+<li>Your completion does not appear.</li>
+<li>Your practical assessment is missing or incorrect.</li>
+<li>Your external credential is not listed.</li>
+<li>Your onboarding task is blocked.</li>
+<li>You see another person&#x27;s data.</li>
+<li>You cannot access required content.</li>
+</ul>
+<p>Include:</p>
+<ul>
+<li><code>{{Your Name}}</code></li>
+<li><code>{{Employee ID}}</code></li>
+<li><code>{{Course or Credential Name}}</code></li>
+<li><code>{{Enrollment ID or Record ID if shown}}</code></li>
+<li><code>{{Screenshot or Error Message}}</code></li>
+<li><code>{{Date and Time}}</code></li>
+</ul>
+<hr>
+<h2 id="9-manager-step-by-step-guide">9. Manager Step-By-Step Guide</h2>
+<p>This section is for supervisors, field operations managers, and leaders responsible for readiness.</p>
+<h3 id="91-review-team-readiness">9.1 Review Team Readiness</h3>
+<ol>
+<li>Sign in to the TTIS dashboard.</li>
+<li>Open the LMS/QMS, readiness, competency matrix, or team learning view.</li>
+<li>Filter by team, role, division, project, customer, or requirement.</li>
+<li>Review each team member&#x27;s status:</li>
+</ol>
+<ul>
+<li>Assigned training.</li>
+<li>Overdue training.</li>
+<li>Quiz status.</li>
+<li>Practical assessment status.</li>
+<li>Active credentials.</li>
+<li>Expiring credentials.</li>
+<li>Waivers or exceptions.</li>
+</ul>
+<ol>
+<li>Export or save a report if needed for project readiness.</li>
+<li>Follow up on gaps before assigning restricted work.</li>
+</ol>
+<p>[Screenshot: Manager readiness matrix filtered by role, learner, and credential status]</p>
+<h3 id="92-assign-required-learning">9.2 Assign Required Learning</h3>
+<ol>
+<li>Open the learner&#x27;s competency or onboarding record.</li>
+<li>Select the required assignment action.</li>
+<li>Choose the course, curriculum, certification, or competency requirement.</li>
+<li>Enter:</li>
+</ol>
+<ul>
+<li><code>{{Learner ID}}</code></li>
+<li><code>{{Requirement}}</code></li>
+<li><code>{{Due Date}}</code></li>
+<li><code>{{Assignment Basis}}</code></li>
+<li><code>{{Project or Role Requirement}}</code></li>
+</ul>
+<ol>
+<li>Confirm whether a practical assessment is required.</li>
+<li>Save the assignment.</li>
+<li>Confirm the learner can see the assignment.</li>
+</ol>
+<h3 id="93-monitor-overdue-or-at-risk-items">9.3 Monitor Overdue Or At-Risk Items</h3>
+<ol>
+<li>Open expiring credentials, overdue training, or readiness reports.</li>
+<li>Sort by due date, severity, role, or project impact.</li>
+<li>Identify blocked learners.</li>
+<li>Contact each learner with a clear due date and next action.</li>
+<li>Escalate items that affect safety, customer access, regulated work, or contract requirements.</li>
+<li>Document follow-up in the onboarding record, readiness note, or applicable workflow.</li>
+</ol>
+<h3 id="94-schedule-or-review-practical-assessments">9.4 Schedule Or Review Practical Assessments</h3>
+<ol>
+<li>Confirm the learner completed prerequisite learning.</li>
+<li>Confirm an authorized assessor is available.</li>
+<li>Schedule the practical assessment.</li>
+<li>Confirm the rubric matches the skill being assessed.</li>
+<li>After submission, review the assessment result.</li>
+<li>If the learner did not pass, assign retraining or schedule reassessment.</li>
+<li>If the learner passed, verify certification eligibility updates.</li>
+</ol>
+<h3 id="95-request-a-waiver-or-exception">9.5 Request A Waiver Or Exception</h3>
+<p>Managers should use waivers only when company policy allows them.</p>
+<ol>
+<li>Identify the requirement that cannot be completed on time.</li>
+<li>Confirm the business reason.</li>
+<li>Confirm the risk of temporary waiver.</li>
+<li>Enter the waiver request:</li>
+</ol>
+<ul>
+<li><code>{{Learner ID}}</code></li>
+<li><code>{{Requirement}}</code></li>
+<li><code>{{Reason}}</code></li>
+<li><code>{{Effective Date}}</code></li>
+<li><code>{{Expiration Date}}</code></li>
+<li><code>{{Compensating Control}}</code></li>
+<li><code>{{Manager Justification}}</code></li>
+</ul>
+<ol>
+<li>Route the request for approval.</li>
+<li>Track the waiver until closed, expired, or replaced by completed evidence.</li>
+</ol>
+<p><code>[TBD: information needed - waiver approval levels by requirement type]</code></p>
+<h3 id="96-confirm-new-employee-onboarding-completion">9.6 Confirm New Employee Onboarding Completion</h3>
+<ol>
+<li>Open the onboarding record.</li>
+<li>Review all tasks, training, acknowledgements, screenings, assets, check-ins, and gates.</li>
+<li>Confirm no required item is incomplete unless a valid waiver exists.</li>
+<li>Confirm the learner has required credentials for assigned work.</li>
+<li>Record a final manager check-in.</li>
+<li>Mark onboarding ready for completion or notify the onboarding coordinator.</li>
+</ol>
+<hr>
+<h2 id="10-administrator-step-by-step-guide">10. Administrator Step-By-Step Guide</h2>
+<p>This section is for LMS/QMS administrators, course authors, compliance owners, and authorized administrative users.</p>
+<h3 id="101-create-a-course">10.1 Create A Course</h3>
+<ol>
+<li>Sign in with an account authorized to create LMS content.</li>
+<li>Open the LMS administration or course authoring area.</li>
+<li>Select create course.</li>
+<li>Enter course metadata:</li>
+</ol>
+<ul>
+<li><code>{{Course Code}}</code></li>
+<li><code>{{Course Title}}</code></li>
+<li><code>{{Description}}</code></li>
+<li><code>{{Owner}}</code></li>
+<li><code>{{Approval Track}}</code></li>
+<li><code>{{Status}}</code></li>
+</ul>
+<ol>
+<li>Add modules in the correct order.</li>
+<li>Add lessons to each module.</li>
+<li>Add lesson content or references.</li>
+<li>Add prerequisites if required.</li>
+<li>Add quizzes, questions, passing criteria, and retake policy if required.</li>
+<li>Add competency mappings where applicable.</li>
+<li>Add a practical rubric if observed skill is required.</li>
+<li>Save the course as draft.</li>
+</ol>
+<p>[Screenshot: Course authoring page showing course metadata, modules, lessons, quiz, and competency mapping]</p>
+<h3 id="102-configure-approval-track">10.2 Configure Approval Track</h3>
+<ol>
+<li>Open the draft course.</li>
+<li>Select the approval track:</li>
+</ol>
+<ul>
+<li><code>policy_anchored</code></li>
+<li><code>trade_technical</code></li>
+<li><code>federal_compliance</code></li>
+</ul>
+<ol>
+<li>Confirm the track matches the content risk:</li>
+</ol>
+<ul>
+<li>Use policy-anchored for internal policy or standard operating procedure training.</li>
+<li>Use trade-technical for technical field skill content.</li>
+<li>Use federal-compliance for FAR, CMMC, customer, federal compliance, or regulated content where applicable.</li>
+</ul>
+<ol>
+<li>Save the approval track.</li>
+<li>Submit the course for review.</li>
+</ol>
+<h3 id="103-review-approve-reject-and-release-a-course">10.3 Review, Approve, Reject, And Release A Course</h3>
+<p>For reviewers:</p>
+<ol>
+<li>Open the pending review queue.</li>
+<li>Filter by approval track.</li>
+<li>Open the course.</li>
+<li>Review course title, description, modules, lessons, quizzes, prerequisites, competency mappings, rubrics, and references.</li>
+<li>Confirm you have authority and competence to review the selected track.</li>
+<li>Approve or reject the course.</li>
+<li>Enter review notes:</li>
+</ol>
+<ul>
+<li><code>{{Decision}}</code></li>
+<li><code>{{Reviewer Name}}</code></li>
+<li><code>{{Reviewer Credential if required}}</code></li>
+<li><code>{{Justification}}</code></li>
+</ul>
+<ol>
+<li>Save the review.</li>
+</ol>
+<p>For release owner:</p>
+<ol>
+<li>Open courses pending release.</li>
+<li>Confirm required approvals are complete.</li>
+<li>Confirm no rejected or unresolved review items remain.</li>
+<li>Record release.</li>
+<li>If overriding, enter override justification.</li>
+<li>Confirm the course is published.</li>
+</ol>
+<h3 id="104-create-or-update-competencies">10.4 Create Or Update Competencies</h3>
+<ol>
+<li>Open the competency registry.</li>
+<li>Search for an existing competency before creating a duplicate.</li>
+<li>Create or update the competency:</li>
+</ol>
+<ul>
+<li><code>{{Competency ID}}</code></li>
+<li><code>{{Competency Name}}</code></li>
+<li><code>{{Description}}</code></li>
+<li><code>{{Role Mapping}}</code></li>
+<li><code>{{Prerequisites}}</code></li>
+<li><code>{{Recertification Interval}}</code></li>
+<li><code>{{Standard Reference}}</code></li>
+</ul>
+<ol>
+<li>Add prerequisite relationships if required.</li>
+<li>Link lessons, quiz questions, practical criteria, or certifications to the competency.</li>
+<li>Ratify the competency if required.</li>
+<li>Record standard revisions when external standards or internal procedures change.</li>
+</ol>
+<h3 id="105-create-a-certification">10.5 Create A Certification</h3>
+<ol>
+<li>Open the certifications administration area.</li>
+<li>Select create certification.</li>
+<li>Enter:</li>
+</ol>
+<ul>
+<li><code>{{Certification Code}}</code></li>
+<li><code>{{Certification Name}}</code></li>
+<li><code>{{Description}}</code></li>
+<li><code>{{Required Curriculum}}</code></li>
+<li><code>{{Required Courses}}</code></li>
+<li><code>{{Required Quiz or Final Assessment}}</code></li>
+<li><code>{{Practical Rubric Required}}</code></li>
+<li><code>{{Expiration Period}}</code></li>
+<li><code>{{Renewal Requirements}}</code></li>
+</ul>
+<ol>
+<li>Save the certification.</li>
+<li>Verify eligibility logic using a test learner or review screen.</li>
+<li>Publish or activate according to policy.</li>
+</ol>
+<h3 id="106-issue-an-internal-credential">10.6 Issue An Internal Credential</h3>
+<ol>
+<li>Open the learner&#x27;s certification eligibility page.</li>
+<li>Confirm all curriculum courses are complete.</li>
+<li>Confirm final quiz or assessment is passed if required.</li>
+<li>Confirm practical assessment is passed if the certification has a practical rubric.</li>
+<li>Confirm there is no active disqualifying exception.</li>
+<li>Select issue credential.</li>
+<li>Enter:</li>
+</ol>
+<ul>
+<li><code>{{Learner ID}}</code></li>
+<li><code>{{Certification ID}}</code></li>
+<li><code>{{Issue Date}}</code></li>
+<li><code>{{Expiration Date}}</code></li>
+<li><code>{{Issued By}}</code></li>
+<li><code>{{Evidence Reviewed}}</code></li>
+</ul>
+<ol>
+<li>Save the credential.</li>
+<li>Confirm the credential appears in the learner&#x27;s active credential list.</li>
+</ol>
+<h3 id="107-record-an-external-credential">10.7 Record An External Credential</h3>
+<p>External credentials are earned outside the LMS and recorded by attestation. The learner should not attest their own external credential.</p>
+<ol>
+<li>Open the external credential entry screen.</li>
+<li>Select the learner.</li>
+<li>Enter:</li>
+</ol>
+<ul>
+<li><code>{{Credential Name}}</code></li>
+<li><code>{{Issuing Organization}}</code></li>
+<li><code>{{Credential Number}}</code></li>
+<li><code>{{Issue Date}}</code></li>
+<li><code>{{Expiration Date}}</code></li>
+<li><code>{{Evidence Reference}}</code></li>
+<li><code>{{Attestor}}</code></li>
+<li><code>{{Attestation Date}}</code></li>
+</ul>
+<ol>
+<li>Confirm the attestor is not the learner.</li>
+<li>Confirm evidence is sufficient under company policy.</li>
+<li>Save the external credential.</li>
+<li>Confirm the credential appears in the learner competency record.</li>
+</ol>
+<p><code>[TBD: information needed - approved external credential evidence standards and file handling rules]</code></p>
+<h3 id="108-manage-onboarding-records">10.8 Manage Onboarding Records</h3>
+<ol>
+<li>Open onboarding administration.</li>
+<li>Create or search for an onboarding record.</li>
+<li>Assign tasks, training, acknowledgements, screenings, assets, and check-ins.</li>
+<li>Monitor due dates and gate conditions.</li>
+<li>Process waivers only when authorized.</li>
+<li>Release gates only after evidence review.</li>
+<li>Export onboarding data when required for reporting.</li>
+<li>Complete or cancel records with documented reason.</li>
+</ol>
+<h3 id="109-review-integrity-status-and-record-history">10.9 Review Integrity Status And Record History</h3>
+<ol>
+<li>Open LMS administration.</li>
+<li>Select integrity status.</li>
+<li>Review the current audit-chain verification result.</li>
+<li>If integrity is healthy, record the date and result for audit readiness.</li>
+<li>If integrity check fails, stop normal evidence-changing activity and escalate immediately.</li>
+<li>Open record history for the affected record.</li>
+<li>Preserve all evidence and logs.</li>
+<li>Start incident, corrective action, or CAPA workflow according to policy.</li>
+</ol>
+<p>[Screenshot: LMS integrity status page showing chain verification result and record history link]</p>
+<hr>
+<h2 id="11-certification-and-credential-management">11. Certification And Credential Management</h2>
+<h3 id="111-internal-certifications">11.1 Internal Certifications</h3>
+<p>Internal certifications are earned through LMS-controlled requirements.</p>
+<p>The expected evidence set includes:</p>
+<ul>
+<li>Required course completions.</li>
+<li>Required quiz or assessment pass.</li>
+<li>Required practical assessment pass, when applicable.</li>
+<li>Credential issue record.</li>
+<li>Expiration or renewal schedule.</li>
+</ul>
+<p>Do not issue an internal credential when eligibility evidence is incomplete.</p>
+<h3 id="112-external-credentials">11.2 External Credentials</h3>
+<p>External credentials are recorded by attestation. Examples may include OSHA, BICSI, FOA, manufacturer training, or other industry credentials when applicable.</p>
+<p>External credential controls:</p>
+<ul>
+<li>The credential is not issued by the LMS.</li>
+<li>The attestor must not be the learner.</li>
+<li>Evidence should identify the issuing organization.</li>
+<li>Date fields are attested claims unless verified through an authoritative source.</li>
+<li>External credential records should include expiration dates when applicable.</li>
+</ul>
+<h3 id="113-expiration-and-renewal">11.3 Expiration And Renewal</h3>
+<p>Managers and administrators should monitor expiring credentials before they affect readiness.</p>
+<ol>
+<li>Open the expiring credentials report.</li>
+<li>Filter by date range:</li>
+</ol>
+<ul>
+<li><code>{{Within 30 Days}}</code></li>
+<li><code>{{Within 60 Days}}</code></li>
+<li><code>{{Within 90 Days}}</code></li>
+<li><code>{{Expired}}</code></li>
+</ul>
+<ol>
+<li>Notify affected learners and managers.</li>
+<li>Assign renewal training or request updated external evidence.</li>
+<li>Confirm renewal completion.</li>
+<li>Update credential status or issue a renewed credential.</li>
+</ol>
+<p><code>[TBD: information needed - official notification windows for expiring credentials]</code></p>
+<h3 id="114-revocation">11.4 Revocation</h3>
+<p>Credential revocation should be used when a credential is no longer valid.</p>
+<ol>
+<li>Confirm revocation authority.</li>
+<li>Review the credential record.</li>
+<li>Confirm the reason:</li>
+</ol>
+<ul>
+<li>Expired or invalid evidence.</li>
+<li>Incorrect issuance.</li>
+<li>Failed reassessment.</li>
+<li>Policy or compliance issue.</li>
+<li>Other documented reason.</li>
+</ul>
+<ol>
+<li>Record revocation reason.</li>
+<li>Save the revocation.</li>
+<li>Notify affected learner, manager, and compliance owner.</li>
+<li>Review downstream readiness impact.</li>
+</ol>
+<h3 id="115-certification-governance-checklist">11.5 Certification Governance Checklist</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Required evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Certification definition is approved</td>
+<td>Certification record and owner.</td>
+</tr>
+<tr>
+<td>Curriculum requirements are clear</td>
+<td>Required courses and assessments.</td>
+</tr>
+<tr>
+<td>Competencies are mapped</td>
+<td>Competency links and standard references.</td>
+</tr>
+<tr>
+<td>Practical criteria are defined</td>
+<td>Rubric and criteria.</td>
+</tr>
+<tr>
+<td>Issuance is eligibility-based</td>
+<td>Completion, quiz, and practical evidence.</td>
+</tr>
+<tr>
+<td>External credential is attested</td>
+<td>Attestor, evidence reference, issuing organization.</td>
+</tr>
+<tr>
+<td>Expiration is monitored</td>
+<td>Expiring report and renewal action.</td>
+</tr>
+<tr>
+<td>Revocation is documented</td>
+<td>Revocation reason and actor.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="12-qms-integration-and-competence-evidence">12. QMS Integration And Competence Evidence</h2>
+<p>The LMS/QMS module supports quality management by connecting training, competence, readiness, and audit evidence.</p>
+<h3 id="121-qms-evidence-types">12.1 QMS Evidence Types</h3>
+<table>
+<thead>
+<tr>
+<th>Evidence type</th>
+<th>Example</th>
+<th>Quality purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Course record</td>
+<td>Published course, approval track, release history</td>
+<td>Shows controlled training content.</td>
+</tr>
+<tr>
+<td>Enrollment record</td>
+<td>Assigned learner, due date, status</td>
+<td>Shows required learning assignment.</td>
+</tr>
+<tr>
+<td>Lesson completion</td>
+<td>Lesson completion timestamp</td>
+<td>Shows learner activity.</td>
+</tr>
+<tr>
+<td>Quiz attempt</td>
+<td>Score, pass/fail, attempt timestamp</td>
+<td>Shows knowledge assessment.</td>
+</tr>
+<tr>
+<td>Practical assessment</td>
+<td>Rubric, assessor, result, locked submission</td>
+<td>Shows observed skill competence.</td>
+</tr>
+<tr>
+<td>Credential record</td>
+<td>Active, expired, revoked, issue/expiration date</td>
+<td>Shows current qualification status.</td>
+</tr>
+<tr>
+<td>External credential attestation</td>
+<td>Issuer, credential number, attestor</td>
+<td>Shows outside qualification evidence.</td>
+</tr>
+<tr>
+<td>Competency matrix</td>
+<td>Role requirement, learner readiness</td>
+<td>Shows role-to-competence alignment.</td>
+</tr>
+<tr>
+<td>Onboarding acknowledgement</td>
+<td>Policy version and learner acknowledgement</td>
+<td>Shows receipt and acknowledgement.</td>
+</tr>
+<tr>
+<td>Waiver or exception</td>
+<td>Reason, approver, expiration</td>
+<td>Shows controlled deviation.</td>
+</tr>
+<tr>
+<td>CAPA reference</td>
+<td>Corrective action record</td>
+<td>Shows gap handling and remediation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="122-controlled-content-expectations">12.2 Controlled Content Expectations</h3>
+<p>Controlled training content should include:</p>
+<ul>
+<li>Course owner.</li>
+<li>Version or revision reference.</li>
+<li>Approval track.</li>
+<li>Reviewer decision.</li>
+<li>Release record.</li>
+<li>Standard or policy reference.</li>
+<li>Competency mapping.</li>
+<li>Effective date.</li>
+<li>Retirement or supersession status when applicable.</li>
+</ul>
+<p><code>[TBD: information needed - final document control numbering convention for LMS content]</code></p>
+<h3 id="123-standard-revisions">12.3 Standard Revisions</h3>
+<p>When a policy, customer requirement, technical standard, safety requirement, or compliance obligation changes:</p>
+<ol>
+<li>Record the standard revision.</li>
+<li>Identify affected courses, competencies, certifications, practical rubrics, and onboarding tasks.</li>
+<li>Update controlled content in draft status.</li>
+<li>Route updated content through the appropriate approval track.</li>
+<li>Release the updated content.</li>
+<li>Assign retraining or recertification as required.</li>
+<li>Preserve previous evidence and version history.</li>
+</ol>
+<h3 id="124-readiness-decisions">12.4 Readiness Decisions</h3>
+<p>A readiness decision should be based on current evidence, not informal knowledge.</p>
+<p>Before approving a person for role, project, customer, or regulated work:</p>
+<ol>
+<li>Confirm the learner identity.</li>
+<li>Review the competency matrix.</li>
+<li>Confirm required training completion.</li>
+<li>Confirm quiz or knowledge assessment completion.</li>
+<li>Confirm practical skill assessment completion where required.</li>
+<li>Confirm active credentials.</li>
+<li>Confirm external credentials are attested and not expired.</li>
+<li>Confirm no unresolved waiver, CAPA, or exception blocks readiness.</li>
+<li>Record the decision or export supporting evidence as needed.</li>
+</ol>
+<hr>
+<h2 id="13-reporting-and-audit-readiness">13. Reporting And Audit Readiness</h2>
+<h3 id="131-common-reports">13.1 Common Reports</h3>
+<table>
+<thead>
+<tr>
+<th>Report</th>
+<th>Purpose</th>
+<th>Typical audience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learner transcript</td>
+<td>Show an individual&#x27;s course, quiz, practical, and credential history.</td>
+<td>Learner, manager, auditor.</td>
+</tr>
+<tr>
+<td>Team readiness matrix</td>
+<td>Show readiness by role, competency, credential, or project.</td>
+<td>Managers, operations leaders.</td>
+</tr>
+<tr>
+<td>Expiring credentials</td>
+<td>Identify credentials nearing expiration.</td>
+<td>Managers, LMS/QMS admins.</td>
+</tr>
+<tr>
+<td>Course completion report</td>
+<td>Track assigned, in-progress, completed, waived, and overdue learning.</td>
+<td>Managers, LMS/QMS admins.</td>
+</tr>
+<tr>
+<td>Practical assessment report</td>
+<td>Review observed skill assessment status and outcomes.</td>
+<td>Field ops, QMS, auditors.</td>
+</tr>
+<tr>
+<td>External credentials report</td>
+<td>Review attested external qualifications.</td>
+<td>LMS/QMS admins, auditors.</td>
+</tr>
+<tr>
+<td>Onboarding status report</td>
+<td>Track onboarding task, gate, and completion status.</td>
+<td>HR/onboarding coordinators, managers.</td>
+</tr>
+<tr>
+<td>Integrity status report</td>
+<td>Confirm audit-chain health.</td>
+<td>Administrators, compliance reviewers.</td>
+</tr>
+<tr>
+<td>Record history</td>
+<td>Show evidence changes for a selected record.</td>
+<td>Auditors, administrators.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="132-prepare-for-an-audit">13.2 Prepare For An Audit</h3>
+<ol>
+<li>Confirm the audit scope:</li>
+</ol>
+<ul>
+<li><code>{{Audit Period}}</code></li>
+<li><code>{{Business Unit}}</code></li>
+<li><code>{{Project or Customer}}</code></li>
+<li><code>{{Learner Population}}</code></li>
+<li><code>{{Requirement Set}}</code></li>
+</ul>
+<ol>
+<li>Export or prepare the required reports.</li>
+<li>Verify LMS integrity status.</li>
+<li>Sample learner records for:</li>
+</ol>
+<ul>
+<li>Assignment evidence.</li>
+<li>Completion evidence.</li>
+<li>Quiz attempt evidence.</li>
+<li>Practical assessment evidence.</li>
+<li>Credential evidence.</li>
+<li>Waiver or CAPA evidence.</li>
+</ul>
+<ol>
+<li>Confirm controlled courses were approved and released.</li>
+<li>Confirm external credentials have independent attestation.</li>
+<li>Confirm expired or revoked credentials did not support current readiness.</li>
+<li>Document findings, exceptions, and follow-up actions.</li>
+</ol>
+<h3 id="133-evidence-package-checklist">13.3 Evidence Package Checklist</h3>
+<table>
+<thead>
+<tr>
+<th>Evidence package item</th>
+<th>Included?</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Audit scope and date range</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Integrity status result</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Learner list</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Training assignments</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Course completion records</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Quiz attempts</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Practical assessments</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Credential records</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>External credential attestations</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Waivers and CAPA references</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Course approval and release records</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+<tr>
+<td>Onboarding records</td>
+<td><code>{{Yes/No}}</code></td>
+<td><code>{{Notes}}</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>[TBD: information needed - approved export format, storage folder, and audit package naming convention]</code></p>
+<hr>
+<h2 id="14-exceptions-waivers-corrections-and-capa">14. Exceptions, Waivers, Corrections, And CAPA</h2>
+<h3 id="141-exception-types">14.1 Exception Types</h3>
+<table>
+<thead>
+<tr>
+<th>Exception type</th>
+<th>Use when</th>
+<th>Required controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Waiver</td>
+<td>A requirement is temporarily waived by authorized personnel.</td>
+<td>Reason, approver, expiration, compensating control.</td>
+</tr>
+<tr>
+<td>Deferral</td>
+<td>A required item is delayed but remains required.</td>
+<td>New due date, reason, manager approval.</td>
+</tr>
+<tr>
+<td>Correction</td>
+<td>Historical information needs correction without altering original evidence.</td>
+<td>New linked correction record, reason, actor.</td>
+</tr>
+<tr>
+<td>Revocation</td>
+<td>A credential is no longer valid.</td>
+<td>Reason, revocation actor, readiness review.</td>
+</tr>
+<tr>
+<td>CAPA</td>
+<td>A systemic or quality issue requires corrective/preventive action.</td>
+<td>Root cause, action owner, due date, closure evidence.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="142-waiver-procedure">14.2 Waiver Procedure</h3>
+<ol>
+<li>Confirm the requirement is eligible for waiver.</li>
+<li>Identify the learner, course, credential, onboarding task, or gate.</li>
+<li>Document why the requirement cannot be completed.</li>
+<li>Identify risk and compensating controls.</li>
+<li>Set an expiration date.</li>
+<li>Obtain approval from the required authority.</li>
+<li>Record the waiver.</li>
+<li>Monitor the waiver until it expires or the requirement is completed.</li>
+<li>Do not use a waiver to hide incomplete evidence.</li>
+</ol>
+<h3 id="143-correction-procedure">14.3 Correction Procedure</h3>
+<ol>
+<li>Identify the record that appears incorrect.</li>
+<li>Preserve the original record.</li>
+<li>Gather supporting evidence.</li>
+<li>Create a correction record or linked note.</li>
+<li>Enter:</li>
+</ol>
+<ul>
+<li><code>{{Original Record ID}}</code></li>
+<li><code>{{Correction Reason}}</code></li>
+<li><code>{{Corrected Value or Clarification}}</code></li>
+<li><code>{{Supporting Evidence}}</code></li>
+<li><code>{{Correction Actor}}</code></li>
+</ul>
+<ol>
+<li>Save the correction.</li>
+<li>Notify affected learner, manager, and compliance owner if readiness is impacted.</li>
+</ol>
+<h3 id="144-capa-procedure">14.4 CAPA Procedure</h3>
+<p>Use CAPA when a training, competence, onboarding, or credential issue indicates a broader quality problem.</p>
+<ol>
+<li>Identify the issue.</li>
+<li>Contain immediate risk.</li>
+<li>Record the affected learners, courses, credentials, onboarding records, or standards.</li>
+<li>Determine root cause.</li>
+<li>Define corrective action.</li>
+<li>Define preventive action if applicable.</li>
+<li>Assign an owner and due date.</li>
+<li>Link LMS/QMS evidence to the CAPA record:</li>
+</ol>
+<ul>
+<li><code>{{CAPA ID}}</code></li>
+<li><code>{{Affected Course ID}}</code></li>
+<li><code>{{Affected Credential ID}}</code></li>
+<li><code>{{Affected Learner ID}}</code></li>
+<li><code>{{Evidence Reference}}</code></li>
+</ul>
+<ol>
+<li>Verify completion.</li>
+<li>Close CAPA only after evidence supports closure.</li>
+</ol>
+<p><code>[TBD: information needed - CAPA system of record and link format if outside the LMS/QMS module]</code></p>
+<hr>
+<h2 id="15-notifications-and-escalations">15. Notifications And Escalations</h2>
+<p>The repository documents reports and status endpoints, but final notification timing and escalation policy are business-process decisions. Use this section as an operating model until the official schedule is confirmed.</p>
+<h3 id="151-recommended-notification-events">15.1 Recommended Notification Events</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Notify</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New training assigned</td>
+<td>Learner, manager</td>
+<td>Start required learning.</td>
+</tr>
+<tr>
+<td>Training due soon</td>
+<td>Learner, manager</td>
+<td>Prevent overdue status.</td>
+</tr>
+<tr>
+<td>Training overdue</td>
+<td>Learner, manager, operations owner</td>
+<td>Restore readiness.</td>
+</tr>
+<tr>
+<td>Quiz locked or failed repeatedly</td>
+<td>Learner, manager, LMS/QMS admin</td>
+<td>Trigger support or retraining.</td>
+</tr>
+<tr>
+<td>Practical assessment scheduled</td>
+<td>Learner, assessor, manager</td>
+<td>Coordinate observed assessment.</td>
+</tr>
+<tr>
+<td>Practical assessment failed</td>
+<td>Learner, manager</td>
+<td>Assign retraining or reassessment.</td>
+</tr>
+<tr>
+<td>Credential expiring</td>
+<td>Learner, manager, LMS/QMS admin</td>
+<td>Start renewal.</td>
+</tr>
+<tr>
+<td>Credential expired or revoked</td>
+<td>Learner, manager, operations owner</td>
+<td>Remove from restricted work until resolved.</td>
+</tr>
+<tr>
+<td>Course pending review</td>
+<td>Reviewer, course owner</td>
+<td>Complete approval gate.</td>
+</tr>
+<tr>
+<td>Course pending release</td>
+<td>CEO or release owner</td>
+<td>Publish approved content.</td>
+</tr>
+<tr>
+<td>Onboarding task overdue</td>
+<td>Learner, manager, onboarding coordinator</td>
+<td>Keep onboarding on schedule.</td>
+</tr>
+<tr>
+<td>Gate blocked</td>
+<td>Manager, onboarding coordinator</td>
+<td>Resolve missing evidence.</td>
+</tr>
+<tr>
+<td>Integrity check failure</td>
+<td>LMS/QMS admin, compliance owner, executive owner</td>
+<td>Protect evidence and investigate.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="152-escalation-model">15.2 Escalation Model</h3>
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Example</th>
+<th>Escalation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>Learner has non-critical training due soon.</td>
+<td>Learner reminder.</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>Required training overdue but work is not safety-critical or customer-restricted.</td>
+<td>Manager follow-up.</td>
+</tr>
+<tr>
+<td>High</td>
+<td>Credential expired for restricted work.</td>
+<td>Manager and operations owner action before assignment.</td>
+</tr>
+<tr>
+<td>Critical</td>
+<td>Audit integrity failure or unauthorized evidence change suspected.</td>
+<td>Immediate administrator, compliance, and executive escalation.</td>
+</tr>
+</tbody>
+</table>
+<p><code>[TBD: information needed - official escalation timeframes, notification channels, and owner list]</code></p>
+<hr>
+<h2 id="16-data-records-and-retention">16. Data, Records, And Retention</h2>
+<h3 id="161-recordkeeping-principles">16.1 Recordkeeping Principles</h3>
+<p>LMS/QMS records should be:</p>
+<ul>
+<li>Accurate.</li>
+<li>Attributable to a user or system actor.</li>
+<li>Legible and exportable.</li>
+<li>Timely.</li>
+<li>Complete for the decision being supported.</li>
+<li>Preserved for the configured retention period.</li>
+<li>Protected from unauthorized change.</li>
+<li>Corrected through linked evidence rather than destructive edits.</li>
+</ul>
+<h3 id="162-retention">16.2 Retention</h3>
+<p>The LMS architecture documents <code>LMS_RETENTION_DAYS</code> with a default of <code>2557</code>, approximately seven years. Company policy may require longer retention for certain contract, safety, HR, or quality records.</p>
+<p><code>[TBD: information needed - official company retention matrix by LMS/QMS record type]</code></p>
+<h3 id="163-sensitive-data">16.3 Sensitive Data</h3>
+<p>Do not enter unnecessary sensitive personal information into LMS/QMS free-text fields. Use only the data required for training, onboarding, credentialing, readiness, or audit evidence.</p>
+<p>Avoid entering:</p>
+<ul>
+<li>Social Security numbers.</li>
+<li>Dates of birth unless explicitly required by an approved process.</li>
+<li>Medical details.</li>
+<li>Unrelated disciplinary information.</li>
+<li>Customer-sensitive data not required for the training record.</li>
+</ul>
+<h3 id="164-data-quality-checks">16.4 Data Quality Checks</h3>
+<p>Administrators should periodically review:</p>
+<ul>
+<li>Duplicate learners.</li>
+<li>Missing employee IDs.</li>
+<li>Expired credentials still used for readiness.</li>
+<li>Waivers without expiration.</li>
+<li>Courses stuck in draft, pending review, or release pending.</li>
+<li>Practical assessments not submitted.</li>
+<li>Onboarding records not completed or cancelled.</li>
+<li>External credentials without independent attestation.</li>
+<li>Integrity status failures.</li>
+</ul>
+<hr>
+<h2 id="17-acceptance-criteria">17. Acceptance Criteria</h2>
+<p>The guide and LMS/QMS process should be considered complete when these outcomes are satisfied.</p>
+<h3 id="171-guide-acceptance-criteria">17.1 Guide Acceptance Criteria</h3>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Markdown version exists.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>HTML-ready version exists.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Learner, manager, and administrator instructions are included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Onboarding workflow is included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Certification and credential workflows are included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>QMS evidence and audit readiness are included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Exceptions, waivers, corrections, and CAPA are included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Screenshot placeholders are included.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Field placeholders use <code>{{Field Name}}</code> format.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+<tr>
+<td>Unknown information is marked with <code>[TBD: information needed]</code>.</td>
+<td><code>{{Pass/Fail}}</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="172-operational-acceptance-criteria">17.2 Operational Acceptance Criteria</h3>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Expected outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New employee onboarding can be created and tracked.</td>
+<td>Record includes tasks, training, acknowledgements, screenings, assets, gates, and check-ins.</td>
+</tr>
+<tr>
+<td>Learners can complete assigned training.</td>
+<td>Enrollment status and completion records are visible.</td>
+</tr>
+<tr>
+<td>Required quizzes are recorded.</td>
+<td>Quiz attempt evidence is available.</td>
+</tr>
+<tr>
+<td>Practical assessments are controlled.</td>
+<td>Assessments are submitted by authorized assessors and locked after submission.</td>
+</tr>
+<tr>
+<td>Internal credentials are eligibility-based.</td>
+<td>Credentials are not issued unless requirements are complete.</td>
+</tr>
+<tr>
+<td>External credentials are independently attested.</td>
+<td>Attestor is not the learner.</td>
+</tr>
+<tr>
+<td>Readiness can be reviewed.</td>
+<td>Manager can see gaps, active credentials, and exceptions.</td>
+</tr>
+<tr>
+<td>Audit evidence is available.</td>
+<td>Reports, record history, and integrity status can be reviewed.</td>
+</tr>
+<tr>
+<td>Exceptions are controlled.</td>
+<td>Waivers, corrections, revocations, and CAPA references are documented.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="18-troubleshooting">18. Troubleshooting</h2>
+<h3 id="181-learner-issues">18.1 Learner Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely cause</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I cannot see my course.</td>
+<td>Not assigned, wrong account, course not published, or access issue.</td>
+<td>Confirm account, refresh, contact manager/admin with course name and employee ID.</td>
+</tr>
+<tr>
+<td>My course will not show complete.</td>
+<td>Lesson, quiz, or prerequisite is incomplete.</td>
+<td>Review course detail and complete missing items.</td>
+</tr>
+<tr>
+<td>My quiz is locked.</td>
+<td>Attempt limit or lockout rule reached.</td>
+<td>Contact manager or LMS/QMS admin.</td>
+</tr>
+<tr>
+<td>My credential is missing.</td>
+<td>Eligibility not complete, issue step not performed, or external credential not attested.</td>
+<td>Review readiness and contact manager/admin.</td>
+</tr>
+<tr>
+<td>My onboarding task is blocked.</td>
+<td>Missing evidence, pending screening, asset issue, or gate hold.</td>
+<td>Contact manager or onboarding coordinator.</td>
+</tr>
+<tr>
+<td>I see incorrect information.</td>
+<td>Data entry issue or stale record.</td>
+<td>Report the issue. Do not edit unrelated records.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="182-manager-issues">18.2 Manager Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely cause</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Team readiness looks incomplete.</td>
+<td>Missing assignment, expired credential, or incomplete practical.</td>
+<td>Review learner record and assign missing requirement.</td>
+</tr>
+<tr>
+<td>Learner says training is complete but report says open.</td>
+<td>Quiz, lesson, or prerequisite may be incomplete.</td>
+<td>Open enrollment details and verify completion evidence.</td>
+</tr>
+<tr>
+<td>External credential cannot be recorded.</td>
+<td>Attestor may match learner or required field missing.</td>
+<td>Use independent attestor and complete all fields.</td>
+</tr>
+<tr>
+<td>Gate cannot be released.</td>
+<td>Required onboarding evidence missing.</td>
+<td>Review gate conditions and document waiver if allowed.</td>
+</tr>
+<tr>
+<td>Export is missing expected data.</td>
+<td>Filter, date range, or access scope may be wrong.</td>
+<td>Adjust filters or request admin review.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="183-administrator-issues">18.3 Administrator Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely cause</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Course cannot be published.</td>
+<td>Approval or release step incomplete.</td>
+<td>Check approval track, review log, and release status.</td>
+</tr>
+<tr>
+<td>Reviewer cannot approve trade content.</td>
+<td>Missing per-user grant or active qualifying credential.</td>
+<td>Confirm grants and reviewer credential status.</td>
+</tr>
+<tr>
+<td>Practical assessment cannot be submitted.</td>
+<td>Missing assessor access, rubric, or required fields.</td>
+<td>Verify <code>lms_assess</code> access and assessment configuration.</td>
+</tr>
+<tr>
+<td>Credential issue fails.</td>
+<td>Eligibility requirements incomplete.</td>
+<td>Check course, quiz, and practical requirements.</td>
+</tr>
+<tr>
+<td>Integrity status fails.</td>
+<td>Audit chain mismatch or evidence problem.</td>
+<td>Stop evidence-changing activity and escalate.</td>
+</tr>
+<tr>
+<td>Onboarding record cannot complete.</td>
+<td>Open tasks, blocked gates, missing screening, or missing training.</td>
+<td>Resolve evidence or record authorized waiver.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="184-escalation-checklist">18.4 Escalation Checklist</h3>
+<p>When escalating an issue, include:</p>
+<ul>
+<li><code>{{Issue Summary}}</code></li>
+<li><code>{{Affected User}}</code></li>
+<li><code>{{Employee ID}}</code></li>
+<li><code>{{Course ID}}</code></li>
+<li><code>{{Enrollment ID}}</code></li>
+<li><code>{{Credential ID}}</code></li>
+<li><code>{{Onboarding Record ID}}</code></li>
+<li><code>{{Error Message}}</code></li>
+<li><code>{{Date and Time}}</code></li>
+<li><code>{{Screenshot}}</code></li>
+<li><code>{{Business Impact}}</code></li>
+</ul>
+<hr>
+<h2 id="19-appendix-a-common-fields">19. Appendix A: Common Fields</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example or note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{{Employee ID}}</code></td>
+<td>Company employee identifier.</td>
+<td><code>[TBD: information needed - format]</code></td>
+</tr>
+<tr>
+<td><code>{{Learner ID}}</code></td>
+<td>LMS learner/user identifier.</td>
+<td>Same as VBS user identifier where configured.</td>
+</tr>
+<tr>
+<td><code>{{Course ID}}</code></td>
+<td>System course identifier.</td>
+<td>Course record primary key.</td>
+</tr>
+<tr>
+<td><code>{{Course Code}}</code></td>
+<td>Human-readable course code.</td>
+<td><code>[TBD: information needed - naming convention]</code></td>
+</tr>
+<tr>
+<td><code>{{Enrollment ID}}</code></td>
+<td>Assignment record identifier.</td>
+<td>Used for learner course progress.</td>
+</tr>
+<tr>
+<td><code>{{Certification ID}}</code></td>
+<td>Certification definition identifier.</td>
+<td>Used for eligibility and issuance.</td>
+</tr>
+<tr>
+<td><code>{{Credential ID}}</code></td>
+<td>Issued or recorded credential identifier.</td>
+<td>Used for active/expired/revoked status.</td>
+</tr>
+<tr>
+<td><code>{{Competency ID}}</code></td>
+<td>Competency registry identifier.</td>
+<td>Used for matrix and readiness.</td>
+</tr>
+<tr>
+<td><code>{{Practical Assessment ID}}</code></td>
+<td>Observed skill assessment identifier.</td>
+<td>Locked after submission.</td>
+</tr>
+<tr>
+<td><code>{{Onboarding Record ID}}</code></td>
+<td>Employee onboarding lifecycle record.</td>
+<td>Used for onboarding tracking.</td>
+</tr>
+<tr>
+<td><code>{{Task ID}}</code></td>
+<td>Onboarding task identifier.</td>
+<td>Used for task completion or waiver.</td>
+</tr>
+<tr>
+<td><code>{{Gate ID}}</code></td>
+<td>Onboarding gate identifier.</td>
+<td>Used for gate release.</td>
+</tr>
+<tr>
+<td><code>{{Evidence Reference}}</code></td>
+<td>Link, file reference, or external evidence identifier.</td>
+<td><code>[TBD: information needed - approved evidence storage pattern]</code></td>
+</tr>
+<tr>
+<td><code>{{CAPA ID}}</code></td>
+<td>Corrective/preventive action identifier.</td>
+<td><code>[TBD: information needed - CAPA system format]</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="20-appendix-b-key-api-surfaces">20. Appendix B: Key API Surfaces</h2>
+<p>The following API surfaces are included for administrators and technical reviewers. End users normally use dashboard screens rather than direct API calls.</p>
+<h3 id="201-lms-learning-and-course-apis">20.1 LMS Learning And Course APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v1/lms/courses</code></td>
+<td>Course list and course creation.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}</code></td>
+<td>Course detail and update.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/modules</code></td>
+<td>Course module management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/modules/{module_id}/lessons</code></td>
+<td>Lesson management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/prerequisites</code></td>
+<td>Course prerequisite management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/status</code></td>
+<td>Course status changes.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/enroll</code></td>
+<td>Learner enrollment.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments</code></td>
+<td>Enrollment list.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}</code></td>
+<td>Enrollment detail.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}/lessons/{lesson_id}/complete</code></td>
+<td>Lesson completion.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}/complete</code></td>
+<td>Course completion.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="202-quiz-and-assessment-apis">20.2 Quiz And Assessment APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/quizzes</code></td>
+<td>Course quiz management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/quizzes/{quiz_id}/questions</code></td>
+<td>Quiz question management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}/quizzes/{quiz_id}/serve</code></td>
+<td>Serve learner quiz.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}/quizzes/{quiz_id}/attempt</code></td>
+<td>Submit quiz attempt.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/quiz-escalations</code></td>
+<td>Quiz escalation review.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/enrollments/{enrollment_id}/quizzes/{quiz_id}/reset-lock</code></td>
+<td>Reset quiz lock where authorized.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/rubrics</code></td>
+<td>Practical rubric management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/practicals</code></td>
+<td>Practical assessment scheduling/list.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/practicals/{assessment_id}</code></td>
+<td>Practical assessment detail.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/practicals/{assessment_id}/results</code></td>
+<td>Practical assessment results.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/practicals/{assessment_id}/submit</code></td>
+<td>Submit and lock practical assessment.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="203-credential-competency-and-readiness-apis">20.3 Credential, Competency, And Readiness APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v1/lms/curricula</code></td>
+<td>Curriculum management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/certifications</code></td>
+<td>Certification management.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/certifications/{cert_id}/eligibility</code></td>
+<td>Certification eligibility review.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/certifications/{cert_id}/issue</code></td>
+<td>Issue internal credential.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/credentials</code></td>
+<td>Credential list.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/credentials/{credential_id}</code></td>
+<td>Credential detail.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/credentials/{credential_id}/revoke</code></td>
+<td>Revoke credential.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/credentials/external</code></td>
+<td>Record external credential.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/credentials</code></td>
+<td>Admin credential view.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/credentials/expire-sweep</code></td>
+<td>Expiration sweep.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/people/{learner_id}/competency-record</code></td>
+<td>Learner competency record.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/competency-matrix</code></td>
+<td>Competency matrix.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/readiness/{learner_id}</code></td>
+<td>Learner readiness.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/people/{learner_id}/assign-required</code></td>
+<td>Assign required competencies/training.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/standard-revisions</code></td>
+<td>Record standard revision.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/expiring</code></td>
+<td>Expiring credential report.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/competencies</code></td>
+<td>Competency registry.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/competencies/{competency_id}/ratify</code></td>
+<td>Ratify competency.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="204-approval-and-audit-apis">20.4 Approval And Audit APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/approval-track</code></td>
+<td>Configure approval track.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/submit-review</code></td>
+<td>Submit course for review.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/reviews/pending</code></td>
+<td>Pending review queue.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/approval-log</code></td>
+<td>Course approval log.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/review</code></td>
+<td>Approve or reject course.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/courses/{course_id}/release</code></td>
+<td>Release approved course.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/integrity</code></td>
+<td>Integrity status.</td>
+</tr>
+<tr>
+<td><code>/api/v1/lms/admin/records/{record_id}/history</code></td>
+<td>Record history.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="205-onboarding-apis">20.5 Onboarding APIs</h3>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v1/onboarding/records</code></td>
+<td>Create and list onboarding records.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}</code></td>
+<td>Onboarding record detail.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/tasks/{task_id}</code></td>
+<td>Onboarding task update.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}/acks</code></td>
+<td>Record acknowledgement.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/training/{training_id}</code></td>
+<td>Onboarding training update.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/training/{training_id}/waive</code></td>
+<td>Waive onboarding training.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/tasks/{task_id}/waive</code></td>
+<td>Waive onboarding task.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/gates/{gate_id}/release</code></td>
+<td>Release onboarding gate.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/screening/{screening_id}</code></td>
+<td>Screening update.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}/assets</code></td>
+<td>Assign onboarding assets.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/assets/{asset_id}</code></td>
+<td>Asset update.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}/checkins</code></td>
+<td>Record onboarding check-in.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}/complete</code></td>
+<td>Complete onboarding record.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/records/{record_id}/cancel</code></td>
+<td>Cancel onboarding record.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/export/{kind}</code></td>
+<td>Export onboarding data.</td>
+</tr>
+<tr>
+<td><code>/api/v1/onboarding/assistant</code></td>
+<td>Onboarding assistant support.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="21-appendix-c-screenshot-checklist">21. Appendix C: Screenshot Checklist</h2>
+<p>Replace each placeholder with a current screenshot when screenshots are approved for publication.</p>
+<table>
+<thead>
+<tr>
+<th>Placeholder</th>
+<th>Screenshot needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[Screenshot: LMS/QMS dashboard landing page showing learner assignments, certification status, and manager/admin navigation]</code></td>
+<td>LMS/QMS home or landing view.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Learner readiness page showing course, quiz, practical, credential, waiver, and expiration checkpoints]</code></td>
+<td>Readiness or competency matrix page.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Onboarding record page with tasks, training, acknowledgements, screenings, assets, gates, and check-ins]</code></td>
+<td>Onboarding record detail page.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Learner dashboard with assigned learning, due dates, and onboarding status]</code></td>
+<td>Learner assignment dashboard.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Course detail page showing modules, lessons, completion status, quiz, and due date]</code></td>
+<td>Learner course detail page.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Practical assessment detail page showing rubric criteria and assessment status]</code></td>
+<td>Practical assessment view.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Manager readiness matrix filtered by role, learner, and credential status]</code></td>
+<td>Manager team readiness view.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: Course authoring page showing course metadata, modules, lessons, quiz, and competency mapping]</code></td>
+<td>Course authoring page.</td>
+</tr>
+<tr>
+<td><code>[Screenshot: LMS integrity status page showing chain verification result and record history link]</code></td>
+<td>Integrity status page.</td>
+</tr>
+</tbody>
+</table>
+<p><code>[TBD: information needed - screenshot capture owner, redaction requirements, and publication approval process]</code></p>
+<hr>
+<h2 id="22-revision-history">22. Revision History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2026-06-23</td>
+<td>Codex</td>
+<td>Initial LMS/QMS learning, certifications, and onboarding guide in Markdown and HTML-ready formats.</td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>

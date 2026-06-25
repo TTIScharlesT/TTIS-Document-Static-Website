@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LoRA Fine-Tuning Manual Validation Kit</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+.doc-nav{max-width:920px; margin:-18px auto 24px; padding:0 24px;}
+.doc-nav-inner{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 16px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+.doc-nav a{display:inline-block; margin:.15rem .8rem .15rem 0; font-size:.92rem; font-weight:600;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .doc-nav{display:none}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+  .doc-nav{padding:0 12px}
+}
+.doc-footer{max-width:920px; margin:24px auto 0; padding:0 24px 48px; color:var(--muted); font-size:.9rem;}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>LoRA Fine-Tuning Manual Validation Kit</h1>
+    <p>Manual validation guide and injectable datasets for the LoRA fine-tuning control plane.</p>
+  </div>
+</header>
+<nav class="doc-nav" aria-label="Document navigation">
+  <div class="doc-nav-inner">
+    <a href="#introduction">Introduction</a><a href="#prerequisites">Prerequisites</a><a href="#installation">Installation</a><a href="#configuration">Configuration</a><a href="#troubleshooting">Troubleshooting</a><a href="#validation-checklist-results">Validation</a>
+  </div>
+</nav>
+<div class="wrap">
+  <main>
+    <section aria-label="Document content">
+      <article>
+<h1 id="lora-fine-tuning-manual-validation-kit">LoRA Fine-Tuning Manual Validation Kit</h1>
+<p>This kit validates the LoRA fine-tuning control plane end to end: consent, preflight, dataset preview, job creation, training manifests, evaluation gates, model registry, promotion, rollback, and audit evidence.</p>
+<p>It is designed for manual injection into an existing test tenant. Use an existing admin user so you can validate the UI with the same org that receives the data.</p>
+<h2 id="files">Files</h2>
+<ul>
+<li><code>01_seed_lora_training_dataset.sql</code> - opportunity, proposal, sections, section versions, and <code>ai_audit_log</code> rows for dataset preview/export.</li>
+<li><code>02_seed_completed_lora_job_fixture.sql</code> - completed job, manifest, registry entry, passing eval run, and lifecycle events.</li>
+<li><code>create_job_payload.json</code> - API payload for a real queued LoRA job.</li>
+<li><code>eval_gate_pass_payload.json</code> - evaluation gate config that should allow the completed fixture to promote.</li>
+<li><code>eval_gate_fail_payload.json</code> - intentionally strict gate used to verify promotion blocking.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>Apply migrations through <code>076_fine_tuning_registry_eval_manifest.sql</code>.</li>
+<li>Run API and web locally or in the target environment.</li>
+<li>Have an admin user you can log in as.</li>
+<li>Know that admin user's <code>org_id</code> and <code>user_id</code>.</li>
+<li>Set <code>AI_CONFIG_ENCRYPTION_KEY</code> in the API environment; AI provider config encryption requires it.</li>
+</ol>
+<p>Find a usable admin:</p>
+<pre><code class="language-sql">SELECT id AS user_id, org_id, email, name, system_roles
+FROM users
+WHERE active = true
+ORDER BY created_at DESC
+LIMIT 20;
+</code></pre>
+<h2 id="injection">Injection</h2>
+<p>Run these from the repo root with <code>psql</code>, replacing the two UUIDs:</p>
+<pre><code class="language-sql">\set org_id  'YOUR_EXISTING_ORG_UUID'
+\set user_id 'YOUR_EXISTING_ADMIN_USER_UUID'
+\i docs/testing/lora-fine-tuning-validation/01_seed_lora_training_dataset.sql
+</code></pre>
+<p>To validate promotion/rollback without running the fine-tuner:</p>
+<pre><code class="language-sql">\set org_id  'YOUR_EXISTING_ORG_UUID'
+\set user_id 'YOUR_EXISTING_ADMIN_USER_UUID'
+\i docs/testing/lora-fine-tuning-validation/02_seed_completed_lora_job_fixture.sql
+</code></pre>
+<p>Do not inject <code>02</code> into production-like data unless you explicitly want a synthetic completed model registry entry.</p>
+<h2 id="step-by-step-validation">Step-By-Step Validation</h2>
+<h3 id="1-enable-training-consent">1. Enable Training Consent</h3>
+<p>In Admin Console -&gt; AI Provider:</p>
+<ol>
+<li>Check <code>Allow org data to be used for local LoRA fine-tuning</code>.</li>
+<li>Save configuration.</li>
+</ol>
+<p>Expected:</p>
+<ul>
+<li>Save succeeds.</li>
+<li><code>GET /api/v1/admin/ai/config</code> returns <code>&quot;trainingDataOptIn&quot;: true</code>.</li>
+<li>Admin Console -&gt; AI Fine-Tuning -&gt; Preflight shows <code>Training consent</code> as <code>pass</code>.</li>
+</ul>
+<p>Evidence query:</p>
+<pre><code class="language-sql">SELECT provider, configured_at, updated_at
+FROM org_ai_configs
+WHERE org_id = 'YOUR_EXISTING_ORG_UUID';
+</code></pre>
+<p>The encrypted value is intentionally not human-readable.</p>
+<h3 id="2-validate-preflight">2. Validate Preflight</h3>
+<p>Open Admin Console -&gt; AI Fine-Tuning.</p>
+<p>Expected:</p>
+<ul>
+<li><code>Training consent</code> should pass after Step 1.</li>
+<li><code>Shared work directory</code> should pass if <code>FINE_TUNING_WORK_DIR</code> exists from the API container/process.</li>
+<li><code>Trainable model path</code> may warn if <code>FINE_TUNING_MODEL_PATH</code> is unset. That is acceptable for control-plane validation.</li>
+<li><code>Fine-tuner sidecar</code> passes only if the fine-tuner service is running.</li>
+</ul>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  http://localhost:3001/api/v1/fine-tuning/preflight
+</code></pre>
+<h3 id="3-validate-dataset-preview">3. Validate Dataset Preview</h3>
+<p>Admin Console -&gt; AI Fine-Tuning -&gt; Dataset preview -&gt; Preview.</p>
+<p>Expected:</p>
+<ul>
+<li><code>Exported</code> is at least <code>12</code>.</li>
+<li><code>Eligible</code> is at least <code>10</code>.</li>
+<li>Preview rows show hashes, section labels, character counts, and realistic GovCon text snippets.</li>
+</ul>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  &quot;http://localhost:3001/api/v1/fine-tuning/dataset-preview?maxSamples=12&amp;previewLimit=5&quot;
+</code></pre>
+<p>Evidence query:</p>
+<pre><code class="language-sql">SELECT action, section_type, COUNT(*)
+FROM ai_audit_log
+WHERE org_id = 'YOUR_EXISTING_ORG_UUID'
+  AND session_id = 'manual-lora-validation'
+GROUP BY action, section_type
+ORDER BY action, section_type;
+</code></pre>
+<h3 id="4-validate-evaluation-gate-configuration">4. Validate Evaluation Gate Configuration</h3>
+<p>Admin Console -&gt; AI Fine-Tuning -&gt; Evaluation gate.</p>
+<p>Set:</p>
+<ul>
+<li>Minimum samples: <code>10</code></li>
+<li>Minimum win rate: <code>0.5</code></li>
+<li>Max latency regression: <code>0.1</code></li>
+<li>Require golden set: unchecked</li>
+<li>Golden set JSON: contents of <code>eval_gate_pass_payload.json</code>'s <code>goldenSet</code></li>
+</ul>
+<p>Save Gate.</p>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -X PUT \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  --data @docs/testing/lora-fine-tuning-validation/eval_gate_pass_payload.json \
+  http://localhost:3001/api/v1/fine-tuning/evaluation-config
+</code></pre>
+<p>Expected:</p>
+<ul>
+<li>Save succeeds.</li>
+<li>Audit log contains <code>fine_tuning.eval_config_updated</code>.</li>
+</ul>
+<p>Evidence query:</p>
+<pre><code class="language-sql">SELECT name, thresholds, jsonb_array_length(golden_set) AS golden_prompts
+FROM fine_tuning_eval_configs
+WHERE org_id = 'YOUR_EXISTING_ORG_UUID'
+ORDER BY updated_at DESC
+LIMIT 3;
+</code></pre>
+<h3 id="5-validate-real-job-creation">5. Validate Real Job Creation</h3>
+<p>Use this only when the fine-tuner service is running or you intentionally want to test failure behavior.</p>
+<p>Admin Console -&gt; AI Fine-Tuning:</p>
+<ol>
+<li>Base model: <code>llama3.1:8b</code></li>
+<li>Max samples: <code>12</code></li>
+<li>Queue Fine-Tuning Job.</li>
+</ol>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -X POST \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  --data @docs/testing/lora-fine-tuning-validation/create_job_payload.json \
+  http://localhost:3001/api/v1/fine-tuning/jobs
+</code></pre>
+<p>Expected if fine-tuner is running:</p>
+<ul>
+<li>Job appears as <code>pending</code>, then <code>exporting</code>, <code>training</code>, <code>converting</code>, <code>validating</code>, <code>completed</code>.</li>
+<li>Manifest row is created after export.</li>
+<li>Registry row is created after model registration.</li>
+<li>Eval run is created after validation.</li>
+</ul>
+<p>Expected if fine-tuner is not running:</p>
+<ul>
+<li>Preflight sidecar check fails.</li>
+<li>If queued anyway through API, job should eventually fail with a clear fine-tuner connection error.</li>
+</ul>
+<h3 id="6-validate-manifest-registry-and-eval-without-real-training">6. Validate Manifest, Registry, And Eval Without Real Training</h3>
+<p>Run <code>02_seed_completed_lora_job_fixture.sql</code>, then refresh Admin Console -&gt; AI Fine-Tuning.</p>
+<p>Expected:</p>
+<ul>
+<li>Job history shows <code>pursuite-lora-validation-manual:ft-pass</code> as a completed job.</li>
+<li>Model registry shows <code>pursuite-lora-validation-manual:ft-pass</code> with status <code>registered</code>.</li>
+<li>The job has a passing eval run.</li>
+</ul>
+<p>API checks:</p>
+<pre><code class="language-bash">curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  http://localhost:3001/api/v1/fine-tuning/models/registry
+
+curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  http://localhost:3001/api/v1/fine-tuning/jobs/20000000-0000-0000-0000-000000000001/manifest
+
+curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  http://localhost:3001/api/v1/fine-tuning/jobs/20000000-0000-0000-0000-000000000001/evaluations
+</code></pre>
+<p>Evidence query:</p>
+<pre><code class="language-sql">SELECT r.model_tag, r.status, r.is_active, e.status AS eval_status, e.failure_reasons
+FROM fine_tuning_model_registry r
+LEFT JOIN fine_tuning_eval_runs e ON e.id = r.latest_eval_run_id
+WHERE r.org_id = 'YOUR_EXISTING_ORG_UUID'
+ORDER BY r.created_at DESC;
+</code></pre>
+<h3 id="7-validate-promotion">7. Validate Promotion</h3>
+<p>Click <code>Promote</code> on the completed fixture job.</p>
+<p>Expected:</p>
+<ul>
+<li>Request succeeds.</li>
+<li>Registry entry becomes <code>is_active = true</code>, <code>status = promoted</code>.</li>
+<li>AI provider config switches to <code>provider = custom</code> and encrypted config contains the promoted model.</li>
+<li>Audit log contains <code>fine_tuning.model_promoted</code>.</li>
+<li>Model lifecycle events include <code>promoted</code>.</li>
+</ul>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -X POST \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  --data '{}' \
+  http://localhost:3001/api/v1/fine-tuning/jobs/20000000-0000-0000-0000-000000000001/promote
+</code></pre>
+<p>Evidence query:</p>
+<pre><code class="language-sql">SELECT model_tag, status, is_active, promoted_at
+FROM fine_tuning_model_registry
+WHERE org_id = 'YOUR_EXISTING_ORG_UUID'
+ORDER BY updated_at DESC;
+
+SELECT action, target_type, target_id, created_at
+FROM audit_events
+WHERE org_id = 'YOUR_EXISTING_ORG_UUID'
+  AND action IN ('fine_tuning.model_promoted', 'fine_tuning.model_rolled_back', 'fine_tuning.eval_config_updated')
+ORDER BY created_at DESC;
+</code></pre>
+<h3 id="8-validate-rollback">8. Validate Rollback</h3>
+<p>Click <code>Roll Back</code> on the completed fixture job.</p>
+<p>Expected:</p>
+<ul>
+<li>Request succeeds.</li>
+<li>Previously active registry row becomes <code>is_active = false</code>, <code>status = retired</code>.</li>
+<li>AI provider custom model is set back to the job base model, <code>llama3.1:8b</code>.</li>
+<li>Audit log contains <code>fine_tuning.model_rolled_back</code>.</li>
+<li>Model lifecycle events include <code>rolled_back</code>.</li>
+</ul>
+<p>API equivalent:</p>
+<pre><code class="language-bash">curl -s -X POST \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  --data '{}' \
+  http://localhost:3001/api/v1/fine-tuning/jobs/20000000-0000-0000-0000-000000000001/rollback
+</code></pre>
+<h3 id="9-validate-promotion-blocking">9. Validate Promotion Blocking</h3>
+<p>Use the intentionally strict gate:</p>
+<pre><code class="language-bash">curl -s -X PUT \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  --data @docs/testing/lora-fine-tuning-validation/eval_gate_fail_payload.json \
+  http://localhost:3001/api/v1/fine-tuning/evaluation-config
+</code></pre>
+<p>Then create or inject a new eval run with <code>status = failed</code>, or run a new real job under the strict thresholds.</p>
+<p>Expected:</p>
+<ul>
+<li>Promotion returns HTTP <code>409</code>.</li>
+<li>Response message says the latest evaluation gate did not pass.</li>
+<li>Active model is not changed.</li>
+</ul>
+<p>Manual failed eval insert for the fixture:</p>
+<pre><code class="language-sql">INSERT INTO fine_tuning_eval_runs (
+  id, org_id, job_id, model_registry_id, eval_config_id, status,
+  scores, thresholds, golden_set_summary, failure_reasons
+) VALUES (
+  '20000000-0000-0000-0000-000000000099',
+  'YOUR_EXISTING_ORG_UUID',
+  '20000000-0000-0000-0000-000000000001',
+  '20000000-0000-0000-0000-000000000004',
+  '20000000-0000-0000-0000-000000000003',
+  'failed',
+  '{&quot;samplesUsed&quot;:12,&quot;winRate&quot;:0.72,&quot;latencyRegressionPct&quot;:-0.0667}'::jsonb,
+  '{&quot;minSamples&quot;:50,&quot;minWinRateFt&quot;:0.95,&quot;maxLatencyRegressionPct&quot;:-0.25,&quot;requireGoldenSet&quot;:true}'::jsonb,
+  '{&quot;promptCount&quot;:0,&quot;executionStatus&quot;:&quot;not_configured&quot;}'::jsonb,
+  '[&quot;samples_used 12 is below minimum 50&quot;,&quot;golden set is required but empty&quot;]'::jsonb
+) ON CONFLICT (id) DO NOTHING;
+
+UPDATE fine_tuning_model_registry
+SET latest_eval_run_id = '20000000-0000-0000-0000-000000000099'
+WHERE id = '20000000-0000-0000-0000-000000000004';
+</code></pre>
+<h2 id="passfail-checklist">Pass/Fail Checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Pass condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Training consent</td>
+<td>AI Provider config returns <code>trainingDataOptIn: true</code>; preflight consent check passes.</td>
+</tr>
+<tr>
+<td>Preflight</td>
+<td>Consent and work directory checks pass; sidecar accurately reports pass/fail based on runtime.</td>
+</tr>
+<tr>
+<td>Dataset preview</td>
+<td>Preview returns eligible samples and safe metadata/snippets from seeded proposal content.</td>
+</tr>
+<tr>
+<td>Job creation</td>
+<td>API accepts valid LoRA hyperparameters and enforces one active job per org.</td>
+</tr>
+<tr>
+<td>Export config</td>
+<td><code>train_config.json</code> uses requested hyperparameters and configured model path behavior.</td>
+</tr>
+<tr>
+<td>Manifest</td>
+<td><code>fine_tuning_training_manifests</code> has dataset checksum, paths, samples, hyperparameters, stats.</td>
+</tr>
+<tr>
+<td>Registry</td>
+<td><code>fine_tuning_model_registry</code> records completed model and active/retired state.</td>
+</tr>
+<tr>
+<td>Eval config</td>
+<td>Thresholds and golden-set JSON save and reload through API/UI.</td>
+</tr>
+<tr>
+<td>Eval runs</td>
+<td><code>fine_tuning_eval_runs</code> stores scores, thresholds, golden-set summary, failure reasons.</td>
+</tr>
+<tr>
+<td>Promotion</td>
+<td>Passing eval promotes model, updates registry, updates AI config, emits audit/event rows.</td>
+</tr>
+<tr>
+<td>Promotion block</td>
+<td>Failed latest eval returns HTTP 409 and does not change active model.</td>
+</tr>
+<tr>
+<td>Rollback</td>
+<td>Base model restored in AI config; registry active model retired; audit/event rows created.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cleanup">Cleanup</h2>
+<pre><code class="language-sql">BEGIN;
+DELETE FROM fine_tuning_model_events WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND job_id = '20000000-0000-0000-0000-000000000001';
+DELETE FROM fine_tuning_eval_runs WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND job_id = '20000000-0000-0000-0000-000000000001';
+DELETE FROM fine_tuning_model_registry WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND job_id = '20000000-0000-0000-0000-000000000001';
+DELETE FROM fine_tuning_training_manifests WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND job_id = '20000000-0000-0000-0000-000000000001';
+DELETE FROM fine_tuning_jobs WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND id = '20000000-0000-0000-0000-000000000001';
+DELETE FROM ai_audit_log WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND session_id = 'manual-lora-validation';
+DELETE FROM section_versions WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND id BETWEEN '10000000-0000-0000-0000-000000000201' AND '10000000-0000-0000-0000-000000000209';
+DELETE FROM sections WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND volume_id = '10000000-0000-0000-0000-000000000003';
+DELETE FROM volumes WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND id = '10000000-0000-0000-0000-000000000003';
+DELETE FROM proposals WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND id = '10000000-0000-0000-0000-000000000002';
+DELETE FROM opportunities WHERE org_id = 'YOUR_EXISTING_ORG_UUID' AND id = '10000000-0000-0000-0000-000000000001';
+COMMIT;
+</code></pre>
+<p><code>ai_audit_log</code> may be protected by immutability rules in some environments. If deletion is blocked, leave the seeded audit rows in the test tenant or restore from a test snapshot.</p>
+
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <p>Generated from README.md. Review all Information Not Yet Available items before publication.</p>
+</footer>
+</body>
+</html>

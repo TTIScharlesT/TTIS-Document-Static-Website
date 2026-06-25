@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocGuard AI Licensing</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1>DocGuard AI Licensing</h1>
+<p>Version: v1.2.0 RC1 U6.1</p>
+<p>DocGuard AI supports local trial operation, offline activation for controlled environments, and optional online activation through TSG License Manager.</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Product Identity" id="product-identity"><h2>Product Identity</h2>
+<p>| Field | Value |</p>
+<p>|---|---|</p>
+<p>| Product name | DocGuard AI |</p>
+<p>| Product ID | <code>docguard_ai</code> |</p>
+<p>| Product key prefix | <code>DGA</code> |</p>
+<p>| Edition | Core |</p>
+<p>Writing Assistant is included in Core and is not separately licensed.</p>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Product Key Format" id="product-key-format"><h2>Product Key Format</h2>
+<pre><code>
+DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Legacy <code>SSP-...</code> keys may be accepted only for RC compatibility.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="Check License Status" id="check-license-status"><h2>Check License Status</h2>
+<pre><code>
+sanitize license
+</code></pre>
+<p>In the desktop app, use:</p>
+<pre><code>
+Tools -&gt; License Status
+</code></pre>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Offline Activation" id="offline-activation"><h2>Offline Activation</h2>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Offline activation stores a local license cache under:</p>
+<pre><code>
+%APPDATA%\DocGuardAI\license.json
+</code></pre>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Online Activation" id="online-activation"><h2>Online Activation</h2>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX --online --server-url http://127.0.0.1:8010
+</code></pre>
+<p>Online activation, refresh, and deactivation use TSG License Manager when configured.</p>
+<p>Online license cache:</p>
+<pre><code>
+%APPDATA%\DocGuardAI\tsg_license.json
+</code></pre>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="Refresh" id="refresh"><h2>Refresh</h2>
+<pre><code>
+sanitize license --refresh --server-url http://127.0.0.1:8010
+</code></pre>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="Deactivate" id="deactivate"><h2>Deactivate</h2>
+<pre><code>
+sanitize license --deactivate
+sanitize license --deactivate --online --server-url http://127.0.0.1:8010
+</code></pre>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="Security Notes" id="security-notes"><h2>Security Notes</h2>
+<ul>
+<li>Do not include full product keys in screenshots or support tickets.</li>
+<li>Core document processing does not require cloud upload.</li>
+<li>Licensing and update-check requests contact TSG License Manager only when configured or explicitly invoked.</li>
+</ul>
+</section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

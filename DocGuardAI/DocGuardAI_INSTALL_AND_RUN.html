@@ -1,0 +1,67 @@
+﻿<!doctype html><html><head><meta charset="utf-8"><title>INSTALL_AND_RUN</title><style>body{font-family:Segoe UI,Arial,sans-serif;line-height:1.55;margin:32px;max-width:1060px;color:#0b2136}h1,h2,h3{color:#0b2136}code,pre{background:#f3f6f9;border:1px solid #d8dee6;border-radius:6px}code{padding:1px 4px}pre{padding:12px;overflow:auto}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #d8dee6;padding:8px;text-align:left}th{background:#f3f6f9}blockquote{border-left:4px solid #008c7f;padding-left:12px;color:#526579}</style></head><body>
+<h1>Install and Run DocGuard AI</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Status: Production release approved</p>
+<h2>Recommended Install</h2>
+<p>Run the approved installer:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<p>The installer is built from:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI
+</code></pre>
+<p>Installer behavior:</p>
+<ul>
+<li>Product name: <code>DocGuard AI</code></li>
+<li>Executable: <code>DocGuardAI.exe</code></li>
+<li>Default install root: <code>{autopf}\DocGuard AI</code></li>
+<li>Privileges: non-admin capable</li>
+<li>Desktop shortcut: current user when running without elevation</li>
+</ul>
+<h2>Portable Launch</h2>
+<p>For portable validation or controlled file-share deployment:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe
+</code></pre>
+<p>Do not use older <code>dist-*</code> folders for production validation.</p>
+<h2>Source Launch</h2>
+<p>Use source launch only for engineering validation.</p>
+<pre><code>
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -e .
+sanitize-gui
+</code></pre>
+<p>Alternative source launch:</p>
+<pre><code>
+py main.py
+py -m sanitize
+</code></pre>
+<h2>Command-Line Examples</h2>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+sanitize scan example.docx --profile aggressive --summary
+sanitize clean example.docx --profile aggressive --html-report auto
+sanitize run &quot;C:\Source&quot; --profile aggressive --html-report auto
+sanitize history --last 20
+</code></pre>
+<h2>Production Validation Evidence</h2>
+<p>The current release was approved after:</p>
+<ul>
+<li>Packaged EXE click-through QA passed.</li>
+<li>Installer link QA passed.</li>
+<li>Installed-app click-through QA passed.</li>
+<li>Dead-link scan passed.</li>
+<li>Missing-resource scan passed.</li>
+</ul>
+<p>Evidence files:</p>
+<pre><code>
+release\qa-packaged-ui-polish-clickthrough.json
+release\qa-installed-clickthrough.json
+release\qa-manual-matrix.md
+</code></pre>
+</body></html>

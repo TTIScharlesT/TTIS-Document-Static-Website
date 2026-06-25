@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite - End-User Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite - End-User Guide</h1>
+    <p>A professional step-by-step guide to using Pursuite across the GovCon CRM, capture, proposal, compliance, and bid lifecycle.</p>
+  </div>
+</header>
+<div class="wrap">
+  <main>
+<h1 id="pursuite--end-user-guide">Pursuite — End-User Guide</h1>
+<p><em>A step-by-step guide to using Pursuite, the GovCon CRM and bid/capture lifecycle platform, for capture managers, proposal managers, BD leads, and organization admins.</em></p>
+<p>This guide follows the application sidebar from top to bottom. Each sidebar item has its own section. Large areas (such as the <strong>Proposals</strong> workspace) are broken into full subsections so you can find the exact task you need.</p>
+<h3 id="a-note-on-roles">A note on roles</h3>
+<p>Pursuite uses five roles. From most to least access, they are <strong>Admin</strong>, <strong>Proposal Manager</strong>, <strong>Writer</strong>, <strong>Executive Approver</strong>, and <strong>Read-Only</strong>. Most sidebar items are visible to everyone, but some items and some actions inside a screen are limited to certain roles. Each section's <strong>Who can use it</strong> tells you what you need.</p>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol start="0">
+<li><a href="#0-before-you-begin">Before You Begin</a>
+<ul>
+<li><a href="#01-how-to-use-this-guide">0.1 How to Use This Guide</a></li>
+<li><a href="#02-role-based-access-summary">0.2 Role-Based Access Summary</a></li>
+<li><a href="#03-end-to-end-workflow-playbooks">0.3 End-to-End Workflow Playbooks</a></li>
+</ul>
+</li>
+<li><a href="#1-home">Home</a></li>
+<li><strong>Contacts</strong>
+<ul>
+<li><a href="#21-accounts">2.1 Accounts</a></li>
+<li><a href="#22-crm-reports">2.2 CRM Reports</a></li>
+<li><a href="#23-pipeline">2.3 Pipeline</a>
+<ul>
+<li><a href="#231-opportunity-detail">2.3.1 Opportunity detail</a></li>
+<li><a href="#232-bid--no-bid-decision">2.3.2 Bid / No-Bid decision</a></li>
+<li><a href="#233-closing-out-an-opportunity">2.3.3 Closing out an opportunity</a></li>
+</ul>
+</li>
+<li><a href="#24-proposals">2.4 Proposals</a>
+<ul>
+<li><a href="#241-the-proposals-list">2.4.1 The proposals list</a></li>
+<li><a href="#242-the-proposal-workspace">2.4.2 The proposal workspace</a></li>
+<li><a href="#243-rfp-shredder">2.4.3 RFP Shredder</a></li>
+<li><a href="#244-compliance-matrix">2.4.4 Compliance Matrix</a></li>
+<li><a href="#245-section-editor-and-ai-drafting">2.4.5 Section Editor and AI drafting</a></li>
+<li><a href="#246-win-themes">2.4.6 Win Themes</a></li>
+<li><a href="#247-pricing-volume">2.4.7 Pricing Volume</a></li>
+<li><a href="#248-autonomous-proposal-pipeline">2.4.8 Autonomous Proposal Pipeline</a></li>
+<li><a href="#249-presentations">2.4.9 Presentations</a></li>
+<li><a href="#2410-ask-panel">2.4.10 Ask panel</a></li>
+<li><a href="#2411-discussion-team-timeline-export-and-debrief">2.4.11 Discussion, Team, Timeline, Export, and Debrief</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Quoting</strong>
+<ul>
+<li><a href="#31-catalog">3.1 Catalog</a></li>
+<li><a href="#32-quotes">3.2 Quotes</a>
+<ul>
+<li><a href="#321-quote-builder">3.2.1 Quote Builder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Resources</strong>
+<ul>
+<li><a href="#41-analytics">4.1 Analytics</a>
+<ul>
+<li><a href="#411-win-loss-report">4.1.1 Win-Loss report</a></li>
+</ul>
+</li>
+<li><a href="#42-calculator">4.2 Calculator</a></li>
+<li><a href="#43-compliance">4.3 Compliance</a>
+<ul>
+<li><a href="#431-scan-results">4.3.1 Scan results</a></li>
+</ul>
+</li>
+<li><a href="#44-content-library">4.4 Content Library</a></li>
+<li><a href="#45-dashboards">4.5 Dashboards</a></li>
+<li><a href="#46-intel">4.6 Intel</a></li>
+<li><a href="#47-templates">4.7 Templates</a></li>
+</ul>
+</li>
+<li><strong>Settings</strong>
+<ul>
+<li><a href="#51-integrations">5.1 Integrations</a></li>
+<li><a href="#52-scheduled-reports">5.2 Scheduled Reports</a></li>
+<li><a href="#53-workflows">5.3 Workflows</a></li>
+</ul>
+</li>
+<li><strong>System</strong>
+<ul>
+<li><a href="#61-admin">6.1 Admin</a></li>
+<li><a href="#62-help">6.2 Help</a></li>
+</ul>
+</li>
+<li><a href="#7-guided-setup">Guided Setup</a></li>
+<li><a href="#8-your-profile">Your profile</a></li>
+</ol>
+<p><em>Author-only appendix: <a href="#appendix-items-needing-verification">Items needing verification</a></em></p>
+<hr>
+<h2 id="0-before-you-begin">0. Before You Begin</h2>
+<p>This section explains how to use Pursuite effectively before you begin working through the feature-by-feature instructions. It is intended to make the guide easier to follow for new users, cross-functional teams, and organizations standardizing their capture-to-proposal process.</p>
+<h3 id="01-how-to-use-this-guide">0.1 How to Use This Guide</h3>
+<p>Each major section in this guide follows a consistent professional operating format:</p>
+<ul>
+<li><strong>What it's for</strong> explains the business purpose of the screen or workflow.</li>
+<li><strong>Who can use it</strong> explains role access and common permission boundaries.</li>
+<li><strong>Step by step</strong> provides the exact sequence to complete the workflow.</li>
+<li><strong>What success looks like</strong> describes the expected end state.</li>
+<li><strong>If something goes wrong</strong> lists common causes and practical corrections.</li>
+<li><strong>Tips &amp; things to watch for</strong> captures operational guidance that helps avoid rework.</li>
+<li><strong>Related sections</strong> points to the next area of the application.</li>
+</ul>
+<p>Recommended use:</p>
+<ol>
+<li>Start with the workflow playbook closest to your goal.</li>
+<li>Follow the numbered steps in order.</li>
+<li>Use the feature-specific section if you need more detail on a screen.</li>
+<li>Confirm the success state before moving to the next workflow.</li>
+<li>Ask an Admin or Proposal Manager if a control is hidden or unavailable.</li>
+</ol>
+<h3 id="02-role-based-access-summary">0.2 Role-Based Access Summary</h3>
+<p>Pursuite is role-aware. Your role determines which buttons, dialogs, and administrative controls you can see.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Primary Purpose</th>
+<th>Typical Actions</th>
+<th>Common Restrictions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin</td>
+<td>Tenant administration and operational governance</td>
+<td>Manage users, settings, integrations, audit evidence, templates, CUI controls, and all proposal-level workflows</td>
+<td>Should be used only for users with tenant-level responsibility</td>
+</tr>
+<tr>
+<td>Proposal Manager</td>
+<td>Capture and proposal leadership</td>
+<td>Create opportunities and proposals, manage proposal teams, upload and confirm RFP requirements, run compliance and pipeline workflows</td>
+<td>Cannot perform some tenant-only security or billing actions unless also Admin</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>Proposal contribution</td>
+<td>Draft assigned sections, use approved content, view RFP requirements and proposal context</td>
+<td>Cannot upload/replace RFPs, confirm requirements, administer users, or manage tenant settings</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Quality and SME review</td>
+<td>Review content, comment, participate in review workflows</td>
+<td>Usually cannot make structural or tenant-level changes</td>
+</tr>
+<tr>
+<td>Executive Approver</td>
+<td>Leadership decision authority</td>
+<td>Review bid/no-bid decisions and executive-level pursuit data</td>
+<td>Not intended for day-to-day writing or system administration</td>
+</tr>
+<tr>
+<td>Read-Only</td>
+<td>Observation and audit support</td>
+<td>View permitted records and reports</td>
+<td>Cannot edit records or run most workflows</td>
+</tr>
+</tbody>
+</table>
+<p>If this guide instructs you to click a button that you cannot see, first confirm your role and workspace membership. In most cases, the missing control is permission-gated rather than broken.</p>
+<h3 id="03-end-to-end-workflow-playbooks">0.3 End-to-End Workflow Playbooks</h3>
+<p>The playbooks below connect individual screens into complete operating workflows. Use them as the fastest path from a business objective to a finished outcome.</p>
+<h4 id="playbook-1-create-and-qualify-a-new-pursuit">Playbook 1: Create and Qualify a New Pursuit</h4>
+<p>Use this workflow when a new solicitation, customer opportunity, or potential bid enters the pipeline.</p>
+<ol>
+<li>Open <strong>Pipeline</strong>.</li>
+<li>Click <strong>+ New Opportunity</strong>, <strong>From Email</strong>, <strong>From RFP</strong>, or <strong>Import</strong>, depending on your source.</li>
+<li>Enter or verify the opportunity name and agency/customer.</li>
+<li>Add solicitation number, due date, estimated value, NAICS, set-aside, bid type, and source.</li>
+<li>Save the opportunity.</li>
+<li>Open the opportunity detail page.</li>
+<li>Upload source documents on the Documents tab if available.</li>
+<li>Complete bid/no-bid scoring.</li>
+<li>Submit the bid/no-bid decision for approval when your organization requires it.</li>
+<li>Record the decision.</li>
+<li>If the pursuit is approved, create a proposal workspace.</li>
+</ol>
+<p>Success state: the opportunity is active, key metadata is complete, the decision is recorded, and a proposal workspace exists when the organization intends to bid.</p>
+<h4 id="playbook-2-build-a-proposal-workspace-from-an-rfp">Playbook 2: Build a Proposal Workspace from an RFP</h4>
+<p>Use this workflow when a proposal team is ready to start structured proposal work.</p>
+<ol>
+<li>Open the approved opportunity.</li>
+<li>Create or open the proposal workspace.</li>
+<li>Confirm proposal metadata such as proposal name, due date, page limit, target format, and bid type.</li>
+<li>Add team members in the Team panel.</li>
+<li>Assign roles such as Proposal Manager, Writer, Reviewer, or Read Only.</li>
+<li>Select a template or manually create volumes and sections.</li>
+<li>Open <strong>RFP Shredder</strong>.</li>
+<li>Upload the solicitation PDF or DOCX.</li>
+<li>Wait for extraction to complete.</li>
+<li>Review extracted requirements.</li>
+<li>Edit incorrect rows, add missing requirements, delete false positives, and mark low-confidence rows reviewed.</li>
+<li>Confirm requirements.</li>
+<li>Open <strong>Compliance Matrix</strong> and generate the matrix.</li>
+<li>Assign proposal sections to writers.</li>
+<li>Begin drafting.</li>
+</ol>
+<p>Success state: the proposal has a team, structure, confirmed RFP requirements, and a generated compliance baseline.</p>
+<h4 id="playbook-3-draft-review-and-approve-proposal-sections">Playbook 3: Draft, Review, and Approve Proposal Sections</h4>
+<p>Use this workflow when writers and reviewers are producing proposal content.</p>
+<ol>
+<li>Open the proposal workspace.</li>
+<li>Select your assigned section.</li>
+<li>Read the section instructions, page limit, source material, and related RFP requirements.</li>
+<li>Draft content manually, from approved library content, or with AI assistance where permitted.</li>
+<li>Review AI-generated content for accuracy, grounding, and customer relevance.</li>
+<li>Save frequently.</li>
+<li>Check compliance alerts and page/word guidance.</li>
+<li>Move the section to the next status when ready.</li>
+<li>Request review or notify the assigned reviewer.</li>
+<li>Address comments and requested changes.</li>
+<li>Mark the section approved when the reviewer or Proposal Manager accepts it.</li>
+</ol>
+<p>Success state: every required section has current content, comments are resolved, and section status reflects the team's review process.</p>
+<h4 id="playbook-4-use-compliance-tools-before-final-review">Playbook 4: Use Compliance Tools Before Final Review</h4>
+<p>Use this workflow before color team review, management review, or final assembly.</p>
+<ol>
+<li>Confirm RFP requirements are confirmed in RFP Shredder.</li>
+<li>Open <strong>Compliance Matrix</strong>.</li>
+<li>Generate or refresh the compliance assessment.</li>
+<li>Review each requirement for addressed, partial, or missing coverage.</li>
+<li>Assign missing or weak requirements to sections.</li>
+<li>Open <strong>Compliance</strong> and run a compliance scan if available.</li>
+<li>Review critical and warning findings.</li>
+<li>Fix the proposal text or waive findings only when justified.</li>
+<li>Re-run the scan after major corrections.</li>
+<li>Export or save the compliance matrix for review if needed.</li>
+</ol>
+<p>Success state: critical compliance gaps are resolved or formally waived, and the team can explain how each RFP requirement is addressed.</p>
+<h4 id="playbook-5-assemble-export-and-close-out-a-proposal">Playbook 5: Assemble, Export, and Close Out a Proposal</h4>
+<p>Use this workflow when the proposal is ready for final production.</p>
+<ol>
+<li>Confirm all required sections are approved.</li>
+<li>Confirm compliance findings are resolved or accepted.</li>
+<li>Confirm pricing, attachments, and supporting files are current.</li>
+<li>Open the export or assembly panel.</li>
+<li>Choose the target format such as DOCX, PDF, or PDF/A.</li>
+<li>Start assembly.</li>
+<li>Review the generated file.</li>
+<li>Download before the signed link expires.</li>
+<li>Store the final file in your approved repository.</li>
+<li>Update proposal and opportunity status.</li>
+<li>After submission or award decision, record closeout details and debrief information.</li>
+</ol>
+<p>Success state: the team has a final export, proposal status is current, and the opportunity record reflects the latest business outcome.</p>
+<h4 id="playbook-6-recover-from-a-blocked-workflow">Playbook 6: Recover from a Blocked Workflow</h4>
+<p>Use this workflow when an expected action is unavailable or a workflow will not proceed.</p>
+<ol>
+<li>Read the visible error message.</li>
+<li>Confirm your system role.</li>
+<li>Confirm your proposal workspace role.</li>
+<li>Confirm prerequisite gates, such as RFP confirmation or review approval.</li>
+<li>Confirm the record is not archived or locked.</li>
+<li>Check whether the document is still processing.</li>
+<li>Ask a Proposal Manager or Admin to perform restricted actions.</li>
+<li>If the issue appears technical, capture the screen, time, record name, and error message before escalating.</li>
+</ol>
+<p>Success state: the blocker is resolved by completing the missing prerequisite, correcting permissions, or escalating with enough detail for support.</p>
+<hr>
+<h2 id="1-home">1. Home</h2>
+<p><strong>What it's for.</strong> Home is the landing screen you see after signing in. It gives you a single, at-a-glance view of your federal pipeline, your CRM deals, the proposals that need attention soon, and the work assigned to you. From here you can jump straight into any major area without hunting through the sidebar.</p>
+<p><strong>Who can use it.</strong> All roles. The greeting and the figures reflect your own organization's data; some panels only show numbers once there is data to show.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li>
+<p><strong>Read the welcome banner.</strong> At the top, Home greets you by name and shows today's date and your role.</p>
+</li>
+<li>
+<p><strong>Use the two quick buttons in the banner.</strong> <strong>View Pipeline</strong> opens your CRM opportunities; <strong>Contacts</strong> opens your accounts.</p>
+</li>
+<li>
+<p><strong>Choose which panels you see.</strong> Click the <strong>gear icon</strong> (labeled <em>Home settings</em>) in the banner to open the <strong>Visible Widgets</strong> menu, then turn panels on or off with the checkboxes:</p>
+<ul>
+<li><strong>Pipeline Trend</strong></li>
+<li><strong>My Work</strong></li>
+<li><strong>Team Productivity</strong></li>
+<li><strong>Deals by Stage</strong></li>
+<li><strong>Account Health</strong></li>
+<li><strong>Pending Bid Reviews</strong></li>
+</ul>
+<p>Your choices are remembered on this device the next time you sign in.</p>
+</li>
+<li>
+<p><strong>Scan the KPI strip.</strong> Six summary cards sit below the banner. Several are clickable and take you to the related screen:</p>
+<ul>
+<li><strong>Open Opportunities</strong> — count of pursuits not yet closed (opens the Pipeline).</li>
+<li><strong>BCP Pipeline</strong> — estimated total contract value of open pursuits (opens the Pipeline).</li>
+<li><strong>CRM Deal Value</strong> — open deal value from your CRM (opens CRM opportunities).</li>
+<li><strong>Bid Win Rate</strong> — your won-versus-lost percentage.</li>
+<li><strong>Open Deals</strong> — count of open CRM deals (opens CRM opportunities).</li>
+<li><strong>Proposals Due Soon</strong> — proposals due within seven days; this card turns red when any are due (opens Proposals).</li>
+</ul>
+</li>
+<li>
+<p><strong>Review the Bid Pipeline funnel.</strong> This panel lists each pipeline stage — <strong>Identified, Qualifying, Active, In Review, Submitted, Award Pending</strong> — with a bar and a count. Click any stage to open the Pipeline filtered to that stage. The footer shows <strong>Won</strong>, <strong>Lost</strong>, <strong>No Bid</strong> totals and your <strong>Win rate</strong>.</p>
+</li>
+<li>
+<p><strong>Check the side panels (when enabled):</strong></p>
+<ul>
+<li><strong>Proposals due soon</strong> — a warning card listing proposals due within seven days, with days remaining.</li>
+<li><strong>My Work</strong> — tasks assigned to you (for example, a bid decision, a section to write, or a section to review). Click a task to go straight to it. If you have none, you'll see &quot;You're all caught up.&quot;</li>
+<li><strong>Deals by Stage</strong> — your CRM funnel across <strong>Lead, Qualified, Proposal, Negotiation</strong>, with counts, values, and win rate.</li>
+<li><strong>Account Health</strong> — a breakdown of accounts by letter grade (A–F) and the average score out of 100.</li>
+</ul>
+</li>
+<li>
+<p><strong>Review Team Productivity (when enabled).</strong> Two tables show <strong>Writer Sections</strong> (active, in review, and completed sections per writer) and <strong>Proposal Managers</strong> (active proposals per manager). Your own row is highlighted.</p>
+</li>
+<li>
+<p><strong>Act on Pending Bid/No-Bid Reviews (when enabled).</strong> If bid/no-bid scores are waiting for your review, this amber panel lists them with their weighted score and who scored them. Click one to open its bid/no-bid review.</p>
+</li>
+<li>
+<p><strong>Use Quick Access.</strong> The tile row at the bottom links to <strong>Opportunities, Proposals, Win / Loss Report, Proposal Templates, SAM.gov Monitors,</strong> and <strong>Compliance</strong>.</p>
+</li>
+</ol>
+<p><strong>What success looks like.</strong> You land on Home with your name in the banner, the KPI cards populated, and the panels you enabled showing current figures.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>Panels show &quot;No data yet&quot; or &quot;—&quot;.</em> You have no records of that type yet (for example, no closed bids means no win rate). The panel fills in as you add and close work.</li>
+<li><em>A KPI card won't click.</em> Only some cards are links; the rest are display-only.</li>
+<li><em>A panel you wanted is missing.</em> Open the <strong>Home settings</strong> gear and re-enable it under <strong>Visible Widgets</strong>.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Win rate and trend only appear once bids have closed as won, lost, or no-bid.</li>
+<li>&quot;Proposals Due Soon&quot; counts only proposals that are not yet submitted and are due within seven days.</li>
+<li>Your widget choices are per-device, so a different computer may show a different layout.</li>
+</ul>
+<p><strong>Related sections.</strong> From Home you'll most often move to <a href="#23-pipeline">Pipeline</a>, <a href="#24-proposals">Proposals</a>, <a href="#21-accounts">Accounts</a>, or the <a href="#411-win-loss-report">Win-Loss report</a>.</p>
+<hr>
+<h2 id="2-contacts">2. Contacts</h2>
+<p>The <strong>Contacts</strong> group holds your customer relationship records and the reporting built on them: <strong>Accounts</strong>, <strong>CRM Reports</strong>, <strong>Pipeline</strong>, and <strong>Proposals</strong>.</p>
+<h3 id="21-accounts">2.1 Accounts</h3>
+<p><strong>What it's for.</strong> Accounts is your customer relationship list — the organizations you do business with or pursue. Each account gathers its contacts, opportunities, and interactions in one place, and carries a health grade so you can see at a glance which relationships are strong and which need attention.</p>
+<p><strong>Who can use it.</strong> All roles can open Accounts and view the list and account details. Creating, editing, deleting, and importing accounts require <strong>Proposal Manager</strong> or higher. Read-Only, Writer, and Executive Approver users see the list but not the <strong>+ New Account</strong>, <strong>Import CSV</strong>, <strong>Edit</strong>, or <strong>Delete</strong> controls.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li>
+<p><strong>Find an account.</strong> Use the <strong>Search accounts…</strong> box to search by name, and the <strong>Filter by industry…</strong> box to narrow by industry. The list updates as you type and resets to the first page.</p>
+</li>
+<li>
+<p><strong>Read the table.</strong> Columns are <strong>Name, Industry, Location, Employees, Health, Created</strong>. Click a <strong>Name</strong> to open that account's detail page.</p>
+</li>
+<li>
+<p><strong>Refresh a health grade.</strong> In the <strong>Health</strong> column, click the small circular-arrow button next to a grade to recalculate that account's health score. You'll see &quot;Health score refreshed.&quot;</p>
+</li>
+<li>
+<p><strong>Create an account (Proposal Manager+).</strong> Click <strong>+ New Account</strong>. In the <strong>New Account</strong> dialog, complete the fields:</p>
+<ul>
+<li><strong>Name</strong> (required).</li>
+<li><strong>Industry</strong>, <strong>Website</strong>, <strong>Primary Location</strong> (optional).</li>
+<li><strong>Employee Count</strong>, <strong>Annual Revenue ($)</strong> (optional, numbers).</li>
+</ul>
+<p>If a similar name already exists, Pursuite shows &quot;Similar accounts already exist&quot; with links so you can avoid duplicates. Click <strong>Create Account</strong> to save; you'll see &quot;Account &quot;…&quot; created.&quot;</p>
+</li>
+<li>
+<p><strong>Import accounts from a spreadsheet (Proposal Manager+).</strong> Click <strong>Import CSV</strong>. In the <strong>Import Accounts from CSV</strong> dialog:</p>
+<ul>
+<li>Choose your <strong>CSV File</strong> (it needs a header row and at least one data row).</li>
+<li>Map your columns to the account fields <strong>Name, Industry, Website, Phone, Email</strong>. <strong>Name</strong> is required; set any field you don't have to <strong>— Skip —</strong>. Matching columns are mapped automatically.</li>
+<li>Review the <strong>Preview (first 3 rows)</strong> and the total row count, then click <strong>Import</strong>.</li>
+<li>When it finishes you'll see how many accounts were created and any errors. Click <strong>Done</strong>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Edit an account (Proposal Manager+).</strong> Click <strong>Edit</strong> on a row and change any field in the <strong>Edit Account</strong> dialog, then <strong>Save Changes</strong>.</p>
+</li>
+<li>
+<p><strong>Delete an account (Proposal Manager+).</strong> Click <strong>Delete</strong>, then confirm in the <strong>Delete Account</strong> dialog. Deleting an account also removes its contacts, opportunities, and interactions.</p>
+</li>
+<li>
+<p><strong>Move through pages.</strong> Accounts are shown 25 per page. Use <strong>← Prev</strong>, the page numbers, and <strong>Next →</strong> at the bottom.</p>
+</li>
+</ol>
+<p><strong>What success looks like.</strong> New or edited accounts appear in the list immediately, with a confirmation message. Imported accounts appear with a created-count summary. Deleted accounts disappear from the list.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Name is required.&quot;</em> The account name is blank — enter a name before saving.</li>
+<li><em>&quot;Similar accounts already exist.&quot;</em> A close match was found. Open the linked account to check before creating a duplicate.</li>
+<li><em>&quot;You must map the Name column.&quot;</em> During CSV import you didn't assign a column to <strong>Name</strong> — map it, then import.</li>
+<li><em>&quot;No valid rows to import.&quot;</em> None of your rows had a name in the mapped Name column — check your file and mapping.</li>
+<li><em>No <strong>+ New Account</strong>, <strong>Edit</strong>, or <strong>Delete</strong> buttons.</em> Your role is below Proposal Manager; ask an Admin or Proposal Manager to make the change.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Health grades show only after a score has been calculated; use the refresh button on a row to generate one.</li>
+<li>Search needs at least three characters to check for duplicates while you type a new name.</li>
+<li>Deleting an account is far-reaching — it removes everything linked to it. Export or note anything you need first.</li>
+</ul>
+<p><strong>Related sections.</strong> Open an account to reach its contacts and opportunities; roll-ups of this data appear in <a href="#22-crm-reports">CRM Reports</a> and on <a href="#1-home">Home</a>.</p>
+<h3 id="22-crm-reports">2.2 CRM Reports</h3>
+<p><strong>What it's for.</strong> CRM Reports turns your accounts and deals into analytics: where deals sit in the funnel, how they convert from one stage to the next, how healthy your accounts are, and which open opportunities are worth the most. Use it to spot where the pipeline is thin and which relationships need attention. (The screen's heading reads <strong>Contact Reports</strong>.)</p>
+<p><strong>Who can use it.</strong> All roles. The figures reflect your organization's CRM data and update as accounts and deals change.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open the report.</strong> Selecting <strong>CRM Reports</strong> in the sidebar opens the dashboard with a row of summary cards across the top: <strong>Open Pipeline Value, Win Rate, Open Opportunities, Won,</strong> and <strong>Avg Health Score</strong>.</li>
+<li><strong>Refresh the data.</strong> Click <strong>Refresh</strong> (top right) to pull the latest figures.</li>
+<li><strong>Read Pipeline by Stage.</strong> This funnel lists each CRM stage — <strong>Lead, Qualified, Proposal, Negotiation, Won, Lost</strong> — with the number of opportunities and total value at each stage.</li>
+<li><strong>Read Account Health Distribution.</strong> This panel shows your average health score out of 100 and a bar for each grade (<strong>A — Excellent, B — Good, C — Fair, D — Weak, F — Critical</strong>) with counts and percentages. Any accounts that haven't been scored yet are noted at the bottom.</li>
+<li><strong>Review the Open Stage Breakdown table.</strong> Columns are <strong>Stage, Deals, Value, % of total</strong>, with an <strong>Open Total</strong> row at the bottom (the four open stages only).</li>
+<li><strong>Check Stage Conversion.</strong> Four figures show conversion between stages: <strong>Lead → Qualified, Qualified → Proposal, Proposal → Negotiation,</strong> and <strong>Close Rate (Won)</strong>.</li>
+<li><strong>Scan Top Open Opportunities.</strong> Up to eight open deals, ranked by value. Click any one to open its account.</li>
+</ol>
+<p><strong>What success looks like.</strong> The cards and panels show current numbers, and the funnel, tables, and top-opportunity list reflect your live pipeline.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;No data&quot; or &quot;No health scores yet.&quot;</em> You don't have enough records yet — add accounts and opportunities (and calculate health scores on the Accounts screen) to populate the report.</li>
+<li><em>Numbers look stale.</em> Click <strong>Refresh</strong>.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Health scores are calculated nightly or on demand; if a grade is missing, recalculate it from the Accounts screen.</li>
+<li>The <strong>Open Stage Breakdown</strong> total covers only the open stages (Lead, Qualified, Proposal, Negotiation), so it won't match counts that include Won/Lost.</li>
+</ul>
+<p><strong>Related sections.</strong> Drill into a deal via <a href="#21-accounts">Accounts</a>; for bid/proposal outcomes (won/lost) see <a href="#41-analytics">Analytics</a> and the <a href="#411-win-loss-report">Win-Loss report</a>.</p>
+<h3 id="23-pipeline">2.3 Pipeline</h3>
+<p><strong>What it's for.</strong> The Pipeline (titled <strong>Opportunity Pipeline</strong>) is your working list of federal and other pursuits — every solicitation you're tracking, from first identified through award or loss. You filter, sort, and view it the way that suits you, move pursuits through their stages, and create new ones quickly from an email or an RFP file.</p>
+<p><strong>Who can use it.</strong> All roles can view the Pipeline and open any opportunity. Editing, deleting, closing out, moving stages, and bulk actions require <strong>Proposal Manager</strong> or higher. Recording an <em>approved</em> bid/no-bid decision is reserved for <strong>Executive Approver</strong> or higher (see <a href="#232-bid--no-bid-decision">Bid / No-Bid decision</a>).</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li>
+<p><strong>Choose a view.</strong> Use the view toggle (top right) to switch between <strong>list</strong>, <strong>kanban</strong>, and <strong>timeline</strong>:</p>
+<ul>
+<li><strong>List</strong> — a sortable, paged table (50 per page). Sort by <strong>Date Added, Due Date, Value,</strong> or <strong>Name</strong>.</li>
+<li><strong>Kanban</strong> — columns by stage; drag a card to another column to change its stage (Proposal Manager+).</li>
+<li><strong>Timeline</strong> — pursuits grouped by the month they're due, with a &quot;No Due Date&quot; group at the end.</li>
+</ul>
+</li>
+<li>
+<p><strong>Search and filter.</strong> Type in <strong>Search name or agency…</strong>. Open the <strong>Filters</strong> panel on the left to narrow by:</p>
+<ul>
+<li><strong>Stage</strong> — tick any of <strong>Identified, Qualifying, Active, In Review, Submitted, Award Pending, Won, Lost, No Bid</strong>.</li>
+<li><strong>Bid Type</strong> — All Types, Federal, SLED, Commercial.</li>
+<li><strong>Set-Aside</strong> — Any Set-Aside, 8(a), HUBZone, SDVOSB, VOSB, WOSB, Small Business, Unrestricted.</li>
+<li><strong>NAICS Code</strong>, <strong>Est. Value Range</strong> (Min/Max), and <strong>Response Due</strong> (From/To).</li>
+</ul>
+<p>A count shows how many filters are active; click <strong>Clear</strong> to reset. Selected stages also appear as removable chips above the list.</p>
+</li>
+<li>
+<p><strong>Create from an email.</strong> Click <strong>✉️ From Email</strong>, paste the solicitation email, and click <strong>Parse Email</strong>. Pursuite extracts fields it recognizes (name, agency, solicitation number, value, due date, NAICS, set-aside, source). Review the extracted fields, then click <strong>Use Extracted Data →</strong> to open the <strong>New Opportunity</strong> form pre-filled for your check, and <strong>Add to Pipeline</strong>.</p>
+</li>
+<li>
+<p><strong>Create from an RFP file.</strong> Click <strong>📄 From RFP</strong> (or drag a PDF/DOCX anywhere onto the page — a &quot;Drop RFP to create opportunity&quot; overlay appears). Pursuite pre-fills the create form from the file name.</p>
+</li>
+<li>
+<p><strong>Import many at once.</strong> Click <strong>Import</strong> to open the import wizard and bring in a batch of opportunities.</p>
+</li>
+<li>
+<p><strong>Fill the New Opportunity form.</strong> Required fields are <strong>Opportunity Name</strong> and <strong>Agency / Customer</strong>. Optional fields include <strong>Account</strong>, <strong>Bid Type</strong> (Federal/SLED/Commercial), <strong>Set-Aside</strong>, <strong>Solicitation #</strong>, <strong>NAICS Code</strong>, <strong>Est. Value ($)</strong>, <strong>Response Due</strong>, and <strong>Source</strong>. Click <strong>Add to Pipeline</strong>; you'll see &quot;… added to pipeline.&quot;</p>
+</li>
+<li>
+<p><strong>Act on a row (Proposal Manager+).</strong> Each list row offers <strong>Edit</strong>, <strong>Delete</strong>, and — for pursuits that are <strong>Submitted</strong> or <strong>Award Pending</strong> — <strong>Close Out</strong>. Click a row's name to open the <a href="#231-opportunity-detail">opportunity detail</a>.</p>
+</li>
+<li>
+<p><strong>Work in bulk (Proposal Manager+).</strong> Tick the checkboxes (or <strong>Select all</strong>). A bulk bar appears: choose <strong>Move to stage…</strong> and click <strong>Apply</strong>, click <strong>Export CSV</strong>, or <strong>Delete</strong> the selected records (with a confirm step).</p>
+</li>
+<li>
+<p><strong>Export.</strong> With nothing selected, <strong>Export CSV</strong> from the bulk bar exports your current filtered list; with rows selected, it exports just those.</p>
+</li>
+</ol>
+<p><strong>What success looks like.</strong> New pursuits appear in the list with a confirmation message; stage changes, edits, and deletions take effect immediately; the count under the title shows the total and notes when the list is filtered.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Name is required.&quot; / &quot;Agency is required.&quot;</em> Fill both required fields before saving.</li>
+<li><em>&quot;Limited data extracted…&quot;</em> during email intake — the email didn't contain much Pursuite could recognize; fill the rest in by hand on the next step.</li>
+<li><em>&quot;Failed to move opportunity.&quot;</em> A stage change was rejected; check whether the pursuit conflicts with the target stage and try again.</li>
+<li><em>No <strong>Edit/Delete/Close Out</strong> buttons, or drag doesn't move cards.</em> Your role is below Proposal Manager.</li>
+<li><em>&quot;No opportunities match your filters.&quot;</em> Loosen or clear the filters with <strong>Clear all filters</strong>.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Due dates flag automatically: overdue shows in red, due within seven days in amber.</li>
+<li>Kanban and timeline load up to 200 matching pursuits at once for layout; list view is paged at 50.</li>
+<li>Always review extracted fields from email/RFP intake — pre-fill is a starting point, not a guarantee, especially for an amended solicitation or one missing its NAICS/set-aside.</li>
+<li>The empty Pipeline suggests creating opportunities from a contact so they stay linked to the right account.</li>
+</ul>
+<p><strong>Related sections.</strong> Open a pursuit to reach the <a href="#231-opportunity-detail">opportunity detail</a>; score a pursuit in <a href="#232-bid--no-bid-decision">Bid / No-Bid decision</a>; after award/loss, see <a href="#41-analytics">Analytics</a>.</p>
+<h4 id="231-opportunity-detail">2.3.1 Opportunity detail</h4>
+<p><strong>What it's for.</strong> The detail page is the full record for a single pursuit: its stage and key facts, its documents, its bid/no-bid decisions, the proposals and quotes attached to it, any teaming workspace, and a history of how its status changed over time.</p>
+<p><strong>Who can use it.</strong> All roles can open and read the detail. Editing, changing the stage, uploading documents, creating a proposal, and managing teaming require <strong>Proposal Manager</strong> or higher. Recording decisions requires <strong>Executive Approver</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open a pursuit.</strong> Click its name anywhere in the Pipeline. The header shows the name, reference ID, agency, bid type, and current status, with a stage-progress bar beneath.</li>
+<li><strong>Move between tabs.</strong> The tabs are <strong>Overview, Documents, Decision History, Proposals, Quotes, Teaming,</strong> and <strong>Timeline</strong> (Documents, Proposals, and Quotes show a count).</li>
+<li><strong>Change the stage (Proposal Manager+).</strong> On <strong>Overview</strong>, use the <strong>Current Stage</strong> selector to move the pursuit; you'll see &quot;Stage updated to ….&quot;</li>
+<li><strong>Edit key facts (Proposal Manager+).</strong> Click <strong>Edit</strong> to change name, agency, bid type, solicitation number, NAICS code, set-aside, estimated value, response due, and source.</li>
+<li><strong>Manage documents (Proposal Manager+).</strong> On <strong>Documents</strong>, upload files — only <strong>PDF (.pdf)</strong> and <strong>Word (.docx / .doc)</strong> are accepted, up to <strong>50 MB</strong>. Download links refresh if they expire.</li>
+<li><strong>Start a proposal (Proposal Manager+).</strong> On <strong>Proposals</strong>, create a proposal workspace for this pursuit. This is <strong>locked until an <em>Approved</em> bid/no-bid decision exists</strong> — until then you'll see &quot;Proposal creation is locked.&quot;</li>
+<li><strong>Review decisions.</strong> <strong>Decision History</strong> lists each bid/no-bid record with its weighted score and outcome. Executive Approvers can record the formal decision here.</li>
+<li><strong>Set up teaming (Proposal Manager+).</strong> On <strong>Teaming</strong>, create a teaming workspace and <strong>Add Teaming Partner</strong> (Company Name is required; CAGE Code, UEI, Contact Name, Contact Email, Role / Scope, and Work-Share % are optional). You can invite partners and share specific documents with them.</li>
+<li><strong>See linked quotes and history.</strong> <strong>Quotes</strong> lists pricing quotes tied to the pursuit; <strong>Timeline</strong> shows the status history in order.</li>
+</ol>
+<p><strong>What success looks like.</strong> Each change shows a confirmation (&quot;Stage updated…&quot;, &quot;… uploaded.&quot;, &quot;Opportunity updated.&quot;, &quot;Partner added.&quot;), and the tab counts update to match.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Proposal creation is locked.&quot;</em> You need an Approved bid/no-bid decision first — score and approve the pursuit, then return.</li>
+<li><em>&quot;Only PDF (.pdf) and Word (.docx / .doc) files are accepted (max 50 MB).&quot;</em> Convert or shrink the file and try again.</li>
+<li><em>&quot;Failed to update stage.&quot;</em> The stage change was rejected; pick a valid next stage.</li>
+<li><em>Edit/upload/stage controls are missing.</em> Your role is below Proposal Manager.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>A teaming partner's combined work-share across partners cannot exceed 100%.</li>
+<li>Documents shared with partners are clearly marked &quot;Shared with partners.&quot;</li>
+</ul>
+<p><strong>Related sections.</strong> Score the pursuit in <a href="#232-bid--no-bid-decision">Bid / No-Bid decision</a>; when it's submitted, <a href="#233-closing-out-an-opportunity">close it out</a>; build its bid in <a href="#24-proposals">Proposals</a>.</p>
+<h4 id="232-bid--no-bid-decision">2.3.2 Bid / No-Bid decision</h4>
+<p><strong>What it's for.</strong> The Bid/No-Bid screen helps your team decide whether a pursuit is worth bidding. Each reviewer rates the pursuit against weighted criteria; the system produces a single weighted score, and scores at or above the bid threshold are escalated to Executive Approvers for a formal decision.</p>
+<p><strong>Who can use it.</strong> Anyone who can open the pursuit can submit a score. Recording the formal <strong>approve / decline / more-info</strong> decision is reserved for <strong>Executive Approver</strong> or higher. Editing the org-wide scoring criteria is done from this screen too.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open the form.</strong> From the pursuit (or from Home's <em>Pending Bid/No-Bid Reviews</em>), open <strong>Bid / No-Bid Scoring</strong>.</li>
+<li><strong>Review prior scores.</strong> If teammates have already scored, their scores, comments, and decisions appear at the top, along with an averaged consensus score and whether it meets the threshold.</li>
+<li><strong>Score each criterion.</strong> For every criterion, rate it <strong>1–5</strong> and adjust its <strong>weight</strong>. The <strong>Weighted Total Score</strong> gauge updates as you go.</li>
+<li><strong>Add comments (optional).</strong> Use the <strong>Comments</strong> box (up to 2,000 characters) to note context, risks, or a recommendation.</li>
+<li><strong>Save or load weighting templates.</strong> Use <strong>⚙ Templates</strong> to save the current weights under a name, or load a saved set.</li>
+<li><strong>Manage criteria (optional).</strong> Click <strong>Manage Criteria</strong> to open <strong>Manage Scoring Criteria</strong>, where you add or remove criteria and set each weight. Criteria are org-wide and apply to all future scoring forms; each needs a lowercase, snake_case key and a label. If the weights don't total 100%, they're normalized automatically.</li>
+<li><strong>Submit.</strong> Click <strong>Submit Score</strong> (or <strong>Submit &amp; Notify Approvers</strong> when the score meets the threshold). You'll see a confirmation and return to the pursuit.</li>
+<li><strong>Record the decision (Executive Approver+).</strong> When submissions exist, an approval panel lets an approver record <strong>Approved</strong>, <strong>Declined</strong>, or <strong>More Info</strong>.</li>
+</ol>
+<p><strong>What success looks like.</strong> Your score is saved and appears in the team list; if it met the threshold, Executive Approvers are notified. An approver's decision shows as <strong>✅ Approved</strong>, <strong>❌ Declined</strong>, or <strong>⏳ More Info</strong> on the pursuit's Decision History.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to submit scoring form.&quot;</em> Try again; if it persists, confirm criteria are loaded.</li>
+<li><em>No approval controls.</em> Recording the formal decision needs Executive Approver or higher.</li>
+<li><em>Submit is disabled.</em> There are no scoring criteria yet — add some via <strong>Manage Criteria</strong>.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>An <em>Approved</em> decision is what unlocks proposal creation on the pursuit.</li>
+<li>Editing criteria changes the form for everyone in your organization, not just this pursuit.</li>
+</ul>
+<p><strong>Related sections.</strong> Return to the <a href="#231-opportunity-detail">opportunity detail</a>; after an approval, create the bid in <a href="#24-proposals">Proposals</a>.</p>
+<h4 id="233-closing-out-an-opportunity">2.3.3 Closing out an opportunity</h4>
+<p><strong>What it's for.</strong> Closing out records the final outcome of a pursuit — won, lost, or no-bid — and captures a short debrief so the result feeds your win/loss analytics and lessons learned.</p>
+<p><strong>Who can use it.</strong> <strong>Proposal Manager</strong> or higher. <strong>Close Out</strong> appears only on pursuits that are <strong>Submitted</strong> or <strong>Award Pending</strong>.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Start the close-out.</strong> Click <strong>Close Out</strong> on the pursuit (in the Pipeline list, timeline, or detail). The <strong>Close Out Opportunity</strong> dialog opens, naming the pursuit.</li>
+<li><strong>Pick the outcome (required).</strong> Choose <strong>🏆 Win</strong>, <strong>❌ Loss</strong>, or <strong>⏭ No Bid</strong>.</li>
+<li><strong>Add outcome details.</strong>
+<ul>
+<li>For a win or loss: <strong>Contract Value ($)</strong> / <strong>Estimated Award Value ($)</strong>, <strong>Award Date</strong>, and <strong>Competitors</strong> (one per line).</li>
+<li>For a win: <strong>Win Themes</strong> (what made you win).</li>
+<li>For a loss: <strong>Loss Reasons</strong> (root cause).</li>
+<li>For any outcome: <strong>Lessons Learned</strong> and <strong>Customer Feedback</strong>.</li>
+</ul>
+</li>
+<li><strong>Confirm.</strong> Click <strong>🏆 Mark Won</strong>, <strong>❌ Mark Lost</strong>, or <strong>⏭ Mark No Bid</strong>. You'll see a confirmation and the pursuit moves to its closed status.</li>
+</ol>
+<p><strong>What success looks like.</strong> The pursuit shows as Won, Lost, or No Bid, and the debrief details flow into your win/loss reporting.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>No <strong>Close Out</strong> button.</em> The pursuit isn't in a closeable stage (only Submitted or Award Pending) or your role is below Proposal Manager.</li>
+<li><em>&quot;Failed to close out opportunity.&quot;</em> Try again; your status change and debrief are saved together.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The detail fields are optional, but the more you capture (especially loss reasons and lessons learned) the more useful your <a href="#411-win-loss-report">Win-Loss report</a> becomes.</li>
+</ul>
+<p><strong>Related sections.</strong> Outcomes appear in <a href="#41-analytics">Analytics</a> and the <a href="#411-win-loss-report">Win-Loss report</a>.</p>
+<h3 id="24-proposals">2.4 Proposals</h3>
+<p>The <strong>Proposals</strong> area is where you build the bid itself. It starts with a list of every proposal workspace, and each workspace is a full editing environment with volumes, sections, AI assistance, pricing, compliance, and export. Because it's large, it's documented in subsections below.</p>
+<h4 id="241-the-proposals-list">2.4.1 The proposals list</h4>
+<p><strong>What it's for.</strong> The proposals list shows every proposal workspace across your pipeline, with its status, due date, assembly state, and last-updated time, so you can find a proposal and jump into it — or nudge the team on one that's due soon.</p>
+<p><strong>Who can use it.</strong> All roles can view the list and open a proposal. Creating a proposal requires <strong>Proposal Manager</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li>
+<p><strong>Find a proposal.</strong> Type in <strong>Search proposals…</strong> to filter by name or proposal number.</p>
+</li>
+<li>
+<p><strong>Read the table.</strong> Columns are <strong>Proposal</strong> (with its version), <strong>Number</strong>, <strong>Status</strong> (draft, in progress, under review, submitted, archived), <strong>Due Date</strong>, <strong>Assembly</strong> (queued, running, ✓ assembled, failed), <strong>Last Updated</strong>, and <strong>Actions</strong>. Click any row to open the proposal.</p>
+</li>
+<li>
+<p><strong>Remind the team.</strong> In <strong>Actions</strong>, click <strong>Remind</strong> to send a due-date reminder. For proposals due within 48 hours the button shows <strong>⚠ Remind</strong>; after sending it shows &quot;Sent ✓.&quot;</p>
+</li>
+<li>
+<p><strong>Create a proposal (Proposal Manager+).</strong> Click <strong>+ New Proposal</strong>. In the <strong>New Proposal</strong> dialog:</p>
+<ul>
+<li><strong>Opportunity</strong> (required) — type at least two characters in <strong>Search opportunities…</strong> and pick one.</li>
+<li><strong>Proposal name</strong> (required).</li>
+<li><strong>Due date</strong> (optional).</li>
+<li><strong>Template</strong> (optional) — choose a published template, or <strong>No template — start blank</strong>.</li>
+</ul>
+<p>Click <strong>Create Proposal</strong>. The proposal number is generated for you, and you land in the new workspace.</p>
+</li>
+</ol>
+<p><strong>What success looks like.</strong> &quot;Proposal &quot;…&quot; created&quot; appears and the workspace opens. New proposals show in the list with a draft status.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>Create button is missing.</em> Your role is below Proposal Manager.</li>
+<li><em>No template options appear.</em> No templates have been published yet — you can start blank.</li>
+<li><em>Reminder didn't seem to send.</em> It only appears for proposals that aren't submitted or archived.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Choosing a published template auto-builds the volumes and sections for you; starting blank gives you an empty workspace to structure yourself.</li>
+</ul>
+<p><strong>Related sections.</strong> Opening a proposal takes you to the <a href="#242-the-proposal-workspace">proposal workspace</a>; proposals are created against a pursuit from <a href="#23-pipeline">Pipeline</a>.</p>
+<h4 id="242-the-proposal-workspace">2.4.2 The proposal workspace</h4>
+<p><strong>What it's for.</strong> The workspace is the home for a single proposal: an outline of volumes and sections on the left, a section editor in the center, and a toolbar of specialized panels (RFP requirements, compliance, AI pipeline, pricing, presentations, and more) across the top.</p>
+<p><strong>Who can use it.</strong> All roles can open a workspace. Managing structure (volumes, sections, status, locks, export, templates, the kickoff wizard) requires <strong>Proposal Manager</strong> or higher. Writers can edit the sections they're assigned. Some panels involve <strong>Executive Approver</strong> sign-off (noted in their subsections).</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Get your bearings.</strong> The left outline shows the proposal name, a <strong>status</strong> control, the due date, and an <strong>Est. cost</strong> button. The center is the editor; the top bar holds the breadcrumb (<strong>← Opportunity</strong>) and the panel buttons.</li>
+<li><strong>Set the status (Proposal Manager+).</strong> Use the status selector to move the proposal through <strong>Draft, In Progress, Under Review, Approved, Submitted,</strong> and <strong>Archived</strong>.</li>
+<li><strong>Build the structure (Proposal Manager+).</strong> Click <strong>Add volume</strong> (e.g., &quot;Technical Approach&quot;). Inside a volume, click the <strong>+</strong> to <strong>Add Section</strong> — give it a <strong>Section title</strong> (required) and, optionally, <strong>Instructions</strong>, a <strong>Page limit</strong>, and a <strong>Due date</strong>.</li>
+<li><strong>Open a section.</strong> Click any section in the outline to edit it (the first section opens automatically). See <a href="#245-section-editor-and-ai-drafting">Section Editor and AI drafting</a>.</li>
+<li><strong>Lock or unlock a section (Proposal Manager+).</strong> Use the lock toggle (🔒/🔓) on a section row to freeze its content as read-only or release it.</li>
+<li><strong>Assign a writer.</strong> With a section open, click <strong>Assign</strong> in the top bar and pick a person. If they aren't on the team yet, they're added automatically as a Writer.</li>
+<li><strong>Track cost.</strong> Click <strong>Est. cost</strong> to open the cost panel — see the current estimate, <strong>✏ Update Estimate</strong> (amount and optional note), any <strong>Linked Quotes</strong>, and the change history.</li>
+<li><strong>Open a specialized panel.</strong> From the top bar: <strong>📄 RFP</strong> (RFP Shredder), <strong>📋 Matrix</strong> (Compliance Matrix), <strong>🤖 Pipeline</strong> (Autonomous Pipeline), <strong>🎯 Win Themes</strong>, <strong>💰 Pricing</strong>, <strong>📊 Presentation</strong>, <strong>💬 Ask</strong>, <strong>💬 Discussion</strong>, <strong>📅 Timeline</strong>, <strong>📋 Debrief</strong>, <strong>🧮 Calculator</strong>, and (Proposal Manager+) <strong>✨ Kickoff wizard</strong> and <strong>📋 Save as Template</strong>.</li>
+<li><strong>Manage the team.</strong> Click <strong>Team (n)</strong> to open the workspace team.</li>
+<li><strong>Assemble and export (Proposal Manager+).</strong> Use <strong>Assemble &amp; Export</strong> at the bottom of the outline; once assembled it becomes <strong>↓ Download / Export</strong>.</li>
+</ol>
+<p><strong>What success looks like.</strong> Volumes and sections appear in the outline; status, locks, assignments, and cost changes each show a confirmation; the chosen panel slides in.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to load proposal workspace.&quot;</em> Reopen from the proposals list; the proposal may have been removed.</li>
+<li><em>Structure/status/export controls are missing.</em> Your role is below Proposal Manager.</li>
+<li><em>&quot;This section is locked by a Proposal Manager. Content is read-only.&quot;</em> Ask a Proposal Manager to unlock it.</li>
+<li><em>&quot;Your workspace is empty.&quot;</em> No volumes yet — add one (or start the proposal from a published template).</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li><strong>🧮 Calculator</strong> opens this proposal in the cost calculator and writes the result back as the estimated cost.</li>
+<li><strong>📋 Save as Template</strong> creates a <em>draft</em> template from this proposal's sections; an Admin must publish it before others can use it.</li>
+</ul>
+<p><strong>Related sections.</strong> Edit content in the <a href="#245-section-editor-and-ai-drafting">Section Editor</a>; finish with <a href="#2411-discussion-team-timeline-export-and-debrief">Export</a>.</p>
+<h4 id="243-rfp-shredder">2.4.3 RFP Shredder</h4>
+<p><strong>What it's for.</strong> The RFP Shredder reads your solicitation and pulls out the individual requirements so you don't have to transcribe them by hand. Confirming the requirement set unlocks the Compliance Matrix and the Autonomous Pipeline.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>📄 RFP</strong>) to those who can manage the proposal.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>📄 RFP</strong> in the workspace top bar.</li>
+<li><strong>Upload the solicitation.</strong> Upload a <strong>PDF or DOCX</strong> (up to <strong>50 MB</strong>). The assistant extracts requirements automatically.</li>
+<li><strong>Review the requirements.</strong> Each extracted requirement shows a confidence percentage and a category. Edit the text or category, <strong>Add Requirement</strong> for anything missed, or delete ones that don't apply. Low-confidence rows show <strong>Review required</strong> and must be edited or marked reviewed before confirmation.</li>
+<li><strong>Re-process if needed.</strong> Use the reprocess action to run extraction again. The existing visible requirements stay in place if the new extraction fails; they are replaced only after the new run succeeds.</li>
+<li><strong>Confirm.</strong> Click <strong>Confirm Requirements</strong>. You'll see &quot;Requirements confirmed! Compliance Matrix and Pipeline are now available.&quot;</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> The Shredder reads your uploaded solicitation document and produces a list of discrete requirements, each tagged with a category and a confidence score, drawn from the text of that document. You review, edit, add, or remove entries before confirming. Treat low-confidence items as a prompt to check the wording against the source, and add anything the assistant missed.</p>
+<p><strong>What success looks like.</strong> A confirmed requirement set, and the <strong>📋 Matrix</strong> and <strong>🤖 Pipeline</strong> panels become usable.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Only PDF and DOCX files are supported.&quot;</em> / <em>&quot;File exceeds the 50 MB limit.&quot;</em> Convert or shrink the file.</li>
+<li><em>&quot;Upload failed. Please try again.&quot;</em> Retry the upload.</li>
+<li><em>&quot;Review low-confidence requirements before confirming.&quot;</em> Edit each flagged row or mark it reviewed, then confirm again.</li>
+<li><em>&quot;Failed to confirm requirements.&quot;</em> Try again; nothing is lost.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>For an amended solicitation, re-upload or re-process the latest version and re-confirm so the matrix and pipeline use the current requirements.</li>
+<li>If an RFP is classified as CUI, an administrator must allow external CUI processing before the shredder can send that document to the AI provider.</li>
+</ul>
+<p><strong>Related sections.</strong> Feeds the <a href="#244-compliance-matrix">Compliance Matrix</a> and the <a href="#248-autonomous-proposal-pipeline">Autonomous Pipeline</a>.</p>
+<h4 id="244-compliance-matrix">2.4.4 Compliance Matrix</h4>
+<p><strong>What it's for.</strong> The Compliance Matrix checks that your proposal actually covers every confirmed RFP requirement, mapping each requirement to a section and flagging gaps — the GovCon &quot;shred.&quot;</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>📋 Matrix</strong>) once RFP requirements are confirmed.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>📋 Matrix</strong>.</li>
+<li><strong>Generate the matrix.</strong> If none exists, generate it; you'll see &quot;Matrix generation queued — this will take about a minute.&quot;</li>
+<li><strong>Review coverage.</strong> Each requirement is mapped to a section, with an <strong>AI confidence</strong> percentage on the assessment.</li>
+<li><strong>Override an assessment.</strong> If you disagree, set your own coverage call and add an optional note explaining the override. To revert, clear the override — it returns to the AI assessment.</li>
+<li><strong>Export.</strong> Export the matrix when you need to share or archive it.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> Using your confirmed RFP requirements and your proposal's sections, the assistant assesses how well each requirement is addressed and assigns a confidence score to its judgment. You can accept its assessment or override it with your own, optionally noting why. Where confidence is low, verify the mapping yourself before relying on it.</p>
+<p><strong>What success looks like.</strong> A matrix listing every requirement with its mapped section, confidence, and any overrides you've made.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Confirm RFP requirements first (A1: RFP Shredder → Confirm Requirements).&quot;</em> Confirm the requirement set in the RFP Shredder before generating.</li>
+<li><em>&quot;No compliance matrix yet.&quot;</em> Generate it first.</li>
+<li><em>&quot;Failed to queue matrix generation.&quot; / &quot;Export failed.&quot;</em> Try again.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Regenerate the matrix after major section changes or an amended solicitation so coverage stays accurate.</li>
+</ul>
+<p><strong>Related sections.</strong> Built on <a href="#243-rfp-shredder">RFP Shredder</a>; a deeper FAR/DFARS view lives under <a href="#43-compliance">Compliance</a>.</p>
+<h4 id="245-section-editor-and-ai-drafting">2.4.5 Section Editor and AI drafting</h4>
+<p><strong>What it's for.</strong> The Section Editor is where you write each section of the proposal, with autosave, version history, reusable library content, and an AI drafting assistant that can produce a first draft for you to refine.</p>
+<p><strong>Who can use it.</strong> Anyone with access to the section. Locked sections are read-only until a Proposal Manager unlocks them.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Write.</strong> Use the formatting toolbar — <strong>Bold, Italic, Underline, Heading 1–3, Bullet list, Numbered list, Block quote, Code block, Undo, Redo</strong>. Your work autosaves a few seconds after you stop typing; you can also press <strong>Ctrl+S / Cmd+S</strong>. The status reads <strong>Saving…</strong>, <strong>Saved</strong>, <strong>Unsaved changes</strong>, or <strong>Save failed</strong>. A live <strong>word count</strong>, page estimate, and target appear in the header.</li>
+<li><strong>Rename or delete (when unlocked).</strong> Use the pencil to rename the section, or the trash icon to delete it (with a confirm).</li>
+<li><strong>Insert reusable content.</strong> Click <strong>+ Library</strong> to open <strong>Insert from Library</strong>, search approved content by type (Company Overview, Technical Approach, Past Performance, Key Personnel, Boilerplate, Other), preview it, and <strong>Insert</strong>.</li>
+<li><strong>Draft with AI.</strong> Click <strong>✨ AI Draft</strong> to open the assistant. Set the <strong>Tone</strong> (Formal, Persuasive, Technical), drag the <strong>Target Length</strong> slider (50–1,000 words), and optionally add <strong>Context / Notes</strong>. Click <strong>✨ Generate draft</strong> (or <strong>↺ Regenerate</strong>; <strong>⏹ Stop generating</strong> to halt).</li>
+<li><strong>Review the draft and its checks.</strong> The result shows a <strong>confidence</strong> percentage and a <strong>grounded</strong> percentage (how much of the specific factual content traces to a source). Any <strong>unverified claims</strong> are listed and, if you insert, marked inline as &quot;[unverified: not found in source].&quot;</li>
+<li><strong>Insert it.</strong> Click <strong>Append to section</strong> or <strong>Replace section</strong>. The draft is added and saved, and an <strong>AI Draft · n% confidence</strong> badge appears on the section until you dismiss it.</li>
+<li><strong>Use version history.</strong> Click <strong>History</strong> to see every saved version (with author, time, and AI/grounding badges) and <strong>Restore</strong> any of them — restoring creates a new version, so nothing is lost.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> Given the section title, your chosen tone and length, any notes you add, and the proposal's approved source material, the assistant writes a draft for that section. It reports how confident it is and how much of the draft's specific claims (clause numbers, codes, dates, figures) it could trace to a source, and it flags claims it could not verify. Always read the draft, check flagged or low-grounding items against the solicitation and your library, and edit before relying on it. You decide whether to append or replace.</p>
+<p><strong>What success looks like.</strong> Your content saves automatically (&quot;Saved&quot;), inserted drafts carry a confidence badge, and version history records each change.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Save failed.&quot;</em> Check your connection; your latest text stays in the editor — press Ctrl/Cmd+S to retry.</li>
+<li><em>AI Draft shows an error or returns nothing.</em> AI drafting may not be configured for your organization — an Admin sets up the AI provider (see <a href="#7-guided-setup">Guided Setup</a> and <a href="#61-admin">Admin</a>). Try again once it's connected.</li>
+<li><em>&quot;⚠ … little approved source material was found.&quot;</em> The request asked for specifics that aren't in your sources — verify clause numbers, dates, and figures by hand before submitting.</li>
+<li><em>Editing is blocked.</em> The section is locked; ask a Proposal Manager to unlock it.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The page estimate assumes roughly 275 words per page; if a section has a page limit, the word count turns red when you exceed the target.</li>
+<li>The AI Draft is a starting point — never submit a generated draft without checking its flagged claims and grounding.</li>
+</ul>
+<p><strong>Related sections.</strong> Reusable content comes from the <a href="#44-content-library">Content Library</a>; coverage is checked in the <a href="#244-compliance-matrix">Compliance Matrix</a>.</p>
+<h4 id="246-win-themes">2.4.6 Win Themes</h4>
+<p><strong>What it's for.</strong> Win themes are the handful of messages you want every evaluator to remember. Capturing them here steers AI drafting and lets you check that each theme is actually addressed in your sections.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>🎯 Win Themes</strong>).</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>🎯 Win Themes</strong>.</li>
+<li><strong>Add a theme.</strong> Add up to five win themes, each with a statement and a category tag (for example, &quot;Only vendor with 10+ years experience in healthcare IT&quot;).</li>
+<li><strong>Edit or remove.</strong> Use the edit and delete actions on any theme.</li>
+<li><strong>Check coverage.</strong> Review <strong>Theme Coverage by Category</strong> to see how your themes are distributed.</li>
+</ol>
+<p><strong>What success looks like.</strong> Your themes are listed and feed AI drafting; coverage is summarized by category.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to delete theme.&quot; / &quot;Failed to save win theme.&quot;</em> Try again.</li>
+<li><em>Can't add more.</em> The limit is five themes.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The Export panel warns if a win theme isn't addressed in any section — add themes early so drafting can weave them in.</li>
+</ul>
+<p><strong>Related sections.</strong> Themes influence <a href="#245-section-editor-and-ai-drafting">Section Editor and AI drafting</a> and are reported in <a href="#41-analytics">Analytics</a>.</p>
+<h4 id="247-pricing-volume">2.4.7 Pricing Volume</h4>
+<p><strong>What it's for.</strong> The Pricing Volume workspace holds the cost/price content for the bid, with access controlled separately so only the people who should see pricing can. It supports a draft → review → approved flow.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>💰 Pricing</strong>) to users who have been granted pricing access; managing access is an administrative action within the panel.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>💰 Pricing</strong>.</li>
+<li><strong>Create a pricing volume.</strong> Provide a <strong>Name</strong> (required) and optional <strong>Notes</strong>.</li>
+<li><strong>Manage who can see it.</strong> Grant access to specific users, and revoke it when needed.</li>
+<li><strong>Edit and route for review.</strong> Update the volume, <strong>send to review</strong>, and (as the approver) <strong>approve</strong> it.</li>
+</ol>
+<p><strong>What success looks like.</strong> The pricing volume is created with the right people granted access, and its status reflects where it is in the review flow (&quot;Sent to review,&quot; &quot;Pricing volume approved&quot;).</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Select a user.&quot; / &quot;Name is required.&quot;</em> Complete the field before saving.</li>
+<li><em>&quot;No pricing volumes yet.&quot;</em> Create one to begin.</li>
+<li><em>You can't open the panel.</em> You haven't been granted pricing access.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Pricing access is deliberately separate from general proposal access — granting someone a section to write does not give them pricing visibility.</li>
+</ul>
+<p><strong>Related sections.</strong> Build the numbers in the <a href="#42-calculator">Calculator</a>; link pricing <a href="#32-quotes">Quotes</a> via the cost panel.</p>
+<h4 id="248-autonomous-proposal-pipeline">2.4.8 Autonomous Proposal Pipeline</h4>
+<p><strong>What it's for.</strong> The Autonomous Pipeline drafts a proposal end-to-end — generating an outline, then full section drafts, injecting win themes, and running a compliance check — pausing at human-review gates so your team stays in control.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>🤖 Pipeline</strong>) once RFP requirements are confirmed. Approving a gate is a review action.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>🤖 Pipeline</strong>.</li>
+<li><strong>Launch.</strong> Start the run; you'll see &quot;Pipeline launched — generating outline….&quot; It moves through these stages: <strong>Outline Generation → Human Review (gate) → Draft Generation → Win Theme Injection → Compliance Check</strong>.</li>
+<li><strong>Act on a review gate.</strong> When the run shows <strong>Awaiting Review</strong>, <strong>approve</strong> the gate to continue (with an optional note) or <strong>reject</strong> it to stop the run.</li>
+<li><strong>Cancel if needed.</strong> Cancel an active run at any time.</li>
+<li><strong>Track status.</strong> The run shows <strong>Running, Awaiting Review, Budget Exceeded, Completed, Failed,</strong> or <strong>Cancelled</strong>.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> Using your confirmed RFP requirements, the proposal structure, your win themes, and your source material, the pipeline produces an outline and then section drafts, injects your win themes, and checks compliance — stopping at each human gate for your approval. Review the output at every gate before approving; the generated drafts carry the same confidence and grounding signals as the Section Editor and should be verified before submission.</p>
+<p><strong>What success looks like.</strong> The run advances through the stages, pausing at gates for your approval, and reaches <strong>Completed</strong> with drafts in your sections.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Confirm RFP requirements first (A1: RFP Shredder → Confirm).&quot;</em> Confirm requirements in the RFP Shredder first.</li>
+<li><em>&quot;A pipeline run is already active for this proposal.&quot;</em> Only one run can be active at a time — wait for it or cancel it.</li>
+<li><em>&quot;Budget Exceeded.&quot;</em> The run hit its limit; review what was produced and decide whether to continue manually.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The human gates exist so you can catch problems early — don't approve a gate without reading the output.</li>
+</ul>
+<p><strong>Related sections.</strong> Depends on <a href="#243-rfp-shredder">RFP Shredder</a>; produces content you refine in the <a href="#245-section-editor-and-ai-drafting">Section Editor</a>.</p>
+<h4 id="249-presentations">2.4.9 Presentations</h4>
+<p><strong>What it's for.</strong> Generate an oral-presentation deck from your proposal's sections, styled for the audience and timed to a target duration — useful for orals and downselect briefings.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>📊 Presentation</strong>). If approval is required, an <strong>Executive Approver</strong> signs off before download.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>📊 Presentation</strong>. Existing decks appear under <strong>Generated Presentations</strong>; click <strong>Generate First Presentation</strong> (or generate another).</li>
+<li><strong>Select Sections to Include.</strong> Tick the sections to turn into slides.</li>
+<li><strong>Set Presentation Settings.</strong>
+<ul>
+<li><strong>Presentation Style</strong> — Formal Corporate, Technical, or Pitch (each with guidance on when to use it).</li>
+<li><strong>Target Duration</strong> — adjusts how much detail goes on each slide.</li>
+<li><strong>Require Approver review before download</strong> — when ticked, the deck enters &quot;Awaiting Review&quot; and an Executive Approver must approve it before it can be downloaded.</li>
+</ul>
+</li>
+<li><strong>Generate.</strong> Click <strong>🎯 Generate Presentation</strong>. The estimated slide count is shown before you generate.</li>
+<li><strong>Review and approve.</strong> On a generated deck, request changes or (as approver) approve it.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> From the proposal sections you select and your chosen style and duration, the assistant generates a slide deck (cover, agenda, content, and closing). Review the generated deck for accuracy before sharing; if you required approver review, it can't be downloaded until an Executive Approver approves.</p>
+<p><strong>What success looks like.</strong> &quot;Presentation generated successfully,&quot; and the deck appears in the list — approved, or awaiting review if you required it.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Generation failed. Please try again.&quot;</em> Retry; if it persists, AI may not be configured (see <a href="#61-admin">Admin</a>).</li>
+<li><em>Can't download.</em> The deck is awaiting Executive Approver approval.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>More sections and longer durations produce more slides — the panel estimates the count up front.</li>
+</ul>
+<p><strong>Related sections.</strong> Draws on your written <a href="#245-section-editor-and-ai-drafting">sections</a>.</p>
+<h4 id="2410-ask-panel">2.4.10 Ask panel</h4>
+<p><strong>What it's for.</strong> The Ask panel answers plain-language questions about this opportunity — page limits, applicable FAR clauses, submission details — with answers grounded in your documents and shown with citations.</p>
+<p><strong>Who can use it.</strong> Available from the workspace (<strong>💬 Ask</strong>).</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click <strong>💬 Ask</strong>.</li>
+<li><strong>Ask a question.</strong> Type a question (for example, &quot;What is the page limit for the technical volume? Which FAR clauses apply?&quot;).</li>
+<li><strong>Read the answer.</strong> The answer is returned with citations, and a figure shows the share of factual claims traceable to a cited source.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> The assistant answers your question using this opportunity's documents (such as your uploaded solicitation and related records) and cites where each answer comes from. It also indicates how much of the answer is traceable to a cited source. When that share is low, or a citation is missing, verify the answer against the source document before acting on it.</p>
+<p><strong>What success looks like.</strong> A cited answer to your question with a traceability indicator.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>No answer or a low-traceability result.</em> The documents may not contain the answer — check the solicitation directly, and confirm AI is configured for your organization.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Always open the cited source for anything you'll rely on in the proposal — citations point you to it.</li>
+</ul>
+<p><strong>Related sections.</strong> Works alongside the <a href="#243-rfp-shredder">RFP Shredder</a> and <a href="#244-compliance-matrix">Compliance Matrix</a>.</p>
+<h4 id="2411-discussion-team-timeline-export-and-debrief">2.4.11 Discussion, Team, Timeline, Export, and Debrief</h4>
+<p>These workspace panels round out collaboration, scheduling, delivery, and post-award review.</p>
+<p><strong>Discussion (💬 Discussion).</strong> A proposal-wide comment thread. Post messages and use @mentions to notify teammates. Available to anyone in the workspace.</p>
+<p><strong>Team (Team (n)).</strong> Opens the <strong>Workspace Team</strong>. Add members and set each person's workspace role; update or change roles later. Managing the team is a Proposal Manager action; assigning a section also adds that person as a Writer automatically.</p>
+<p><strong>Timeline (📅 Timeline).</strong> A schedule view of sections and their due dates across the proposal, so you can see what's due when relative to the proposal deadline.</p>
+<p><strong>Export (Assemble &amp; Export / ↓ Download).</strong> Opens <strong>Document Assembly &amp; Export</strong> (Proposal Manager+). Click to assemble the proposal into a document — you'll see &quot;Document assembly queued. This page will update when ready.&quot; The panel warns about coverage gaps (for example, a win theme not addressed in any section); if sections aren't approved, a manager can tick the override to allow export anyway. Past exports appear in the export history. The assembly state (queued, running, assembled, failed) also shows on the proposals list.</p>
+<p><strong>Debrief (📋 Debrief).</strong> Opens <strong>Post-Award Debrief</strong> to record what you learned after award — the awardee, the award value, feedback from the contracting officer or evaluators, and noted strengths and weaknesses. Submit a record to keep it with the proposal.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>Export controls are missing.</em> Export and the override are Proposal Manager actions.</li>
+<li><em>&quot;No exports yet. Assemble the document first.&quot;</em> Run an assembly before downloading.</li>
+<li><em>Coverage warning on export.</em> Address the flagged win themes or sections, or (as a manager) acknowledge the override deliberately.</li>
+</ul>
+<p><strong>Related sections.</strong> Debrief complements the pursuit-level <a href="#233-closing-out-an-opportunity">close-out</a>; export delivers the finished bid.</p>
+<hr>
+<h2 id="3-quoting">3. Quoting</h2>
+<p>The <strong>Quoting</strong> group is where you build priced quotes for your bids: a reusable <strong>Catalog</strong> of cost items, and <strong>Quotes</strong> with a CLIN-based pricing builder.</p>
+<h3 id="31-catalog">3.1 Catalog</h3>
+<p><strong>What it's for.</strong> The Catalog (titled <strong>CPQ — Product Catalog</strong>) holds your reusable cost items — labor categories, ODCs, and other elements — with their unit prices and burden rates, so you can drop them into quotes instead of re-entering rates each time.</p>
+<p><strong>Who can use it.</strong> This item is visible in the sidebar to <strong>Admin</strong> and <strong>Proposal Manager</strong> only. Everyone who can see it can view the catalog; creating, editing, archiving, and deleting items require <strong>Proposal Manager</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Browse.</strong> The table lists items with <strong>Code, Description, Category, Unit, Base Price, Burden Rate, Status</strong>. Filter by category (Labor, ODC, Subcontract, Material, Travel, Other) and tick <strong>Show archived</strong> to include inactive items.</li>
+<li><strong>Add an item (Proposal Manager+).</strong> Click <strong>+ Add Item</strong>. In <strong>Add Catalog Item</strong>, complete the required fields <strong>Item Code</strong>, <strong>Category</strong>, <strong>Description</strong>, <strong>Unit</strong>, and <strong>Base Price ($)</strong>; optionally set <strong>Burden Rate (%)</strong>, <strong>Escalation Rate (%)</strong>, and <strong>Notes</strong>. Click <strong>Add Item</strong>.</li>
+<li><strong>Edit an item (Proposal Manager+).</strong> Click <strong>Edit</strong> on a row, change any field, and <strong>Save Changes</strong>.</li>
+<li><strong>Archive or delete (Proposal Manager+).</strong> <strong>Archive</strong> makes an item inactive (it stays for history); <strong>Delete</strong> removes it permanently after a confirmation.</li>
+</ol>
+<p><strong>What success looks like.</strong> New and edited items appear in the table with a confirmation; archived items show an &quot;Archived&quot; status; deleted items disappear.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>Required field empty.</em> Item Code, Category, Description, Unit, and Base Price are required.</li>
+<li><em>&quot;Failed to save catalog item.&quot; / &quot;Failed to delete item.&quot;</em> Try again.</li>
+<li><em>No add/edit/delete buttons, or the item isn't in your sidebar.</em> Your role is below Proposal Manager.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Burden and escalation rates are entered as percentages; the unit price and burden flow into quotes when you pick a catalog item there.</li>
+</ul>
+<p><strong>Related sections.</strong> Catalog items feed line items in the <a href="#321-quote-builder">Quote Builder</a>.</p>
+<h3 id="32-quotes">3.2 Quotes</h3>
+<p><strong>What it's for.</strong> Quotes (titled <strong>CPQ — Quotes</strong>) is the list of all pricing quotes. Each quote captures a contract type and total value and links to a pursuit; you build the detailed pricing in the builder.</p>
+<p><strong>Who can use it.</strong> All roles can view the list and open the builder. Creating a quote opens it in the builder; deleting a quote requires <strong>Proposal Manager</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Browse.</strong> The table shows <strong>Quote Name, Status</strong> (Draft, Final, Submitted, Accepted, Expired), <strong>Contract Type, Total Value, Created, Opportunity, Actions</strong>.</li>
+<li><strong>Create a quote.</strong> Click <strong>+ New Quote</strong>. Enter a <strong>Quote Name</strong> (required), pick a <strong>Contract Type</strong> (FFP, T&amp;M, CPFF, IDIQ, BPA, CPAF), and optionally link an <strong>Opportunity</strong> (type at least two characters to search). Click <strong>Create Quote</strong> — you land in the builder.</li>
+<li><strong>Open the builder.</strong> Click <strong>Open Builder</strong> on any row.</li>
+<li><strong>Delete a quote (Proposal Manager+).</strong> Click <strong>Delete</strong> and confirm.</li>
+</ol>
+<p><strong>What success looks like.</strong> New quotes are created and open in the builder; the list shows status and total value for each.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to create quote.&quot; / &quot;Failed to delete quote.&quot;</em> Try again.</li>
+<li><em>No Delete button.</em> Your role is below Proposal Manager.</li>
+</ul>
+<p><strong>Related sections.</strong> Configure pricing in the <a href="#321-quote-builder">Quote Builder</a>; a quote can link to an <a href="#231-opportunity-detail">opportunity</a> and a <a href="#247-pricing-volume">proposal</a>.</p>
+<h4 id="321-quote-builder">3.2.1 Quote Builder</h4>
+<p><strong>What it's for.</strong> The builder is where you structure a quote's pricing using CLINs and line items, set contract terms, link the quote to an opportunity and a proposal, and export the result. It computes burdened prices and a total quote value as you go.</p>
+<p><strong>Who can use it.</strong> All roles can open the builder; deleting the quote requires <strong>Proposal Manager</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open and rename.</strong> Open a quote from the Quotes list. Click the quote name (top left) to edit it.</li>
+<li><strong>Set quote terms.</strong> In <strong>Quote Settings</strong> (left panel), set the <strong>Contract Type</strong>, <strong>Option Years</strong>, and <strong>Fee Percentage (%)</strong>, then save.</li>
+<li><strong>Link to an opportunity.</strong> Use <strong>Link Opportunity</strong> (search by name or agency) to associate the quote with a pursuit; unlink at any time.</li>
+<li><strong>Link to a proposal.</strong> Use <strong>Link Proposal</strong> (filter by name or number) so the quote's total cost auto-syncs to that proposal when you recalculate.</li>
+<li><strong>Add CLINs.</strong> In the <strong>CLINs</strong> panel, click <strong>+ Add CLIN</strong> and give it a <strong>CLIN Number</strong>, <strong>Period</strong>, and <strong>Description</strong>.</li>
+<li><strong>Add line items.</strong> Within a CLIN, <strong>Add Line Item</strong> — pick a catalog item or enter a <strong>Description</strong>, <strong>Qty</strong>, <strong>Unit</strong>, <strong>Unit Price ($)</strong>, and <strong>Burden Rate (%)</strong>. The builder shows the burdened price and amount per line, a CLIN total, and the overall <strong>Total Quote Value</strong>.</li>
+<li><strong>Export.</strong> Click <strong>Export CSV</strong> to export the quote (columns include CLIN, Period, Description, Line Item, Qty, Unit, Unit Price, Burdened Price, Amount).</li>
+<li><strong>Finalize.</strong> While the quote is a draft, click <strong>Finalize Quote</strong> to lock it as final.</li>
+<li><strong>Delete (Proposal Manager+).</strong> Use <strong>Delete Quote</strong> to remove it.</li>
+</ol>
+<p><strong>What success looks like.</strong> CLINs and line items appear with burdened amounts, the total value updates live, and a linked proposal's estimated cost syncs on recalculate.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to add CLIN.&quot; / &quot;Failed to add line item.&quot;</em> Try again; check required fields.</li>
+<li><em>Total isn't reaching the proposal.</em> Make sure the quote is <strong>linked</strong> to the proposal — the cost syncs on recalculate.</li>
+<li><em>No Delete Quote button.</em> Your role is below Proposal Manager.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Picking a catalog item pre-fills its unit price and burden rate, keeping quotes consistent with your Catalog.</li>
+<li>A finalized quote reflects a locked pricing state — finalize when the numbers are settled.</li>
+</ul>
+<p><strong>Related sections.</strong> Rates come from the <a href="#31-catalog">Catalog</a>; linked quotes appear on the <a href="#231-opportunity-detail">opportunity detail</a> and in the proposal cost panel (see <a href="#242-the-proposal-workspace">the proposal workspace</a>).</p>
+<hr>
+<h2 id="4-resources">4. Resources</h2>
+<p>The <strong>Resources</strong> group gathers the cross-cutting tools you use across pursuits and proposals: analytics, the cost calculator, compliance, your content library, custom dashboards, market intel, and proposal templates.</p>
+<h3 id="41-analytics">4.1 Analytics</h3>
+<p><strong>What it's for.</strong> Analytics (titled <strong>Reports</strong>) gives you win/loss analytics and pipeline health across all opportunities, plus a view of how your win themes perform.</p>
+<p><strong>Who can use it.</strong> All roles. Figures reflect your organization's opportunities and proposals.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Analytics</strong> in the sidebar.</li>
+<li><strong>Use the tabs.</strong> Switch between <strong>Pipeline</strong> and <strong>Win Theme Analytics</strong>.</li>
+<li><strong>Read the Pipeline tab.</strong> KPI cards show <strong>Total Opportunities</strong> (with open count), <strong>Win Rate</strong> (with closed count), <strong>Avg Days to Close</strong>, and <strong>Pipeline Value</strong>, followed by stage breakdowns and bid/no-bid analytics.</li>
+<li><strong>Read Win Theme Analytics.</strong> See which win themes are tracked and how they relate to outcomes. (Themes are added on proposals and analyzed once proposals close as won or lost.)</li>
+<li><strong>Open the Win-Loss report.</strong> For the dedicated win/loss view, use the <strong>Win / Loss Report</strong> tile on Home, or see <a href="#411-win-loss-report">Win-Loss report</a>.</li>
+</ol>
+<p><strong>What success looks like.</strong> Cards and charts populate with current figures; tabs switch between pipeline and win-theme views.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to load report data.&quot;</em> Click <strong>Retry</strong>; if it persists the service may be temporarily unavailable.</li>
+<li><em>&quot;No win theme data yet.&quot;</em> Add win themes to proposals and close them as won/lost to build analytics.</li>
+</ul>
+<p><strong>Related sections.</strong> Deeper outcome detail is in the <a href="#411-win-loss-report">Win-Loss report</a>; CRM-side analytics are in <a href="#22-crm-reports">CRM Reports</a>.</p>
+<h4 id="411-win-loss-report">4.1.1 Win-Loss report</h4>
+<p><strong>What it's for.</strong> The Win/Loss report (titled <strong>Win / Loss Analytics</strong>) focuses on closed outcomes — totals, contract value won and lost, monthly trends, win rate over time, and writer workload.</p>
+<p><strong>Who can use it.</strong> All roles.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Use the <strong>Win / Loss Report</strong> tile on Home.</li>
+<li><strong>Use the tabs.</strong> Switch between <strong>Overview</strong> and <strong>Workload</strong>.</li>
+<li><strong>Read the Overview.</strong> KPI cards include <strong>Total Closed</strong> (last 24 months), <strong>Won Contract Value</strong>, and <strong>Lost Contract Value</strong>, with <strong>Monthly Outcomes — Last 24 Months</strong>, an <strong>Outcome Breakdown</strong> table, and <strong>Monthly Win Rate — Last 12 Months</strong>.</li>
+<li><strong>Read the Workload tab.</strong> See <strong>Writer Workload — Active Proposals</strong> across the team.</li>
+</ol>
+<p><strong>What success looks like.</strong> The charts and tables reflect your closed pursuits and current writer load.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>Empty charts.</em> You have no closed outcomes yet — close pursuits as won/lost/no-bid (see <a href="#233-closing-out-an-opportunity">close-out</a>).</li>
+</ul>
+<p><strong>Related sections.</strong> Outcomes are recorded at <a href="#233-closing-out-an-opportunity">close-out</a>; related analytics in <a href="#41-analytics">Analytics</a>.</p>
+<h3 id="42-calculator">4.2 Calculator</h3>
+<p><strong>What it's for.</strong> The Calculator is a guided cost/price model — set up a project, build labor, configure burden and other costs, compare scenarios, and export — and it can send a total back to a proposal as its estimated cost.</p>
+<p><strong>Who can use it.</strong> All roles. When opened from a proposal (via <strong>🧮 Calculator</strong> in the workspace), it's pre-filled and can post the total back.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Calculator</strong> in the sidebar (or open it from a proposal).</li>
+<li><strong>Work through the numbered tabs:</strong>
+<ul>
+<li><strong>1. Project Setup</strong></li>
+<li><strong>2. Labor Builder</strong></li>
+<li><strong>3. Burden Config</strong></li>
+<li><strong>4. Other Costs</strong></li>
+<li><strong>5. Proposal Summary</strong></li>
+<li><strong>6. Scenarios</strong></li>
+<li><strong>7. Tracking</strong></li>
+<li><strong>8. Save &amp; Export</strong></li>
+</ul>
+</li>
+<li><strong>Save and export.</strong> Use <strong>Save &amp; Export</strong> to keep the model and export the results.</li>
+<li><strong>Send the total to a proposal.</strong> When launched from a proposal, use <strong>Send Total to Proposal</strong> to write the calculated cost back as that proposal's estimated cost (you'll see a confirmation in the proposal).</li>
+</ol>
+<p><strong>What success looks like.</strong> A complete cost model with a summary total; when sent to a proposal, the proposal's estimated cost updates (&quot;Updated from Calculator&quot;).</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>The total didn't reach the proposal.</em> Open the Calculator from the proposal's <strong>🧮 Calculator</strong> button so the two are linked, then use <strong>Send Total to Proposal</strong>.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The tabs are meant to be worked in order; later tabs build on the labor and burden you enter earlier.</li>
+</ul>
+<p><strong>Related sections.</strong> Feeds the proposal cost panel (see <a href="#242-the-proposal-workspace">the proposal workspace</a>); for CLIN-level pricing use the <a href="#321-quote-builder">Quote Builder</a>.</p>
+<h3 id="43-compliance">4.3 Compliance</h3>
+<p><strong>What it's for.</strong> The Compliance area (titled <strong>Compliance Center</strong>) is where you run and review compliance scans per proposal. Each proposal has its own requirements derived from its solicitation; you open a proposal to scan it or review findings.</p>
+<p><strong>Who can use it.</strong> All roles can open the Compliance Center and a proposal's scan results.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Compliance</strong> in the sidebar.</li>
+<li><strong>Pick a proposal.</strong> The page lists your active proposals with status. Click one to open its <a href="#431-scan-results">scan results</a>.</li>
+</ol>
+<p><strong>What success looks like.</strong> A list of proposals, each leading to its own scan results.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;No requirements loaded.&quot;</em> Upload an RFP and extract requirements (via the RFP Shredder on the proposal) so there's something to scan against.</li>
+<li><em>&quot;No active proposals.&quot;</em> Create a proposal first.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Compliance scans are proposal-scoped — there is no single org-wide scan; always start from a proposal.</li>
+</ul>
+<p><strong>Related sections.</strong> Requirements come from the <a href="#243-rfp-shredder">RFP Shredder</a>; coverage mapping is in the <a href="#244-compliance-matrix">Compliance Matrix</a>.</p>
+<h4 id="431-scan-results">4.3.1 Scan results</h4>
+<p><strong>What it's for.</strong> The scan results screen (titled <strong>Compliance Scan Results</strong>) shows a proposal's scan history and findings, scores each scan, and lets you address or waive findings and compare scans over time.</p>
+<p><strong>Who can use it.</strong> All roles can view; addressing and waiving findings are working actions on the proposal.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> From the Compliance Center, click a proposal.</li>
+<li><strong>Run a scan.</strong> Click <strong>Run Scan</strong>. The newest scan becomes selected when it finishes.</li>
+<li><strong>Read the scorecard.</strong> See the <strong>Compliance Score</strong> (%) and the findings, split into <strong>blocking</strong> and <strong>advisory</strong> severities.</li>
+<li><strong>Act on a finding.</strong> For an open finding, mark it <strong>addressed</strong>, or <strong>waive</strong> it with a required reason.</li>
+<li><strong>Compare scans.</strong> Use <strong>Compare with</strong> to view two scans side by side from the scan history.</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> A scan evaluates your proposal's content against the proposal's RFP requirements and returns a compliance score plus findings (each with a severity and, often, a suggestion). Review each finding, fix the content or waive it with a reason, and re-scan. Treat findings as prompts to verify against the solicitation, especially &quot;blocking&quot; items.</p>
+<p><strong>What success looks like.</strong> A scored scan with findings you can address or waive; &quot;No findings&quot; when content fully covers requirements (expected for a new or empty proposal).</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;No scans run yet.&quot;</em> Click <strong>Run Scan</strong> to start.</li>
+<li><em>Waive is blocked.</em> A waiver reason is required.</li>
+<li><em>&quot;No findings&quot; on an empty proposal.</em> Add content to your sections, then re-scan.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Saving a section automatically triggers a background re-scan, so scores stay current as you write.</li>
+</ul>
+<p><strong>Related sections.</strong> Built from <a href="#243-rfp-shredder">RFP Shredder</a> requirements; complements the <a href="#244-compliance-matrix">Compliance Matrix</a>.</p>
+<h3 id="44-content-library">4.4 Content Library</h3>
+<p><strong>What it's for.</strong> The Content Library holds reusable, approved content — company overviews, technical approaches, past performance, key personnel, and boilerplate — that writers can insert into proposal sections and that AI drafting can draw on. Items move through a submit → review → approve flow.</p>
+<p><strong>Who can use it.</strong> All roles can browse and add content. Approving or rejecting submissions, bulk importing, and the <strong>Pending Review</strong> queue require approver rights (Proposal Manager or higher). Deleting an approved item is restricted to admins.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Browse the Library tab.</strong> Search by title or content and filter by <strong>Type</strong> and <strong>Bid Type</strong>. Each item shows a status badge (Approved, Draft, Pending Review) and a freshness indicator.</li>
+<li><strong>Add content.</strong> Click <strong>+ Add Content</strong>, enter a <strong>Title</strong> and <strong>Content Type</strong>, paste the body, add tags and bid types, and submit. New or edited items are <strong>submitted for review</strong> (editing an approved item sends it for re-review).</li>
+<li><strong>Bulk import (approvers).</strong> Click <strong>Bulk Import</strong> to add many items at once.</li>
+<li><strong>Review submissions (approvers).</strong> Open the <strong>Pending Review</strong> tab to <strong>approve</strong> an item or <strong>reject</strong> it with a required reason.</li>
+<li><strong>Open an item.</strong> View its content, version history, and details; edit or delete where your role allows.</li>
+</ol>
+<p><strong>What success looks like.</strong> Submitted items appear as Pending Review; approved items become available to insert in the Section Editor and to AI drafting.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Title and content are required.&quot;</em> Complete both before submitting.</li>
+<li><em>&quot;Rejection reason is required.&quot;</em> Provide a reason when rejecting.</li>
+<li><em>Can't delete an approved item.</em> Only admins can delete approved content.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The <strong>Insert from Library</strong> picker in the Section Editor only shows <strong>approved</strong> items, so keep the review queue moving.</li>
+<li>Freshness and expiry badges flag stale content — review items marked &quot;Expires soon&quot; or &quot;Expired.&quot;</li>
+</ul>
+<p><strong>Related sections.</strong> Inserted in the <a href="#245-section-editor-and-ai-drafting">Section Editor</a>; used as source material by AI drafting throughout <a href="#24-proposals">Proposals</a>.</p>
+<h3 id="45-dashboards">4.5 Dashboards</h3>
+<p><strong>What it's for.</strong> Dashboards (titled <strong>Custom Dashboards</strong>) let you assemble your own view from a library of widgets — pipeline, win rate, SAM monitors, workload, compliance health, CPQ, and more.</p>
+<p><strong>Who can use it.</strong> All roles.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Dashboards</strong> in the sidebar.</li>
+<li><strong>Add a widget.</strong> Click <strong>Add Widget</strong> and choose from the catalog, which includes (among others) <strong>Pipeline Funnel, Win Rate, Recent Opportunities, Proposal Status, SAM Monitors, Opportunity Intel, Writer Workload, Team Roster, Debrief Outcomes, pWin Distribution, Top Win Themes, AI Usage Meter, Content Performance, RFP Queue, Compliance Health, FedRAMP Posture, CPQ Pipeline, Revenue Forecast, Plan Usage,</strong> and <strong>Deadline Calendar</strong>.</li>
+<li><strong>Arrange and remove.</strong> Add the widgets you want and remove any with the widget's remove control.</li>
+</ol>
+<p><strong>What success looks like.</strong> Your chosen widgets appear and populate with live data.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Click 'Add Widget' to get started.&quot;</em> The dashboard is empty — add your first widget.</li>
+<li><em>A widget shows &quot;No … data.&quot;</em> There isn't data of that type yet.</li>
+</ul>
+<p><strong>Related sections.</strong> Widgets summarize data from across <a href="#23-pipeline">Pipeline</a>, <a href="#24-proposals">Proposals</a>, <a href="#3-quoting">Quoting</a>, and <a href="#46-intel">Intel</a>.</p>
+<h3 id="46-intel">4.6 Intel</h3>
+<p><strong>What it's for.</strong> Intel (titled <strong>Competitive Intel</strong>) is a market-intelligence feed with a daily digest summarizing recent competitor and award activity, filterable by your areas of interest.</p>
+<p><strong>Who can use it.</strong> All roles.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Intel</strong> in the sidebar.</li>
+<li><strong>Read the Daily Intelligence Digest.</strong> The digest card shows the date, a summary, an item count, and top themes.</li>
+<li><strong>Filter the feed.</strong> Narrow items by fields such as NAICS code and agency, and search to find specific items.</li>
+<li><strong>Add or update a feed.</strong> Use <strong>Add / Update Feed</strong> to register an intel source (with a name and source details).</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> The Daily Intelligence Digest is an AI-generated summary of recent intelligence items in your feed — it produces a short narrative summary and surfaces top themes. Use it as a scan of what's new; open the underlying items to verify specifics before acting.</p>
+<p><strong>What success looks like.</strong> A current digest and a filterable list of intel items.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>No digest, or &quot;No items match your current filters.&quot;</em> Adjust your filters/search, or add a feed so there's material to summarize.</li>
+</ul>
+<p><strong>Related sections.</strong> Intel can surface on <a href="#45-dashboards">Dashboards</a> (Opportunity Intel widget) and informs your <a href="#23-pipeline">Pipeline</a> decisions.</p>
+<h3 id="47-templates">4.7 Templates</h3>
+<p><strong>What it's for.</strong> The Template Library holds reusable proposal structures (volumes and sections) by bid type and agency. Published templates appear when creating a proposal and auto-scaffold its sections; templates move through a draft → (request) → publish flow with version history.</p>
+<p><strong>Who can use it.</strong> All roles can browse templates. Creating, importing, and editing draft sections require <strong>Proposal Manager</strong> or higher. Publishing, unpublishing, cloning, archiving, and approving publish requests are <strong>Admin</strong> actions. A Proposal Manager can <strong>Request Publish</strong>; an Admin reviews it.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Browse.</strong> Search templates and filter by bid type (Federal, SLED, Commercial). Each shows a status badge (Draft, Published, Pending Review, Archived), version, bid type, and usage count.</li>
+<li><strong>Create a template (Proposal Manager+).</strong> Click <strong>+ New Template</strong>, enter a <strong>Name</strong> and <strong>Bid Type</strong> (add <strong>State</strong> for SLED), optionally an <strong>Agency</strong> and <strong>Description</strong>, and <strong>Create</strong>.</li>
+<li><strong>Import a template (Proposal Manager+).</strong> Click <strong>Import JSON</strong> to import a previously exported template as a new draft.</li>
+<li><strong>Edit a draft's sections.</strong> Open a template to the builder; for a draft, <strong>+ Add Section</strong> (title, instructions, page limit, required), reorder with the ▲/▼ controls, and edit or remove sections.</li>
+<li><strong>Request or perform publish.</strong> A Proposal Manager clicks <strong>Request Publish</strong> (with an optional note). An Admin opens <strong>Publish</strong> and provides a required <strong>Change Log</strong> (and optional version) to publish, or reviews a pending request to <strong>Approve &amp; Publish</strong> or <strong>Reject</strong>.</li>
+<li><strong>Clone, archive, export (as permitted).</strong> <strong>Clone</strong> copies a template as a new draft (Admin); <strong>Archive/Restore</strong> hides or restores it (Admin); <strong>Export JSON</strong> downloads it; <strong>History</strong> shows published versions.</li>
+</ol>
+<p><strong>What success looks like.</strong> Draft templates can be built and requested; published templates appear in the New Proposal dialog and auto-build sections when chosen.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Name is required.&quot;</em> Name the template before creating.</li>
+<li><em>&quot;Change log is required.&quot; / &quot;Failed to publish… Make sure it has at least one section.&quot;</em> Add a change log and at least one section before publishing.</li>
+<li><em>&quot;Draft — not available for proposals.&quot;</em> The template must be published by an Admin before it appears in proposal creation.</li>
+<li><em>Publish/clone/archive controls are missing.</em> Those are Admin actions; use <strong>Request Publish</strong> if you're a Proposal Manager.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>A published template can't have its sections edited — <strong>Unpublish</strong> to revert it to draft first.</li>
+<li>Saving a proposal as a template (from the workspace) creates a <em>draft</em> that still needs Admin publishing.</li>
+</ul>
+<p><strong>Related sections.</strong> Templates are chosen when creating a <a href="#241-the-proposals-list">proposal</a> and scaffold <a href="#242-the-proposal-workspace">the workspace</a>.</p>
+<hr>
+<h2 id="5-settings">5. Settings</h2>
+<p>The <strong>Settings</strong> group holds connections and automation: <strong>Integrations</strong>, <strong>Scheduled Reports</strong>, and <strong>Workflows</strong>.</p>
+<h3 id="51-integrations">5.1 Integrations</h3>
+<p><strong>What it's for.</strong> Integrations connects Pursuite to your email and calendar and to other systems, so activity can sync automatically. It's where you connect a Google Workspace or Microsoft 365 account (or an individual mailbox/calendar) and see CRM-related connections.</p>
+<p><strong>Who can use it.</strong> All roles see Integrations in the sidebar; connecting and disconnecting accounts depends on your account's permissions. Because connecting authorizes an outside account, you'll go through that provider's sign-in.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Integrations</strong> in the sidebar. Sections include <strong>Email &amp; Calendar</strong>, <strong>CRM</strong>, and <strong>How sync works</strong>.</li>
+<li><strong>Connect email &amp; calendar.</strong> Click <strong>Connect Google Workspace</strong> or <strong>Connect Microsoft 365</strong> (or connect an individual mailbox), and complete the provider's authorization. A green <strong>Connected</strong> badge appears when done.</li>
+<li><strong>Sync or disconnect.</strong> For a connected account, trigger a sync or disconnect it. You'll see confirmations such as &quot;… sync queued&quot; or &quot;… disconnected.&quot;</li>
+<li><strong>Review activity.</strong> Each connection shows its recent sync events (or &quot;No sync events yet&quot;).</li>
+</ol>
+<p><strong>What success looks like.</strong> A <strong>Connected</strong> badge on the provider and sync events appearing over time.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to start … connection.&quot; / &quot;Could not generate authorization URL.&quot;</em> Start the connection again; you may need to complete sign-in in the provider window.</li>
+<li><em>&quot;Email sync failed.&quot; / &quot;Calendar sync failed.&quot;</em> Trigger the sync again; if it persists, reconnect the account.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Connecting links an external account — only connect accounts you're authorized to use, and disconnect when you no longer need the sync.</li>
+</ul>
+<p><strong>Related sections.</strong> Webhook and other connector setup can also be done via the <a href="#7-guided-setup">Integrations &amp; Webhooks wizard</a>; admin-level connections live in the <a href="#61-admin">Admin</a> console.</p>
+<h3 id="52-scheduled-reports">5.2 Scheduled Reports</h3>
+<p><strong>What it's for.</strong> Scheduled Reports emails a chosen report to recipients on a recurring schedule, so stakeholders get regular updates without logging in.</p>
+<p><strong>Who can use it.</strong> All roles can view; creating, editing, running, and deleting schedules require <strong>Proposal Manager</strong> or higher.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Scheduled Reports</strong> in the sidebar.</li>
+<li><strong>Create a schedule (Proposal Manager+).</strong> Give it a <strong>Name</strong>, choose a <strong>Report Type</strong> (options include Pipeline, Win / Loss, Win Themes, CRM Activity, Compliance Summary, Calculator Summary, Debrief Summary, AI Usage, Content Library, RFP Analysis, Proposal Health, CPQ Summary, SAM Alerts, Opportunity Intel, FedRAMP Posture, Team Activity, and User Activity), pick a frequency (<strong>Daily at 8am</strong>, <strong>Every Monday 8am</strong>, <strong>1st of month 8am</strong>, or a <strong>Custom cron</strong> expression), set a <strong>Timezone</strong> (ET, CT, MT, PT, or UTC), and enter recipient email addresses (one per line). Save it.</li>
+<li><strong>Run now (Proposal Manager+).</strong> Trigger an immediate run; you'll see &quot;Report queued. Check run history for status.&quot;</li>
+<li><strong>Review run history.</strong> Each schedule shows its recent runs (or &quot;No runs yet&quot;).</li>
+<li><strong>Edit or delete (Proposal Manager+).</strong> Update the schedule or remove it.</li>
+</ol>
+<p><strong>What success looks like.</strong> The schedule appears with its report type and cadence; runs show in its history and reports arrive in recipients' inboxes.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Failed to save schedule.&quot; / &quot;Failed to queue report run.&quot;</em> Try again; check the recipient list and cron expression.</li>
+<li><em>No create/edit controls.</em> Your role is below Proposal Manager.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The custom cron field expects a standard expression (for example, <code>0 8 * * 1</code> for Mondays at 8am); use the preset frequencies if you're unsure.</li>
+</ul>
+<p><strong>Related sections.</strong> The reports themselves come from <a href="#41-analytics">Analytics</a>, <a href="#43-compliance">Compliance</a>, <a href="#46-intel">Intel</a>, and other areas.</p>
+<h3 id="53-workflows">5.3 Workflows</h3>
+<p><strong>What it's for.</strong> Workflow Automation runs rule-based automations when key events happen — for example, notifying a role, assigning a user, tagging an opportunity, creating a task, or calling a webhook. These are simple &quot;when this happens, do that&quot; rules (no AI involved).</p>
+<p><strong>Who can use it.</strong> All roles see Workflows in the sidebar; creating and managing workflows depends on your account's permissions.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Workflows</strong> in the sidebar.</li>
+<li><strong>Create a workflow.</strong> Give it a <strong>Name</strong>, choose a <strong>Trigger</strong> — <strong>Opportunity stage change, Bid/No-Bid decision, Proposal status change, Section approved, Compliance scan complete,</strong> or <strong>Debrief submitted</strong> — and optionally add <strong>conditions</strong> (key/value pairs that must match the event; use <code>*</code> to match any value, or leave empty to run on every trigger).</li>
+<li><strong>Add actions (at least one required).</strong> Choose one or more actions: <strong>Send notification</strong> (message + recipient role), <strong>Assign user</strong> (role or user ID), <strong>Set opportunity tag</strong> (tag name), <strong>Create task</strong> (title + due-in-days), or <strong>Send webhook</strong> (webhook URL).</li>
+<li><strong>Save and enable.</strong> Save the workflow; use its toggle to enable or disable it.</li>
+<li><strong>Test and review runs.</strong> Use the test option (you can supply sample event data) and open a workflow to see its run history (or &quot;No runs yet&quot;).</li>
+<li><strong>Edit or delete.</strong> Update or remove a workflow.</li>
+</ol>
+<p><strong>What success looks like.</strong> The workflow is listed with its trigger and run count, and runs appear in its history when the trigger fires.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Name is required.&quot; / &quot;At least one action is required.&quot;</em> Add a name and at least one action.</li>
+<li><em>&quot;Failed to save workflow.&quot;</em> Try again.</li>
+<li><em>No runs recorded.</em> The trigger hasn't fired yet, or conditions didn't match the event.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Leave conditions empty to run on every occurrence of the trigger; add conditions to target specific cases (for example, only when a proposal moves to &quot;submitted&quot;).</li>
+</ul>
+<p><strong>Related sections.</strong> Workflows react to events from <a href="#23-pipeline">Pipeline</a>, <a href="#24-proposals">Proposals</a>, and <a href="#43-compliance">Compliance</a>.</p>
+<hr>
+<h2 id="6-system">6. System</h2>
+<h3 id="61-admin">6.1 Admin</h3>
+<p><strong>What it's for.</strong> The Admin Console is the organization's control center — managing users and roles, sessions, the audit log, billing and plan, webhooks, the AI provider, and CPQ pricing configuration. Several Guided Setup wizards (onboarding, AI provider, SSO/MFA, ProPricer) also write their settings here.</p>
+<p><strong>Who can use it.</strong> <strong>Admin only.</strong> The <strong>Admin</strong> item appears in the sidebar solely for Admins.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Admin</strong> in the sidebar to open the <strong>Admin Console</strong>.</li>
+<li><strong>Use the tabs:</strong>
+<ul>
+<li><strong>Users &amp; Roles</strong> — invite/add users, set roles, deactivate or reactivate accounts, and perform bulk role updates or deactivations.</li>
+<li><strong>Sessions</strong> — view active user sessions and terminate them.</li>
+<li><strong>Audit Log</strong> — review recorded system events.</li>
+<li><strong>Billing &amp; Plan</strong> — see your plan and usage limits.</li>
+<li><strong>Webhooks</strong> — manage outbound webhook connections.</li>
+<li><strong>AI Provider</strong> — connect your AI provider (OpenAI, Azure OpenAI, Anthropic, PursuiteAI, or a custom OpenAI-compatible endpoint), test the connection, and manage API keys. This is what enables AI drafting, the RFP Shredder, the Compliance Matrix, the pipeline, and other AI features across Pursuite.</li>
+<li><strong>CPQ</strong> — configure burden rates and labor-rate (ProPricer) settings used by quotes.</li>
+</ul>
+</li>
+<li><strong>Reach the admin sub-pages.</strong> From Admin you also manage <strong>Compliance Rules</strong> and <strong>Custom Fields</strong> (organization-wide configuration).</li>
+</ol>
+<p><strong>What success looks like.</strong> Changes save with confirmations (for example, &quot;AI provider configuration saved,&quot; &quot;Roles updated&quot;), and new users and settings take effect across the organization.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Connection test failed. Check your credentials.&quot;</em> Re-enter the AI provider details and test again.</li>
+<li><em>&quot;Failed to update roles.&quot; / &quot;Bulk role update failed.&quot;</em> Try again.</li>
+<li><em>The Admin item isn't in your sidebar.</em> Your role isn't Admin.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>AI features fail until a provider is connected and a successful connectivity test passes — set this up early via the AI Provider tab or the <a href="#7-guided-setup">AI Provider wizard</a>.</li>
+<li>A newly saved proposal template stays a draft until an Admin publishes it (see <a href="#47-templates">Templates</a>).</li>
+</ul>
+<p><strong>Related sections.</strong> Many settings here are also reachable through <a href="#7-guided-setup">Guided Setup</a>; roles set here govern access throughout the app.</p>
+<h3 id="62-help">6.2 Help</h3>
+<p><strong>What it's for.</strong> Help is the in-app guide. It explains how to use Pursuite end to end — a quick start, a step-by-step workflow guide, a roles-and-permissions reference, and a catalog of features.</p>
+<p><strong>Who can use it.</strong> All roles.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Select <strong>Help</strong> in the sidebar.</li>
+<li><strong>Browse the sections</strong>, including <strong>Quick Start</strong>, <strong>Workflow Guide</strong>, <strong>Roles &amp; Permissions</strong>, and feature references. Expand a workflow step to see instructions, where to go, and common friction points.</li>
+</ol>
+<p><strong>What success looks like.</strong> You find the guidance you need for the task at hand.</p>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>The <strong>Roles &amp; Permissions</strong> section is a quick way to confirm what your role can and can't do before you go looking for a missing button.</li>
+</ul>
+<p><strong>Related sections.</strong> Help points back to every area of the app described in this guide.</p>
+<hr>
+<h2 id="7-guided-setup">7. Guided Setup</h2>
+<p><strong>What it's for.</strong> Guided Setup is a launcher of step-by-step wizards that walk you through common setup and onboarding tasks. It sits at the bottom of the sidebar (the <strong>✨ Guided Setup</strong> button) and is also reachable inside the proposal workspace for the kickoff wizard.</p>
+<p><strong>Who can use it.</strong> Everyone sees the <strong>✨ Guided Setup</strong> button, but the list of available wizards is filtered to what your role is allowed to run. The wizards and who can run them:</p>
+<ul>
+<li><strong>Proposal Kickoff: RFP → Draft-Ready</strong> (Proposal Manager) — turns an uploaded RFP into a draft-ready proposal.</li>
+<li><strong>New-Tenant Onboarding</strong> (Org Admin) — first-time setup for your organization.</li>
+<li><strong>AI Provider (BYOK) Connection</strong> (Org Admin) — connect and test your AI provider.</li>
+<li><strong>ProPricer Pricing-Bridge Setup</strong> (Admin / Pricing Lead) — connect ProPricer for live labor rates.</li>
+<li><strong>Integrations &amp; Webhooks Connection</strong> (Admin / Integrator) — connect a webhook, mailbox, or calendar.</li>
+<li><strong>Teaming Partner Onboarding</strong> (Proposal Manager) — set up a teaming workspace and partners.</li>
+<li><strong>SSO + MFA + Clearance Governance</strong> (Org Admin) — configure single sign-on, MFA, and personnel clearances.</li>
+</ul>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open the picker.</strong> Click <strong>✨ Guided Setup</strong> at the bottom of the sidebar. Each wizard shows its title, audience, and step count.</li>
+<li><strong>Start a wizard.</strong> Click <strong>Start</strong>. For wizards that act on a specific item (Proposal Kickoff, Teaming Partner), you'll be asked to paste the relevant ID (for example, a Proposal ID or Teaming workspace ID) before it launches.</li>
+<li><strong>Work through the steps.</strong> Each wizard guides you step by step; some steps require an action (such as saving credentials or passing a connectivity test) before you can continue. Progress is saved, so you can close a wizard and resume it later from the same launcher.</li>
+<li><strong>Finish.</strong> Completing the final step applies the setup (for example, &quot;Credentials saved,&quot; &quot;Requirements confirmed,&quot; &quot;Bridge connected&quot;).</li>
+</ol>
+<p><strong>What the AI assistant does here.</strong> The <strong>Proposal Kickoff</strong> wizard ties into the AI features documented under Proposals: it ingests your uploaded RFP (extracting requirements via the RFP Shredder) and can generate a compliance matrix, then leaves you ready to draft. Review and confirm the extracted requirements inside the proposal's RFP Shredder panel before the wizard advances. The <strong>AI Provider</strong> wizard is what connects the AI engine that powers drafting across the app.</p>
+<p><strong>What success looks like.</strong> The wizard reaches its final step and reports success; the related feature (AI drafting, a connected integration, a draft-ready proposal) is now available.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;No wizards available for your role.&quot;</em> Your role can't run any setup wizards — an Admin or Proposal Manager handles these.</li>
+<li><em>A step won't advance.</em> That step requires a successful action first — for example, the AI Provider wizard needs a passing connectivity test, and Proposal Kickoff needs you to confirm RFP requirements in the proposal's RFP Shredder panel.</li>
+<li><em>A connectivity or health test fails.</em> Re-check the URL and key you entered and run the test again.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Resource-scoped wizards (Proposal Kickoff, Teaming) need an ID up front — have the proposal or workspace open so you can copy it.</li>
+<li>The <strong>Proposal Kickoff</strong> wizard can be started from the proposal workspace's <strong>✨ Kickoff wizard</strong> button as well as from the sidebar.</li>
+</ul>
+<p><strong>Related sections.</strong> The wizards configure features documented under <a href="#24-proposals">Proposals</a>, <a href="#51-integrations">Integrations</a>, and <a href="#61-admin">Admin</a>.</p>
+<hr>
+<h2 id="8-your-profile">8. Your profile</h2>
+<p><strong>What it's for.</strong> The profile area (titled <strong>Settings</strong>) is where you manage your own account — your display details, password, notification preferences, digest emails — and find quick links to connected tools. It's reached from the user block at the very bottom of the sidebar.</p>
+<p><strong>Who can use it.</strong> All roles, for their own account.</p>
+<p><strong>Step by step.</strong></p>
+<ol>
+<li><strong>Open it.</strong> Click your name/avatar at the bottom of the sidebar.</li>
+<li><strong>Edit your profile.</strong> Under <strong>Account Settings</strong>, update your <strong>Photo</strong>, <strong>Display name</strong>, <strong>Email address</strong>, <strong>Time zone</strong>, and <strong>Date format</strong>; your <strong>Role</strong> is shown but not editable here. Click <strong>Save changes</strong>.</li>
+<li><strong>Change your password.</strong> Enter your <strong>Current password</strong> (if you have one), then a <strong>New password</strong> (minimum 8 characters) and confirm it. Save to update it.</li>
+<li><strong>Set notification preferences.</strong> Choose which notifications you receive and how, and configure <strong>digest emails</strong>.</li>
+<li><strong>Jump to connected tools.</strong> Use the quick links to <strong>Integrations</strong>, <strong>SAM Monitors</strong>, and (Proposal Manager+) <strong>Scheduled Reports</strong>.</li>
+</ol>
+<p><strong>What success looks like.</strong> &quot;Profile updated.&quot; and &quot;Password updated successfully.&quot; confirmations; your display name, time zone, and date format apply across the app.</p>
+<p><strong>If something goes wrong.</strong></p>
+<ul>
+<li><em>&quot;Passwords don't match.&quot;</em> Re-enter the new password and confirmation so they match.</li>
+<li><em>Password too short.</em> Use at least 8 characters.</li>
+</ul>
+<p><strong>Tips &amp; things to watch for.</strong></p>
+<ul>
+<li>Your <strong>Time zone</strong> and <strong>Date format</strong> affect how deadlines, reminders, and dates appear throughout Pursuite, including digest emails.</li>
+</ul>
+<p><strong>Related sections.</strong> Connected tools link to <a href="#51-integrations">Integrations</a> and <a href="#52-scheduled-reports">Scheduled Reports</a>.</p>
+<hr>
+<h2 id="appendix-items-needing-verification">Appendix: Items needing verification</h2>
+<p><em>This appendix is for the guide's author, not for end users. It lists anything that could not be fully confirmed from the application during writing.</em></p>
+<ul>
+<li><strong>Per-action role gates inside some screens</strong> were inferred from the on-screen permission checks present in each area (for example, management actions generally require Proposal Manager or higher). A few screens — notably <strong>Integrations</strong> and <strong>Workflows</strong> — perform their permission checks on the server rather than in the page, so the exact role required to <em>create or change</em> connections and workflows should be confirmed against the server's permission rules before publishing.</li>
+<li><strong>Webhooks tab (Admin) and SAM.gov Monitors</strong> are referenced from several screens (Home quick access, profile tools, dashboard widgets) but were not documented as their own sections because they aren't top-level sidebar items. If they should appear in the guide, confirm their exact on-screen labels and flows.</li>
+<li><strong>Pricing Volume access control</strong> — the precise rule for <em>who</em> can grant/revoke pricing access (versus who can simply view a granted volume) should be confirmed.</li>
+<li><strong>Presentation and Pricing approvals</strong> — the exact roles that can approve a generated presentation or a pricing volume were described as &quot;Executive Approver / approver&quot; based on surrounding UI; confirm against the server rules.</li>
+<li><strong>Bid/No-Bid threshold value</strong> — the numeric score at which a bid/no-bid escalates to Executive Approvers is shown dynamically on screen; the guide describes it as &quot;the bid threshold&quot; rather than a fixed number.</li>
+</ul>
+
+  </main>
+</div>
+</body>
+</html>

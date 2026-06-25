@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install and Run DocGuard AI</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1>Install and Run DocGuard AI</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Status: Production release approved</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Recommended Install" id="recommended-install"><h2>Recommended Install</h2>
+<p>Run the approved installer:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<p>The installer is built from:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI
+</code></pre>
+<p>Installer behavior:</p>
+<ul>
+<li>Product name: <code>DocGuard AI</code></li>
+<li>Executable: <code>DocGuardAI.exe</code></li>
+<li>Default install root: <code>{autopf}\DocGuard AI</code></li>
+<li>Privileges: non-admin capable</li>
+<li>Desktop shortcut: current user when running without elevation</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Portable Launch" id="portable-launch"><h2>Portable Launch</h2>
+<p>For portable validation or controlled file-share deployment:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe
+</code></pre>
+<p>Do not use older <code>dist-*</code> folders for production validation.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="Source Launch" id="source-launch"><h2>Source Launch</h2>
+<p>Use source launch only for engineering validation.</p>
+<pre><code>
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -e .
+sanitize-gui
+</code></pre>
+<p>Alternative source launch:</p>
+<pre><code>
+py main.py
+py -m sanitize
+</code></pre>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Command-Line Examples" id="command-line-examples"><h2>Command-Line Examples</h2>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+sanitize scan example.docx --profile aggressive --summary
+sanitize clean example.docx --profile aggressive --html-report auto
+sanitize run "C:\Source" --profile aggressive --html-report auto
+sanitize history --last 20
+</code></pre>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Production Validation Evidence" id="production-validation-evidence"><h2>Production Validation Evidence</h2>
+<p>The current release was approved after:</p>
+<ul>
+<li>Packaged EXE click-through QA passed.</li>
+<li>Installer link QA passed.</li>
+<li>Installed-app click-through QA passed.</li>
+<li>Dead-link scan passed.</li>
+<li>Missing-resource scan passed.</li>
+</ul>
+<p>Evidence files:</p>
+<pre><code>
+release\qa-packaged-ui-polish-clickthrough.json
+release\qa-installed-clickthrough.json
+release\qa-manual-matrix.md
+</code></pre>
+</section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

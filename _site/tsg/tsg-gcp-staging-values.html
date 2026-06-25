@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GCP staging values</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="gcp-staging-values">GCP staging values</h1>
+<p>Date captured: 2026-06-20</p>
+<p>These values define the staging target for integrating TSG License Manager into the existing GCP-hosted Virtual Business Solution.</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Core GCP resources" id="core-gcp-resources"><h2 id="core-gcp-resources">Core GCP resources</h2>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GCP project ID</td>
+<td><code>ttis-ai</code></td>
+</tr>
+<tr>
+<td>Region</td>
+<td><code>us-central1</code></td>
+</tr>
+<tr>
+<td>Artifact Registry repository</td>
+<td><code>tsg-platform</code></td>
+</tr>
+<tr>
+<td>Artifact image</td>
+<td><code>tsg-license-manager</code></td>
+</tr>
+<tr>
+<td>Cloud Run service</td>
+<td><code>tsg-license-manager-staging</code></td>
+</tr>
+<tr>
+<td>Cloud SQL instance</td>
+<td><code>tsg-license-manager-staging</code></td>
+</tr>
+<tr>
+<td>Cloud SQL database</td>
+<td><code>tsg_license_manager</code></td>
+</tr>
+<tr>
+<td>Cloud SQL user</td>
+<td><code>tsg_app</code></td>
+</tr>
+<tr>
+<td>Staging base URL</td>
+<td><code>https://license-staging.tti-solutions.com</code></td>
+</tr>
+<tr>
+<td>Allowed hosts</td>
+<td><code>license-staging.tti-solutions.com,docguard-ai-staging.tti-solutions.com,pursuite-staging.tti-solutions.com</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Product portal values" id="product-portal-values"><h2 id="product-portal-values">Product portal values</h2>
+<table>
+<thead>
+<tr>
+<th>Product</th>
+<th>Runtime product ID</th>
+<th>Portal URL</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DocGuard AI</td>
+<td><code>docguard_ai</code></td>
+<td><code>https://docguard-ai-staging.tti-solutions.com</code></td>
+<td>Commercial product name. The former <code>sanitize_*</code> / Sanitize Suite naming was a development codename and is retired. Hostname normalized from the invalid <code>https://DocGuard AI-staging.tti-solutions.com</code>; DNS hostnames cannot contain spaces.</td>
+</tr>
+<tr>
+<td>Pursuite</td>
+<td><code>pursuite_crm</code></td>
+<td><code>https://pursuite-staging.tti-solutions.com</code></td>
+<td>Aligns with the existing seeded product ID for Pursuite.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="Image path" id="image-path"><h2 id="image-path">Image path</h2>
+<div class="codehilite"><pre><span></span><code>us-central1-docker.pkg.dev/ttis-ai/tsg-platform/tsg-license-manager:0.2.0-rc.1
+</code></pre></div>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Cloud SQL connection name" id="cloud-sql-connection-name"><h2 id="cloud-sql-connection-name">Cloud SQL connection name</h2>
+<div class="codehilite"><pre><span></span><code>ttis-ai:us-central1:tsg-license-manager-staging
+</code></pre></div>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Secret Manager names" id="secret-manager-names"><h2 id="secret-manager-names">Secret Manager names</h2>
+<table>
+<thead>
+<tr>
+<th>Environment variable</th>
+<th>Secret Manager name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td><code>tsg-license-manager-staging-database-url</code></td>
+</tr>
+<tr>
+<td><code>TSG_AUTH_SECRET</code></td>
+<td><code>tsg-license-manager-staging-auth-secret</code></td>
+</tr>
+<tr>
+<td><code>TSG_LICENSE_SIGNING_SECRET</code></td>
+<td><code>tsg-license-manager-staging-license-signing-secret</code></td>
+</tr>
+<tr>
+<td><code>TSG_CLIENT_API_SECRET</code></td>
+<td><code>tsg-license-manager-staging-client-api-secret</code></td>
+</tr>
+<tr>
+<td><code>STRIPE_WEBHOOK_SECRET</code></td>
+<td><code>tsg-license-manager-staging-stripe-webhook-secret</code></td>
+</tr>
+<tr>
+<td><code>SMTP_PASSWORD</code></td>
+<td><code>tsg-license-manager-staging-smtp-password</code></td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="Open decisions" id="open-decisions"><h2 id="open-decisions">Open decisions</h2>
+<ol>
+<li>Confirm whether product portal hostnames route directly to the License Manager service or through the existing Virtual Business Solution ingress.</li>
+<li>Confirm the SMTP provider and non-secret SMTP host/user/from settings for staging.</li>
+<li>Confirm the Stripe test-mode webhook endpoint and secret for staging.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="Retired development codename" id="retired-development-codename"><h2 id="retired-development-codename">Retired development codename</h2>
+<p><code>sanitize_suite</code>, <code>sanitize_suite_pro</code>, <code>Sanitize Suite</code>, and <code>SSP</code> were development codenames. They should not appear in customer-facing staging evidence for DocGuard AI. If backward compatibility is needed for existing local/dev data, map retired IDs to <code>docguard_ai</code> during migration rather than exposing the old names in portals or documentation.</p></section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

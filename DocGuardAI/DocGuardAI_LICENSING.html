@@ -1,0 +1,58 @@
+﻿<!doctype html><html><head><meta charset="utf-8"><title>LICENSING</title><style>body{font-family:Segoe UI,Arial,sans-serif;line-height:1.55;margin:32px;max-width:1060px;color:#0b2136}h1,h2,h3{color:#0b2136}code,pre{background:#f3f6f9;border:1px solid #d8dee6;border-radius:6px}code{padding:1px 4px}pre{padding:12px;overflow:auto}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #d8dee6;padding:8px;text-align:left}th{background:#f3f6f9}blockquote{border-left:4px solid #008c7f;padding-left:12px;color:#526579}</style></head><body>
+<h1>DocGuard AI Licensing</h1>
+<p>Version: v1.2.0 RC1 U6.1</p>
+<p>DocGuard AI supports local trial operation, offline activation for controlled environments, and optional online activation through TSG License Manager.</p>
+<h2>Product Identity</h2>
+<p>| Field | Value |</p>
+<p>|---|---|</p>
+<p>| Product name | DocGuard AI |</p>
+<p>| Product ID | <code>docguard_ai</code> |</p>
+<p>| Product key prefix | <code>DGA</code> |</p>
+<p>| Edition | Core |</p>
+<p>Writing Assistant is included in Core and is not separately licensed.</p>
+<h2>Product Key Format</h2>
+<pre><code>
+DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Legacy <code>SSP-...</code> keys may be accepted only for RC compatibility.</p>
+<h2>Check License Status</h2>
+<pre><code>
+sanitize license
+</code></pre>
+<p>In the desktop app, use:</p>
+<pre><code>
+Tools -&gt; License Status
+</code></pre>
+<h2>Offline Activation</h2>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Offline activation stores a local license cache under:</p>
+<pre><code>
+%APPDATA%\DocGuardAI\license.json
+</code></pre>
+<h2>Online Activation</h2>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX --online --server-url http://127.0.0.1:8010
+</code></pre>
+<p>Online activation, refresh, and deactivation use TSG License Manager when configured.</p>
+<p>Online license cache:</p>
+<pre><code>
+%APPDATA%\DocGuardAI\tsg_license.json
+</code></pre>
+<h2>Refresh</h2>
+<pre><code>
+sanitize license --refresh --server-url http://127.0.0.1:8010
+</code></pre>
+<h2>Deactivate</h2>
+<pre><code>
+sanitize license --deactivate
+sanitize license --deactivate --online --server-url http://127.0.0.1:8010
+</code></pre>
+<h2>Security Notes</h2>
+<ul>
+<li>Do not include full product keys in screenshots or support tickets.</li>
+<li>Core document processing does not require cloud upload.</li>
+<li>Licensing and update-check requests contact TSG License Manager only when configured or explicitly invoked.</li>
+</ul>
+</body></html>

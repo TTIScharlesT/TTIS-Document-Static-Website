@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TSG License Manager Workflow Guide</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1>TSG License Manager Workflow Guide</h1>
+<p>Confidence Summary: Product identity, RC1 version, audiences, and environment notes are [verified] from repository documentation; this header has no procedural steps.</p>
+<p><strong>Product Name:</strong> TSG License Manager</p>
+<p><strong>Product Type:</strong> SaaS/software</p>
+<p><strong>Version/Date:</strong> v0.2.0-rc.1 / June 24, 2026</p>
+<p><strong>Primary End-User:</strong> Product customers, licensed users, organization members, and account owners</p>
+<p><strong>Primary Admin:</strong> Administrators, support leads, operations owners, release managers, and product owners</p>
+<p><strong>Environment Notes:</strong> GCP staging and production-style operations; Cloud Run, Cloud SQL for PostgreSQL, Secret Manager, Artifact Registry, product-specific customer portals, Stripe webhooks, SMTP email, and product client APIs.</p>
+<p><strong>Grounding Corpus Used:</strong> Repository guides under <code>README.md</code>, <code>docs/products/tsg_license_manager/</code>, <code>docs/rc1/</code>, <code>docs/operations/</code>, <code>docs/security/</code>, <code>docs/integration/</code>, and <code>docs/production_hardening.md</code>.</p>
+<p><strong>Purpose:</strong> Provide one operating workflow for customer-facing license use and administrator-facing configuration, governance, support, and release operations.</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="At-a-Glance" id="at-a-glance"><h2>At-a-Glance</h2>
+<p>Confidence Summary: Capabilities in this section are [verified] from customer and administrator guides; no procedural steps are included here.</p>
+<table>
+<thead><tr><th>End-User track: what the customer can do</th><th>Admin track: what the administrator can do</th></tr></thead>
+<tbody>
+<tr><td>Set up or reset a portal password.</td><td>Provision and govern tenants, products, plans, modules, and entitlements.</td></tr>
+<tr><td>Sign in through the correct product portal.</td><td>Manage customer records, licenses, device activations, and organization/team data.</td></tr>
+<tr><td>View license status, plan/edition, device limits, and active devices.</td><td>Review product IDs, tenant IDs, key prefixes, portal hostnames, and status.</td></tr>
+<tr><td>Activate a product on an allowed device.</td><td>Retrieve and govern product API credentials and endpoint references.</td></tr>
+<tr><td>Deactivate an old or unused device when permitted.</td><td>Map Stripe prices to product plans and review billing/webhook outcomes.</td></tr>
+<tr><td>Review downloads, updates, extensions, and documentation links when enabled.</td><td>Review email settings, setup/reset delivery, and email event records.</td></tr>
+<tr><td>Review billing or subscription status when applicable.</td><td>Monitor readiness, runtime errors, auth events, billing events, client events, and release evidence.</td></tr>
+<tr><td>Contact support with license/account details without sharing passwords, API keys, or full payment card details.</td><td>Run backup, restore, rollback, smoke-test, security, and acceptance checks.</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Setup / Onboarding Sequence" id="setup-onboarding-sequence"><h2>Setup / Onboarding Sequence</h2>
+<p>Confidence Summary: End-user setup is fully [verified] from the end-user guide; admin setup is mostly [verified] from admin, deployment, security, and hardening guides, with one [unknown — needs SME input] regulated-data classification step.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="End-User Track" id="end-user-track"><h3>End-User Track</h3>
+<p><strong>Precondition:</strong> You have a welcome email, setup email, or portal URL from TTI Solutions or your product administrator.</p>
+<ol>
+<li>[verified] Open the setup email from TTI Solutions or open the product portal URL provided by your product administrator.</li>
+<li>[verified] Select the password setup link.</li>
+<li>[verified] Confirm the page shows the expected product or customer portal context.</li>
+<li><strong>[verified] Enter a new password and submit the form.</strong></li>
+<li>[verified] Return to the product portal.</li>
+<li><strong>[verified] Sign in with your email address and new password.</strong></li>
+<li>[verified] Open the license area or dashboard.</li>
+<li>[verified] Confirm the license shows the expected product, plan or edition, status, device limit, and active devices.</li>
+<li>[verified] Install and open the licensed product application when activation is required.</li>
+<li><strong>[verified] Enter the product key in the product activation or license option.</strong></li>
+<li><strong>[verified] Submit activation and wait for confirmation that activation succeeded.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> The portal account is usable, the assigned license is visible, and the product activates on an allowed device.</p>
+<p><strong>How to confirm success:</strong> Confirm the portal dashboard loads, the license status is active or otherwise expected, the active device count is correct, and the product reports successful activation.</p>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Admin Track" id="admin-track"><h3>Admin Track</h3>
+<p><strong>Precondition:</strong> You have approved administrative access, target environment details, and a staging or production deployment plan.</p>
+<ol>
+<li><strong>[verified] Store <code>DATABASE_URL</code>, <code>TSG_AUTH_SECRET</code>, <code>TSG_LICENSE_SIGNING_SECRET</code>, <code>TSG_CLIENT_API_SECRET</code>, <code>STRIPE_WEBHOOK_SECRET</code>, and SMTP credentials in Secret Manager or an approved secret store.</strong></li>
+<li><strong>[verified] Configure staging or production to use PostgreSQL, HTTPS, secure cookies, explicit allowed hosts, and non-placeholder secrets.</strong></li>
+<li>[verified] Deploy the service to the approved runtime target, such as Cloud Run with Cloud SQL for PostgreSQL and Artifact Registry.</li>
+<li>[verified] Record the image digest, Cloud Run revision, database backup identifier, migration version, and <code>/ready</code> response.</li>
+<li><strong>[verified] Sign in with an approved named admin account.</strong></li>
+<li>[verified] Confirm the environment banner or base URL is the intended staging or production system.</li>
+<li>[verified] Verify tenant ID, display name, domain or portal hostname, theme, visibility group, and support email.</li>
+<li>[verified] Verify product ID, product name, tenant ID, product key prefix, and product status.</li>
+<li><strong>[verified] Configure or validate plans, modules, entitlements, roles, and access boundaries before allowing customer activation.</strong></li>
+<li><strong>[unknown — needs SME input] Classify whether customer, license, billing, or activation records include CUI or other regulated data before configuring retention, export, and support-handling rules.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> The service is deployed, secure-by-configuration, tenant-aware, product-aware, and ready for controlled customer onboarding.</p>
+<p><strong>How to confirm success:</strong> <code>/ready</code> reports database OK, product portals route to the correct tenant/product context, admin seed credentials are absent from production, and release evidence records the deployment state.</p>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Core Operating Procedures" id="core-operating-procedures"><h2>Core Operating Procedures</h2>
+<p>Confidence Summary: Customer portal and admin procedures are primarily [verified] from the product guides, runbook, deployment guide, endpoint reference, and backup/restore guide; limited operational routing choices are [inferred — confirm] where the repository names the condition but not the final business owner.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="End-User Track" id="end-user-track-2"><h3>End-User Track</h3>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="Task EU-1: Sign In and Review a License" id="task-eu-1-sign-in-and-review-a-license"><h4>Task EU-1: Sign In and Review a License</h4>
+<p><strong>Trigger/Precondition:</strong> You need to confirm license status, plan, device limit, billing state, downloads, or team information.</p>
+<ol>
+<li>[verified] Open the product portal URL provided by TTI Solutions, your welcome email, or your product administrator.</li>
+<li>[verified] Enter the email address associated with your product license.</li>
+<li><strong>[verified] Enter your password and select Sign In.</strong></li>
+<li>[verified] Wait for the portal dashboard to load.</li>
+<li>[verified] Open the license area or dashboard.</li>
+<li>[verified] Review product name, product key, plan or edition, license status, device limit, active devices, timestamps, and billing or subscription status when shown.</li>
+</ol>
+<p><strong>Expected result:</strong> The portal shows the license and account details available to your role.</p>
+<p><strong>How to confirm success:</strong> The license belongs to the expected product and account, the status is clear, and the device count matches your known active devices.</p>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="Task EU-2: Activate a Product on a Device" id="task-eu-2-activate-a-product-on-a-device"><h4>Task EU-2: Activate a Product on a Device</h4>
+<p><strong>Trigger/Precondition:</strong> The product is installed, the device is online, and you have a product key for the correct product.</p>
+<ol>
+<li>[verified] Install and open the product.</li>
+<li>[verified] Choose the activation or license option.</li>
+<li><strong>[verified] Enter your product key.</strong></li>
+<li>[verified] Confirm the device label if prompted.</li>
+<li><strong>[verified] Submit activation.</strong></li>
+<li>[verified] Wait for confirmation that activation succeeded.</li>
+<li>[verified] Restart the product if the app asks you to.</li>
+</ol>
+<p><strong>Expected result:</strong> TSG License Manager verifies that the key exists, the license is active, the license belongs to the correct product, the device limit is not exceeded, and the current device is allowed.</p>
+<p><strong>How to confirm success:</strong> The product reports successful activation, the portal shows the active device when device details are available, and licensed features load as expected.</p>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="Task EU-3: Deactivate an Old Device" id="task-eu-3-deactivate-an-old-device"><h4>Task EU-3: Deactivate an Old Device</h4>
+<p><strong>Trigger/Precondition:</strong> You reached a device limit, replaced a workstation, or no longer need access on an old device.</p>
+<ol>
+<li>[verified] Sign in to the product portal.</li>
+<li>[verified] Open the license or device area.</li>
+<li>[verified] Review device names, IDs, or labels.</li>
+<li>[verified] Identify the old or unused device.</li>
+<li><strong>[verified] Confirm you no longer need product access on that device.</strong></li>
+<li><strong>[verified] Select the deactivation action and confirm the action.</strong></li>
+<li><strong>[verified] Activate the product on the new device if needed.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> The old device no longer consumes an active device slot, and product access may be removed from that workstation immediately.</p>
+<p><strong>How to confirm success:</strong> The active device count changes as expected and the new device can activate if the license permits it.</p>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="Task EU-4: Reset a Password" id="task-eu-4-reset-a-password"><h4>Task EU-4: Reset a Password</h4>
+<p><strong>Trigger/Precondition:</strong> You forgot your password, the setup link expired, or support asked you to complete a reset.</p>
+<ol>
+<li>[verified] Open the product portal.</li>
+<li>[verified] Select the password reset option when available.</li>
+<li><strong>[verified] Enter your account email address.</strong></li>
+<li>[verified] Open the reset email.</li>
+<li><strong>[verified] Select the reset link.</strong></li>
+<li><strong>[verified] Enter a new password.</strong></li>
+<li><strong>[verified] Sign in again.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> The old password is replaced, and the account can sign in through the correct product portal.</p>
+<p><strong>How to confirm success:</strong> The portal accepts the new password and the dashboard loads.</p>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="Task EU-5: Resolve Missing Access, Downloads, or Extensions" id="task-eu-5-resolve-missing-access-downloads-or-extensions"><h4>Task EU-5: Resolve Missing Access, Downloads, or Extensions</h4>
+<p><strong>Trigger/Precondition:</strong> A license, feature, download, product update, module, extension, invoice, or subscription detail is missing or appears incorrect.</p>
+<ol>
+<li>[verified] Confirm you are signed in with the email address tied to the license.</li>
+<li>[verified] Confirm you are on the correct product portal.</li>
+<li>[verified] Check license status, plan or edition, device limit, billing status, downloads, and extensions available to your account.</li>
+<li>[verified] Refresh license status from inside the product if that option is available.</li>
+<li>[verified] Contact support with product name, account email, app version, operating system, device label, partial product key details, screenshot or exact error message, and approximate time of the issue.</li>
+<li><strong>[verified] Do not send passwords, full payment card details, API keys, private credentials, or configuration secrets to support.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> You either resolve the mismatch or provide support with enough information to inspect the account and license safely.</p>
+<p><strong>How to confirm success:</strong> The expected feature, download, license, billing record, or support response is visible without exposing secrets.</p>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="Admin Track" id="admin-track-2"><h3>Admin Track</h3>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="Task AD-1: Run the Daily Administrative Check" id="task-ad-1-run-the-daily-administrative-check"><h4>Task AD-1: Run the Daily Administrative Check</h4>
+<p><strong>Trigger/Precondition:</strong> Start of an administrative session, smoke test, release check, or support triage window.</p>
+<ol>
+<li><strong>[verified] Sign in with an approved admin account.</strong></li>
+<li>[verified] Confirm the environment banner or base URL is the expected staging or production system.</li>
+<li>[verified] Check <code>/ready</code> or the readiness card for database connectivity.</li>
+<li>[verified] Review recent runtime errors.</li>
+<li>[verified] Review recent auth, billing, Stripe, email, and client events.</li>
+<li>[verified] Confirm no unexpected product or tenant records were created.</li>
+<li>[verified] Record any unusual finding in the release or operations log.</li>
+</ol>
+<p><strong>Expected result:</strong> The administrator knows whether the service is healthy and whether recent events require triage.</p>
+<p><strong>How to confirm success:</strong> <code>/ready</code> is healthy, monitoring pages show no unreviewed critical errors, and unusual findings are recorded.</p>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="Task AD-2: Validate Product, Plan, Module, and Marketplace Setup" id="task-ad-2-validate-product-plan-module-and-marketplace-setup"><h4>Task AD-2: Validate Product, Plan, Module, and Marketplace Setup</h4>
+<p><strong>Trigger/Precondition:</strong> A product is being added, reviewed for release, or audited after configuration changes.</p>
+<ol>
+<li>[verified] Confirm tenant ID, display name, domain or portal hostname, theme or customer-facing presentation, visibility group, and support email.</li>
+<li>[verified] Confirm product ID is stable and API-safe.</li>
+<li>[verified] Confirm product name is customer-facing.</li>
+<li>[verified] Confirm tenant ID points to the correct tenant.</li>
+<li>[verified] Confirm product key prefix is correct.</li>
+<li><strong>[verified] Set product status to active only when the product is ready.</strong></li>
+<li>[verified] Confirm each plan has plan ID, product ID, edition or name, billing type, device limit, status, and optional license duration.</li>
+<li><strong>[verified] Do not activate paid plans until billing and Stripe mapping are validated.</strong></li>
+<li>[verified] Map modules to plans so licenses receive expected access.</li>
+<li>[verified] Confirm the product application knows how to enforce each entitlement.</li>
+<li>[verified] Confirm marketplace extension ID, product ID, status, required plan, download URL, docs URL, and auditable install records when extensions are used.</li>
+</ol>
+<p><strong>Expected result:</strong> Product identity, portal context, billing plan, entitlements, and optional extensions are coherent before customer use.</p>
+<p><strong>How to confirm success:</strong> Product portal routing, license visibility, activation, refresh, downloads, and extension access match the intended product and plan.</p>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="Task AD-3: Support a Customer License or Device Issue" id="task-ad-3-support-a-customer-license-or-device-issue"><h4>Task AD-3: Support a Customer License or Device Issue</h4>
+<p><strong>Trigger/Precondition:</strong> A customer reports missing license access, activation denial, device-limit failure, expired setup/reset link, or suspected account mismatch.</p>
+<ol>
+<li><strong>[verified] Verify the customer's identity through the approved support procedure.</strong></li>
+<li><strong>[verified] Confirm the customer email is tied to the expected customer or license record.</strong></li>
+<li>[verified] Open the relevant customer, license, or activation record.</li>
+<li>[verified] Review license product ID, plan ID, product key, status, device limit, and activation timestamps.</li>
+<li><strong>[verified] Send or regenerate a setup/reset token only for the verified customer.</strong></li>
+<li><strong>[verified] Deactivate old devices only when requested or approved.</strong></li>
+<li>[verified] Confirm device limit enforcement after changes.</li>
+<li><strong>[verified] Do not ask customers to send passwords, full payment card details, API keys, private credentials, or configuration secrets.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> The customer receives a safe support action without breaking tenant boundaries or exposing secrets.</p>
+<p><strong>How to confirm success:</strong> The customer signs in or activates successfully, and the admin record shows the intended license/device state.</p>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="Task AD-4: Validate Stripe and Billing Operations" id="task-ad-4-validate-stripe-and-billing-operations"><h4>Task AD-4: Validate Stripe and Billing Operations</h4>
+<p><strong>Trigger/Precondition:</strong> Paid products, subscriptions, invoices, Stripe webhooks, or billing-driven access changes are being configured or reviewed.</p>
+<ol>
+<li><strong>[verified] Configure the Stripe test-mode webhook.</strong></li>
+<li><strong>[verified] Map each Stripe price as <code>stripe_price_id -&gt; product_id -&gt; plan_id</code>.</strong></li>
+<li><strong>[verified] Send a signed checkout event.</strong></li>
+<li><strong>[verified] Confirm signature verification succeeds.</strong></li>
+<li><strong>[verified] Confirm license and customer records are created or updated as expected.</strong></li>
+<li><strong>[verified] Confirm replayed events are idempotent.</strong></li>
+<li><strong>[verified] Confirm tampered payloads are rejected.</strong></li>
+<li><strong>[verified] Review subscription status, invoice status, failed payment events, billing-caused license status changes, and audit records.</strong></li>
+</ol>
+<p><strong>Expected result:</strong> Billing events map to the right product and plan, and unsafe webhook payloads do not change customer access.</p>
+<p><strong>How to confirm success:</strong> Billing events, invoices, license status, Stripe logs, and audit records show the expected outcome for signed, replayed, and tampered events.</p>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="Task AD-5: Validate Email Operations" id="task-ad-5-validate-email-operations"><h4>Task AD-5: Validate Email Operations</h4>
+<p><strong>Trigger/Precondition:</strong> Password setup, password reset, license notices, or operational test messages must be accepted for staging or production.</p>
+<ol>
+<li><strong>[verified] Confirm SMTP or provider credentials are stored in the environment or secret store.</strong></li>
+<li><strong>[verified] Confirm staging or production does not depend on database-stored SMTP passwords.</strong></li>
+<li>[verified] Send a password setup email.</li>
+<li>[verified] Send a password reset email.</li>
+<li>[verified] Confirm delivery event records.</li>
+<li>[verified] Confirm email links point to the correct product portal or base URL.</li>
+</ol>
+<p><strong>Expected result:</strong> Account emails reach customers and route them to the correct product context.</p>
+<p><strong>How to confirm success:</strong> Email event records exist, delivery is successful, and links open the intended portal.</p>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="Task AD-6: Run Backup, Restore, and Rollback Validation" id="task-ad-6-run-backup-restore-and-rollback-validation"><h4>Task AD-6: Run Backup, Restore, and Rollback Validation</h4>
+<p><strong>Trigger/Precondition:</strong> Before deployment, before promotion, during rollback rehearsal, or after restoring a database backup.</p>
+<ol>
+<li><strong>[verified] Record the active image digest.</strong></li>
+<li><strong>[verified] Record the active Cloud Run revision.</strong></li>
+<li><strong>[verified] Record the active Cloud SQL backup identifier.</strong></li>
+<li>[verified] Record the migration version.</li>
+<li>[verified] Record the <code>/ready</code> response.</li>
+<li><strong>[verified] Run the backup script for the operator platform: <code>scripts/backup_postgres.ps1</code> on PowerShell or <code>scripts/backup_postgres.sh</code> on Linux/macOS.</strong></li>
+<li><strong>[verified] Restore with <code>scripts/restore_postgres.ps1 -BackupFile backups/tsg_platform_YYYYMMDD_HHMMSS.dump</code> on PowerShell or <code>scripts/restore_postgres.sh backups/tsg_platform_YYYYMMDD_HHMMSS.dump</code> on Linux/macOS when restore is required.</strong></li>
+<li>[verified] After restore, verify login, licenses, billing events, email outbox, and <code>/ready</code>.</li>
+<li>[verified] Re-run <code>/health</code>, <code>/ready</code>, portal login, tenant isolation, activation, and Stripe replay smoke tests after rollback.</li>
+<li>[verified] Record operators, timestamps, backup IDs, image digests, and validation results.</li>
+</ol>
+<p><strong>Expected result:</strong> Backup and rollback evidence proves that the service can be recovered and validated.</p>
+<p><strong>How to confirm success:</strong> Restored or rolled-back environments pass login, tenant isolation, activation, billing replay, email outbox, and readiness checks.</p>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="Admin Configuration &amp; Governance" id="admin-configuration-governance"><h2>Admin Configuration &amp; Governance</h2>
+<p>Confidence Summary: Configuration controls are [verified] from admin, deployment, security, hardening, and operations docs except regulated/CUI handling, which is [unknown — needs SME input] because no product-specific CUI handling rule appears in the grounding corpus.</p>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="Governance Control Map" id="governance-control-map"><h3>Governance Control Map</h3>
+<table>
+<thead><tr><th>Control area</th><th>Admin action</th><th>End-user impact</th><th>Risk flag</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>Roles and permissions</td><td>Use named admin accounts; restrict admin console to approved users; apply least privilege for GCP permissions.</td><td>Customers see only permitted account/license actions.</td><td>Access control</td><td>[verified]</td></tr>
+<tr><td>Tenant and portal boundaries</td><td>Verify tenant ID, portal hostname, product ID, key prefix, and status.</td><td>Customers land in the correct product context.</td><td>Access control</td><td>[verified]</td></tr>
+<tr><td>Product client API credentials</td><td>Retrieve product API settings through Product Integration Settings; authenticate with <code>X-TSG-Product-ID</code> and <code>X-TSG-API-Key</code>.</td><td>Products can activate, refresh, deactivate, check updates, downloads, and extensions.</td><td>Access control</td><td>[verified]</td></tr>
+<tr><td>Secrets</td><td>Store database, auth, signing, client API, Stripe, and SMTP secrets outside source control.</td><td>Reduces credential exposure risk.</td><td>Access control</td><td>[verified]</td></tr>
+<tr><td>Stripe mapping</td><td>Verify each Stripe price maps to product and plan before paid-product activation.</td><td>Billing events grant or suspend the correct access.</td><td>Money / access control</td><td>[verified]</td></tr>
+<tr><td>Logging and audit</td><td>Review monitoring, logs, errors, email events, auth events, billing events, and client events.</td><td>Support can explain login, billing, email, activation, and tenant-boundary outcomes.</td><td>Audit</td><td>[verified]</td></tr>
+<tr><td>Backup and restore</td><td>Run documented backup/restore scripts and validate login, licenses, billing events, email outbox, and <code>/ready</code>.</td><td>Recovery preserves customer-facing license and account data.</td><td>Data retention / recovery</td><td>[verified]</td></tr>
+<tr><td>Regulated/CUI handling</td><td>Define whether customer, billing, license, device, or audit data falls under CUI or another regulated-data scope.</td><td>Support handling, export, deletion, and retention rules become clear.</td><td>Regulated/CUI data</td><td>[unknown — needs SME input]</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="Governance Review Workflow" id="governance-review-workflow"><h3>Governance Review Workflow</h3>
+<p><strong>Precondition:</strong> A product, environment, release, or support process is being prepared for staging acceptance, production promotion, or periodic audit.</p>
+<ol>
+<li><strong>[verified] Confirm named admin accounts, role-based route protection, customer tenant boundaries, and least-privilege GCP permissions.</strong></li>
+<li><strong>[verified] Confirm development credentials, development license-creation routes, placeholder secrets, SQLite, insecure cookies, and wildcard hosts are absent from staging or production.</strong></li>
+<li><strong>[verified] Confirm product client APIs reject missing or invalid <code>X-TSG-Product-ID</code> and <code>X-TSG-API-Key</code> headers.</strong></li>
+<li><strong>[verified] Confirm password setup/reset tokens expire and are single-use.</strong></li>
+<li><strong>[verified] Confirm Stripe signature verification uses the exact HTTP request body and rejects tampered payloads.</strong></li>
+<li><strong>[verified] Confirm SMTP credentials are stored outside source control and staging/production does not depend on database-stored SMTP passwords.</strong></li>
+<li><strong>[verified] Confirm backups are protected and restore validation includes login, licenses, billing events, email outbox, and <code>/ready</code>.</strong></li>
+<li><strong>[unknown — needs SME input] Define and record regulated/CUI handling rules for support screenshots, exports, logs, backups, retention, and deletion requests.</strong></li>
+<li>[verified] Record security, operations, product-owner, and release-manager signoffs.</li>
+</ol>
+<p><strong>Expected result:</strong> Governance checks are explicit, auditable, and tied to product/customer access risks.</p>
+<p><strong>How to confirm success:</strong> Security checklist items are signed off or documented as open environment-evidence gaps before release acceptance.</p>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="Lifecycle &amp; Decision Points" id="lifecycle-decision-points"><h2>Lifecycle &amp; Decision Points</h2>
+<p>Confidence Summary: Activation, billing, password reset, deployment, rollback, and support branches are mostly [verified]; scale/retire ownership and regulated-data decisions are [inferred — confirm] or [unknown — needs SME input] where repository docs do not define business policy.</p>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="End-User Track Decision Map" id="end-user-track-decision-map"><h3>End-User Track Decision Map</h3>
+<table>
+<thead><tr><th>Decision point</th><th>Branch condition</th><th>Action</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>Use setup link vs. request a new link</td><td>Setup link expired or already used</td><td>Request a new setup/reset link and use the newest email only.</td><td>[verified]</td></tr>
+<tr><td>Sign in vs. reset password</td><td>Password is forgotten or rejected</td><td>Use password reset when available; contact support if account state is unclear.</td><td>[verified]</td></tr>
+<tr><td>Activate vs. contact support</td><td>Activation succeeds, or activation is denied</td><td>Check product key, internet access, license status, and device limit before contacting support.</td><td>[verified]</td></tr>
+<tr><td>Deactivate vs. keep a device</td><td>Device limit reached or old workstation no longer needed</td><td>Deactivate an old device only after confirming access is no longer needed there.</td><td>[verified]</td></tr>
+<tr><td>Resolve billing vs. wait</td><td>Subscription-backed access is suspended after failed payment</td><td>Resolve payment issue or contact billing support.</td><td>[verified]</td></tr>
+<tr><td>Use current portal vs. switch portal</td><td>Portal shows the wrong product context</td><td>Sign out and open the correct product portal URL.</td><td>[verified]</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="Admin Track Decision Map" id="admin-track-decision-map"><h3>Admin Track Decision Map</h3>
+<table>
+<thead><tr><th>Decision point</th><th>Branch condition</th><th>Action</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>Activate product vs. hold</td><td>Product, tenant, plan, Stripe mapping, entitlement enforcement, or portal evidence is incomplete</td><td>Keep product inactive until the missing acceptance check is complete.</td><td>[verified]</td></tr>
+<tr><td>Provision reset token vs. deny request</td><td>Customer identity and email/license relationship are verified, or not verified</td><td>Regenerate setup/reset token only for a verified customer.</td><td>[verified]</td></tr>
+<tr><td>Deactivate device vs. preserve access</td><td>Customer requested/approved deactivation, or approval is missing</td><td>Deactivate only when requested or approved; otherwise preserve access and escalate.</td><td>[verified]</td></tr>
+<tr><td>Grant paid access vs. block</td><td>Stripe signed event is valid, tamper rejection passes, and replay is idempotent, or any check fails</td><td>Grant/update access only when webhook validation passes.</td><td>[verified]</td></tr>
+<tr><td>Continue release vs. rollback</td><td><code>/ready</code>, tenant isolation, activation, Stripe replay, or email smoke tests fail</td><td>Shift to rollback rehearsal or previous revision and rerun smoke tests.</td><td>[verified]</td></tr>
+<tr><td>Rotate credentials vs. continue</td><td>Product API key is exposed or suspected exposed</td><td>Rotate product API keys and distribute through an approved secure channel.</td><td>[verified]</td></tr>
+<tr><td>Scale up vs. hold capacity</td><td>Metrics or runtime evidence show sustained load or errors</td><td>Use platform operations policy to decide scaling or capacity changes.</td><td>[inferred — confirm]</td></tr>
+<tr><td>Retain/export/delete regulated records</td><td>Customer data is confirmed as CUI or otherwise regulated</td><td>Apply approved regulated-data retention, export, and deletion rules.</td><td>[unknown — needs SME input]</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="Troubleshooting" id="troubleshooting"><h2>Troubleshooting</h2>
+<p>Confidence Summary: End-user failure modes are [verified] from the customer guide; admin failure modes are [verified] from the runbook, admin guide, deployment guide, and security checklist, with one regulated-data escalation gap marked [unknown — needs SME input].</p>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="User-Resolvable Issues" id="user-resolvable-issues"><h3>User-Resolvable Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>Setup link expired</td><td>Token expired or was already used</td><td>Request a new setup/reset link and use the newest email only.</td><td>[verified]</td></tr>
+<tr><td>Cannot sign in</td><td>Wrong portal, wrong email, wrong password, or inactive account</td><td>Confirm portal URL, email, and password; then use password reset.</td><td>[verified]</td></tr>
+<tr><td>License missing</td><td>License assigned to another email or product context</td><td>Confirm the license was assigned to the same email used to sign in.</td><td>[verified]</td></tr>
+<tr><td>Activation denied</td><td>Product key, internet access, license status, or device limit issue</td><td>Check product key, internet access, license status, and device limit.</td><td>[verified]</td></tr>
+<tr><td>Device limit reached</td><td>Too many active devices</td><td>Deactivate an old device or contact support.</td><td>[verified]</td></tr>
+<tr><td>Product feature missing</td><td>Plan does not include the module or extension</td><td>Confirm your plan includes the module or extension.</td><td>[verified]</td></tr>
+<tr><td>Billing suspension</td><td>Payment issue affected subscription-backed access</td><td>Resolve payment issue or contact billing support.</td><td>[verified]</td></tr>
+<tr><td>Portal shows wrong product</td><td>Incorrect portal URL or stale session</td><td>Sign out and open the correct product portal URL.</td><td>[verified]</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="Admin-Only Issues" id="admin-only-issues"><h3>Admin-Only Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td><code>/ready</code> fails</td><td>Database connectivity, migration, or PostgreSQL health problem</td><td>Check PostgreSQL service health, connection string, backup status, and migration version.</td><td>[verified]</td></tr>
+<tr><td><code>/health</code> fails</td><td>Runtime or deployment problem</td><td>Review Cloud Run revision, image digest, runtime errors, and deployment logs.</td><td>[verified]</td></tr>
+<tr><td>Stripe webhook failures</td><td>Signature, mapping, tamper, replay, or delivery issue</td><td>Check <code>/admin/billing-events</code>, <code>/admin/errors</code>, and Stripe event delivery logs.</td><td>[verified]</td></tr>
+<tr><td>Email delivery failures</td><td>SMTP setting, provider credential, template, or routing issue</td><td>Check <code>/admin/email-events</code>, SMTP settings, and product portal/base URL links.</td><td>[verified]</td></tr>
+<tr><td>Cross-tenant license visibility</td><td>Tenant boundary or portal routing defect</td><td>Stop release acceptance and verify product portal routing, tenant isolation, and customer/product boundaries.</td><td>[verified]</td></tr>
+<tr><td>Product API activation fails</td><td>Missing or invalid product headers or API key</td><td>Verify <code>X-TSG-Product-ID</code>, <code>X-TSG-API-Key</code>, product ID, API base URL, and credential status.</td><td>[verified]</td></tr>
+<tr><td>Production startup blocked</td><td>Unsafe secrets, SQLite, missing Stripe config, insecure cookies, or wildcard hosts</td><td>Fix the unsafe configuration and rerun startup diagnostics before public use.</td><td>[verified]</td></tr>
+<tr><td>Regulated/CUI handling unclear</td><td>No approved product-specific data classification exists</td><td>Escalate to the compliance owner before exporting, retaining, deleting, or sharing regulated records.</td><td>[unknown — needs SME input]</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="Verification Checklist" id="verification-checklist"><h2>Verification Checklist</h2>
+<p>Confidence Summary: Checklist items are [verified] where they repeat acceptance, customer, admin, security, deployment, and backup evidence; regulated/CUI verification remains [unknown — needs SME input].</p>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="End-User Track" id="end-user-track-3"><h3>End-User Track</h3>
+<ul class="checklist">
+<li><span class="box"></span>[verified] Portal URL matches the expected product.</li>
+<li><span class="box"></span><strong>[verified] Password setup or password reset completed without forwarding the link or sharing the password.</strong></li>
+<li><span class="box"></span>[verified] Sign-in succeeds with the licensed account email.</li>
+<li><span class="box"></span>[verified] Dashboard or license area shows the expected product, plan, status, device limit, and active devices.</li>
+<li><span class="box"></span><strong>[verified] Product activation succeeds only with the correct product key and allowed device.</strong></li>
+<li><span class="box"></span><strong>[verified] Old devices are deactivated only after confirming access is no longer needed there.</strong></li>
+<li><span class="box"></span>[verified] Downloads, updates, extensions, billing, and organization/team details are reviewed where enabled.</li>
+<li><span class="box"></span><strong>[verified] Support request excludes passwords, full payment card details, API keys, private credentials, and configuration secrets.</strong></li>
+</ul>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="Admin Track" id="admin-track-3"><h3>Admin Track</h3>
+<ul class="checklist">
+<li><span class="box"></span><strong>[verified] Named admin accounts, approved roles, tenant boundaries, and product portal routing are verified.</strong></li>
+<li><span class="box"></span><strong>[verified] Required secrets are stored outside source control in Secret Manager or an approved secret store.</strong></li>
+<li><span class="box"></span><strong>[verified] Staging/production rejects placeholders, weak secrets, SQLite, missing Stripe configuration, insecure cookies, and wildcard hosts.</strong></li>
+<li><span class="box"></span>[verified] <code>/health</code>, <code>/ready</code>, <code>/metrics</code>, Admin Monitoring, Billing Events, and Email Events are reviewed.</li>
+<li><span class="box"></span><strong>[verified] Product client APIs reject missing or invalid product credentials.</strong></li>
+<li><span class="box"></span><strong>[verified] Activation, refresh, deactivation, and device-limit tests pass.</strong></li>
+<li><span class="box"></span><strong>[verified] Stripe signed payload, tamper rejection, and replay idempotency pass before paid plans are activated.</strong></li>
+<li><span class="box"></span>[verified] SMTP staging delivery passes and links route to the correct product portal/base URL.</li>
+<li><span class="box"></span><strong>[verified] Backup/restore and rollback evidence includes login, licenses, billing events, email outbox, <code>/ready</code>, tenant isolation, activation, and Stripe replay checks.</strong></li>
+<li><span class="box"></span><strong>[unknown — needs SME input] Regulated/CUI data classification, retention, export, deletion, backup protection, and support-handling rules are approved and recorded.</strong></li>
+<li><span class="box"></span>[verified] Security, operations, product-owner, and release-manager signoffs are recorded.</li>
+</ul>
+</section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

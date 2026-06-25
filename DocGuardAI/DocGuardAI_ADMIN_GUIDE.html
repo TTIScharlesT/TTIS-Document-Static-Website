@@ -1,0 +1,461 @@
+﻿<!doctype html><html><head><meta charset="utf-8"><title>ADMIN_GUIDE</title><style>body{font-family:Segoe UI,Arial,sans-serif;line-height:1.55;margin:32px;max-width:1060px;color:#0b2136}h1,h2,h3{color:#0b2136}code,pre{background:#f3f6f9;border:1px solid #d8dee6;border-radius:6px}code{padding:1px 4px}pre{padding:12px;overflow:auto}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{border:1px solid #d8dee6;padding:8px;text-align:left}th{background:#f3f6f9}blockquote{border-left:4px solid #008c7f;padding-left:12px;color:#526579}</style></head><body>
+<h1>DocGuard AI Administrator Guide</h1>
+<p>Version: v1.2.0 RC1 U6.1  </p>
+<p>Audience: IT administrators, release managers, security reviewers, support leads, and deployment owners  </p>
+<p>Status: Production release approved; post-release operational tasks are tracked separately in <code>docs\POST_RC_PRODUCTION_PLAN.md</code></p>
+<h2>Current Release Update</h2>
+<p>DocGuard AI RC1 U6.1 has passed the production release gate.</p>
+<p>| Gate | Result |</p>
+<p>|---|---|</p>
+<p>| Packaged EXE click-through QA | PASS |</p>
+<p>| Installer link QA | PASS |</p>
+<p>| Installed-app click-through QA | PASS |</p>
+<p>| Dead-link scan | PASS |</p>
+<p>| Missing-resource scan | PASS |</p>
+<p>Current approved installer:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<p>Current approved installer payload:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI
+</code></pre>
+<p>Final QA evidence:</p>
+<pre><code>
+release\qa-packaged-ui-polish-clickthrough.json
+release\qa-installed-clickthrough.json
+release\qa-manual-matrix.md
+</code></pre>
+<p>Security and release-readiness remediations completed in this pass:</p>
+<ul>
+<li>Removed stale development payload references from the installer script.</li>
+<li>Rebuilt the installer from the polished UI package.</li>
+<li>Switched installer behavior to non-admin capable per-user installation.</li>
+<li>Added strict package scans for dead-link tokens, missing resources, and excluded long-path QML payloads.</li>
+<li>Verified no packaged UI click target silently fails in packaged or installed form.</li>
+<li>Confirmed dashboard drill-downs open populated destination pages.</li>
+</ul>
+<h2>1. Purpose And Scope</h2>
+<p>This guide explains how to install, configure, license, operate, validate, and support DocGuard AI in an administrative environment.</p>
+<p>DocGuard AI is a local-first desktop and command-line application for document sanitization, metadata inspection, reporting, verification, and writing assistance. The core workflows run on the local workstation. Optional TSG License Manager integration supports online license activation, entitlement refresh, online deactivation, and update checks.</p>
+<p>This guide covers:</p>
+<ul>
+<li>Deployment models and package contents</li>
+<li>System and permission requirements</li>
+<li>Installation and portable operation</li>
+<li>Product identity and configuration locations</li>
+<li>Licensing and TSG License Manager integration</li>
+<li>Security, privacy, and data-handling guidance</li>
+<li>Cleanroom and reporting administration</li>
+<li>Validation checklists</li>
+<li>Support and troubleshooting procedures</li>
+<li>Post-RC production readiness</li>
+</ul>
+<h2>2. Administrative Responsibilities</h2>
+<p>Before deploying DocGuard AI, assign owners for these areas:</p>
+<p>| Area | Responsible Role | Responsibilities |</p>
+<p>|---|---|---|</p>
+<p>| Release ownership | Release manager | Approves production package, tracks evidence, coordinates rollout. |</p>
+<p>| Endpoint deployment | IT administrator | Installs package, configures shortcuts, manages user access. |</p>
+<p>| Licensing | License administrator | Configures product keys, TSG License Manager endpoint, activation and refresh policy. |</p>
+<p>| Security review | Security owner | Reviews local processing claims, reports, backups, dependencies, and endpoint scan results. |</p>
+<p>| Support readiness | Support lead | Maintains support intake, troubleshooting runbook, escalation path. |</p>
+<p>| Data governance | Records or compliance owner | Defines report retention, backup handling, and acceptable document workflows. |</p>
+<h2>3. Product Dashboard</h2>
+<p>DocGuard AI provides:</p>
+<ul>
+<li>Local scan and clean workflows for supported document and media types</li>
+<li>Metadata and structure inspection</li>
+<li>EXIF and image metadata cleaning where supported</li>
+<li>Document cleanup profiles</li>
+<li>Full pipeline Cleanroom</li>
+<li>Post-clean verification</li>
+<li>HTML, JSON, and CSV reporting</li>
+<li>Local run Activity</li>
+<li>Writing Assistant analysis and rewrite assistance</li>
+<li>Extensions visibility for enabled core Extensions and integration/module packs</li>
+<li>Optional TSG License Manager license and update-check integration</li>
+</ul>
+<p>Core processing does not require document upload to a cloud service. License and update-check calls can contact the configured TSG License Manager endpoint when online licensing is used.</p>
+<h2>4. Deployment Models</h2>
+<p>DocGuard AI supports three deployment models.</p>
+<p>| Model | Description | Recommended Use |</p>
+<p>|---|---|---|</p>
+<p>| Portable package | Self-contained folder containing <code>DocGuardAI.exe</code> and bundled runtime files. | Pilot use, controlled file-share deployment, support diagnostics, restricted installs. |</p>
+<p>| Installer package | Windows installer created from <code>installer\DocGuardAI.iss</code>. | Managed endpoint distribution, desktop shortcuts, Start menu entries. |</p>
+<p>| Source install | Python source install with <code>pip install -e .</code>. | Development, validation, integration testing, internal engineering workflows. |</p>
+<p>The approved polished portable build is:</p>
+<pre><code>
+dist-docguard-ui-polish\DocGuardAI\DocGuardAI.exe
+</code></pre>
+<p>The approved installer is:</p>
+<pre><code>
+release\DocGuardAISetup.exe
+</code></pre>
+<h2>5. System Requirements</h2>
+<p>Recommended endpoint requirements:</p>
+<ul>
+<li>Windows 10 or Windows 11</li>
+<li>Standard user execution rights for the application folder</li>
+<li>Read access to target source documents</li>
+<li>Write access to selected output/report locations</li>
+<li>Optional network access to TSG License Manager for online licensing and update checks</li>
+</ul>
+<p>For source-based validation:</p>
+<ul>
+<li>Python 3.11 or newer</li>
+<li>Dependencies from <code>requirements.txt</code></li>
+<li>PyInstaller for packaged build workflows</li>
+</ul>
+<h2>6. Package Contents</h2>
+<p>A portable package should contain:</p>
+<ul>
+<li><code>DocGuardAI.exe</code></li>
+<li><code>_internal\profiles</code></li>
+<li><code>_internal\assets</code></li>
+<li>PySide and Python runtime dependencies</li>
+<li>Supporting libraries collected by PyInstaller</li>
+</ul>
+<p>The production installer is built from the polished package and does not rely on source-tree documentation paths at runtime.</p>
+<h2>7. Installation From Portable Package</h2>
+<p>1. Copy <code>dist-docguard-ui-polish\DocGuardAI</code> to an approved location.</p>
+<p>2. Confirm users have read and execute access to the extracted folder.</p>
+<p>3. Confirm users have write access to the intended report and Activity location.</p>
+<p>4. Launch <code>DocGuardAI.exe</code>.</p>
+<p>5. Confirm the window title shows <code>DocGuard AI v1.2.0 RC1 U6.1</code>.</p>
+<p>6. Confirm <code>Writing Assistant</code> appears in the sidebar.</p>
+<p>7. Confirm <code>Extensions</code> lists the expected enabled Extensions.</p>
+<p>8. Run a scan against a known safe sample.</p>
+<p>Recommended install path examples:</p>
+<pre><code>
+C:\Program Files\DocGuard AI
+C:\Tools\DocGuardAI
+\\ApprovedShare\Tools\DocGuardAI
+</code></pre>
+<p>Avoid running production workflows directly from temporary download folders.</p>
+<h2>8. Installation From Installer</h2>
+<p>1. Run <code>release\DocGuardAISetup.exe</code>.</p>
+<p>2. Use the default install path or select an approved endpoint path.</p>
+<p>3. Confirm <code>DocGuardAI.exe</code> is installed.</p>
+<p>4. Launch DocGuard AI.</p>
+<p>5. Confirm Dashboard, File Review, Findings, Writing Assistant, Risk Map, Cleanroom, Reports, Activity, Extensions, and Settings are visible.</p>
+<p>6. Run a known-safe sample scan.</p>
+<p>7. Confirm Reports and Activity populate after Cleanroom runs.</p>
+<p>The installer uses <code>PrivilegesRequired=lowest</code> and supports non-admin per-user installs.</p>
+<h2>9. Installation From Source</h2>
+<p>Use this method only for validation, internal testing, or engineering workflows.</p>
+<pre><code>
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -e .
+</code></pre>
+<p>Launch the GUI:</p>
+<pre><code>
+sanitize-gui
+</code></pre>
+<p>or:</p>
+<pre><code>
+py main.py
+</code></pre>
+<p>Verify CLI access:</p>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+</code></pre>
+<h2>9. Building A Portable Package</h2>
+<p>The build script is:</p>
+<pre><code>
+.\scripts\build-portable.ps1
+</code></pre>
+<p>To specify a Python runtime:</p>
+<pre><code>
+.\scripts\build-portable.ps1 -PythonExe &quot;C:\Path\To\python.exe&quot;
+</code></pre>
+<p>The build must include:</p>
+<ul>
+<li><code>profiles</code></li>
+<li><code>assets</code></li>
+<li><code>docs</code></li>
+<li>PySide6 dependencies</li>
+<li>application icon <code>assets\brand\docguard-ai-app-icon.ico</code></li>
+</ul>
+<p>After building, verify:</p>
+<pre><code>
+Test-Path .\dist\DocGuardAI\DocGuardAI.exe
+Test-Path .\dist\DocGuardAI\_internal\docs\USER_GUIDE.html
+Test-Path .\dist\DocGuardAI\_internal\docs\ADMIN_GUIDE.html
+</code></pre>
+<h2>10. Product Identity</h2>
+<p>| Field | Value |</p>
+<p>|---|---|</p>
+<p>| Product name | DocGuard AI |</p>
+<p>| Release label | v1.2.0 RC1 U6.1 |</p>
+<p>| Product ID | <code>docguard_ai</code> |</p>
+<p>| Product key prefix | <code>DGA</code> |</p>
+<p>| Edition | Core |</p>
+<p>| Settings namespace | <code>TTI-Solutions / DocGuardAI</code> |</p>
+<p>| Executable | <code>DocGuardAI.exe</code> |</p>
+<p>The Writing Assistant is included in the core package and must not be deployed or documented as a separately licensed module.</p>
+<h2>11. Local Data Locations</h2>
+<p>Default local paths:</p>
+<p>| Data | Default Location |</p>
+<p>|---|---|</p>
+<p>| Reports | <code>reports\</code> under the active working directory |</p>
+<p>| Activity database | <code>reports\history.db</code> |</p>
+<p>| Online license cache | <code>%APPDATA%\DocGuardAI\tsg_license.json</code> |</p>
+<p>| Offline license cache | <code>%APPDATA%\DocGuardAI\license.json</code> |</p>
+<p>| Legacy RC license cache | <code>%APPDATA%\SanitizeSuite\</code> |</p>
+<p>Administrators can control report and Activity locations for CLI workflows:</p>
+<pre><code>
+sanitize run &quot;C:\Source&quot; --report-dir &quot;D:\DocGuardReports&quot; --history-db &quot;D:\DocGuardReports\history.db&quot;
+</code></pre>
+<h2>12. Licensing Model</h2>
+<p>DocGuard AI supports:</p>
+<ul>
+<li>Trial/local operation</li>
+<li>Offline development activation</li>
+<li>Online activation through TSG License Manager</li>
+<li>Online license refresh</li>
+<li>Online deactivation</li>
+</ul>
+<p>Product keys use this format:</p>
+<pre><code>
+DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Legacy <code>SSP-...</code> keys are accepted only for RC compatibility.</p>
+<h2>13. License Administration</h2>
+<p>Check status:</p>
+<pre><code>
+sanitize license
+</code></pre>
+<p>Activate offline:</p>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX
+</code></pre>
+<p>Activate online:</p>
+<pre><code>
+sanitize license --activate DGA-XXXX-XXXX-XXXX --online --server-url https://&lt;tsg-platform-url&gt;
+</code></pre>
+<p>Refresh:</p>
+<pre><code>
+sanitize license --refresh --server-url https://&lt;tsg-platform-url&gt;
+</code></pre>
+<p>Deactivate locally:</p>
+<pre><code>
+sanitize license --deactivate
+</code></pre>
+<p>Deactivate online:</p>
+<pre><code>
+sanitize license --deactivate --online --server-url https://&lt;tsg-platform-url&gt;
+</code></pre>
+<p>Administrative guidance:</p>
+<ul>
+<li>Do not publish full product keys in support tickets.</li>
+<li>Record only the last four characters when documenting license issues.</li>
+<li>Prefer online activation for production if TSG License Manager is available.</li>
+<li>Confirm whether the legacy RC license fallback should remain enabled before production distribution.</li>
+</ul>
+<h2>14. TSG License Manager Integration</h2>
+<p>Set the API endpoint with an environment variable:</p>
+<pre><code>
+$env:TSG_API_URL=&quot;https://&lt;tsg-platform-url&gt;&quot;
+</code></pre>
+<p>Run an update check:</p>
+<pre><code>
+sanitize update-check --server-url https://&lt;tsg-platform-url&gt;
+</code></pre>
+<p>DocGuard AI can send these fields to TSG License Manager:</p>
+<ul>
+<li>product key</li>
+<li>device identifier</li>
+<li>device label</li>
+<li>machine hash</li>
+<li>app version</li>
+<li>product id</li>
+<li>release channel</li>
+<li>platform</li>
+</ul>
+<p>Document content is not required for license activation, refresh, deactivation, or update checks.</p>
+<h2>15. Security And Privacy Controls</h2>
+<p>Recommended controls:</p>
+<ul>
+<li>Restrict deployment folder write permissions.</li>
+<li>Use an approved reports folder for regulated workflows.</li>
+<li>Treat generated reports as sensitive because they may include file paths and finding details.</li>
+<li>Keep backups enabled unless another recovery mechanism exists.</li>
+<li>Review backup retention policy before cleaning sensitive sources.</li>
+<li>Run endpoint protection scans on signed production artifacts.</li>
+<li>Review dependency vulnerability results before production release.</li>
+<li>Confirm local-only processing language in customer-facing materials.</li>
+</ul>
+<h2>16. Cleaning Profiles And Policy</h2>
+<p>Profiles:</p>
+<p>| Profile | Administrative Use |</p>
+<p>|---|---|</p>
+<p>| <code>standard</code> | Conservative cleanup for routine metadata reduction. |</p>
+<p>| <code>aggressive</code> | Recommended default for release preparation. |</p>
+<p>| <code>paranoid</code> | Strongest cleanup; validate output quality before broad rollout. |</p>
+<p>Recommended policy:</p>
+<ul>
+<li>Use <code>aggressive</code> for normal production-release preparation.</li>
+<li>Use <code>standard</code> for low-risk routine cleanup.</li>
+<li>Require sample validation before using <code>paranoid</code> on business-critical document sets.</li>
+<li>Keep <code>Backup</code> enabled in the GUI.</li>
+<li>Restrict CLI use of <code>--no-backup</code> to workflows with separate recovery controls.</li>
+</ul>
+<h2>17. Supported Extensions</h2>
+<p>Core Extensions:</p>
+<ul>
+<li>Document Sanitizer</li>
+<li>Office Sanitizer</li>
+<li>PDF Sanitizer</li>
+<li>Image Sanitizer</li>
+<li>Writing Assistant</li>
+</ul>
+<p>Integration and module packs shown in Extensions:</p>
+<ul>
+<li>Word Add-in</li>
+<li>Outlook Add-in</li>
+<li>Browser Extension</li>
+<li>CAD Pack</li>
+<li>Email Pack</li>
+<li>Media Pack</li>
+</ul>
+<p>Some module packs are inspection-first. CAD, email, and media formats can require external native tools, export workflows, or remux tooling for complete remediation.</p>
+<h2>18. Cleanroom Administration</h2>
+<p>Recommended full pipeline:</p>
+<pre><code>
+sanitize run &quot;C:\Path\To\Source&quot; --profile aggressive --report-dir &quot;C:\Path\To\Reports&quot;
+</code></pre>
+<p>Pipeline order:</p>
+<pre><code>
+scan -&gt; clean -&gt; post-clean scan -&gt; verify -&gt; report -&gt; Activity
+</code></pre>
+<p>Batch job example:</p>
+<pre><code>
+{
+  &quot;profile&quot;: &quot;aggressive&quot;,
+  &quot;report_dir&quot;: &quot;reports&quot;,
+  &quot;sources&quot;: [
+    &quot;C:\\Path\\To\\SourceA&quot;,
+    &quot;C:\\Path\\To\\SourceB&quot;
+  ]
+}
+</code></pre>
+<p>Run the batch:</p>
+<pre><code>
+sanitize batch jobs.json
+</code></pre>
+<p>Watch a folder:</p>
+<pre><code>
+sanitize watch &quot;C:\Path\To\DropFolder&quot; --interval 30
+</code></pre>
+<p>Create a scheduled-task helper:</p>
+<pre><code>
+sanitize schedule nightly --profile aggressive
+</code></pre>
+<p>The schedule command writes a PowerShell helper under <code>reports\</code> and prints a <code>schtasks</code> command. Review and register the scheduled task according to your endpoint policy.</p>
+<h2>19. Reporting And Evidence Retention</h2>
+<p>DocGuard AI can produce:</p>
+<ul>
+<li>HTML scan reports</li>
+<li>HTML clean reports</li>
+<li>JSON reports</li>
+<li>CSV reports</li>
+<li>local Activity database entries</li>
+</ul>
+<p>Examples:</p>
+<pre><code>
+sanitize scan &quot;C:\Path\To\Source&quot; --html-report auto --json-report reports\scan.json --csv-report reports\scan.csv
+sanitize clean &quot;C:\Path\To\Source&quot; --html-report auto
+sanitize history --last 50
+sanitize history --stats
+sanitize history --top-risk
+</code></pre>
+<p>For controlled release workflows, retain:</p>
+<ul>
+<li>pre-clean scan report</li>
+<li>clean report</li>
+<li>post-clean scan report</li>
+<li>verification result</li>
+<li>Activity database entry</li>
+<li>manual remediation notes</li>
+<li>final accepted artifact hash, if applicable</li>
+</ul>
+<h2>20. Validation Checklist</h2>
+<p>Before broad deployment:</p>
+<ul>
+<li>Confirm <code>DocGuardAI.exe</code> launches.</li>
+<li>Confirm application title is <code>DocGuard AI v1.2.0 RC1 U6.1</code>.</li>
+<li>Confirm DocGuard AI icon and branding render correctly.</li>
+<li>Confirm <code>Writing Assistant</code> appears without activation.</li>
+<li>Confirm Extensions lists Writing Assistant as <code>Core</code>.</li>
+<li>Confirm expected Extensions are enabled.</li>
+<li>Run scan against known supported samples.</li>
+<li>Run dry-run clean against copied samples.</li>
+<li>Run Cleanroom and confirm reports and Activity are generated.</li>
+<li>Open generated HTML reports.</li>
+<li>Confirm license status display works.</li>
+<li>Confirm TSG activation, refresh, deactivation, and update-check if online licensing is used.</li>
+<li>Confirm release documentation and QA evidence are present under <code>docs\</code> and <code>release\</code>.</li>
+</ul>
+<h2>21. Post-RC Production Readiness</h2>
+<p>RC1 U6.1 is production-release approved. Use the post-RC production plan as the operational checklist for signing, rollout, monitoring, and support governance:</p>
+<pre><code>
+docs\POST_RC_PRODUCTION_PLAN.md
+docs\POST_RC_PRODUCTION_PLAN.html
+</code></pre>
+<p>Minimum readiness gates:</p>
+<ul>
+<li>Release ownership and approval record are assigned.</li>
+<li>Production build is reproducible from a clean workspace.</li>
+<li>Executable and installer artifacts are signed and timestamped.</li>
+<li>Installer, upgrade, uninstall, and portable workflows pass on target Windows versions.</li>
+<li>TSG License Manager production licensing and update-check paths pass.</li>
+<li>Security and privacy review is complete.</li>
+<li>User Guide, Admin Guide, release notes, and support runbook are approved.</li>
+<li>Signed artifacts, hashes, release notes, rollout instructions, and rollback plan are published.</li>
+<li>Post-release monitoring owner and triage window are assigned.</li>
+</ul>
+<h2>22. Troubleshooting</h2>
+<p>| Symptom | Likely Cause | Administrative Action |</p>
+<p>|---|---|---|</p>
+<p>| Reports page is empty | No report has been generated | Run <code>Run Cleanroom</code> or <code>sanitize run</code>. |</p>
+<p>| Activity is empty | No run recorded or wrong history DB | Check <code>reports\history.db</code> or pass <code>--history-db</code>. |</p>
+<p>| License shows trial | No local or TSG license cache exists | Activate or refresh the license. |</p>
+<p>| Online activation fails | TSG API unavailable or wrong URL | Check endpoint, firewall, DNS, and <code>TSG_API_URL</code>. |</p>
+<p>| File not detected | Unsupported extension or discovery issue | Run <code>sanitize scan &lt;path&gt; --diagnose</code>. |</p>
+<p>| Cleaning does not remove a finding | Finding is informational, inspection-only, or requires stronger profile | Review report remediation and profile selection. |</p>
+<p>| Verification fails | Residual findings remain after cleaning | Review File Review and post-clean report, remediate, or document residual risk. |</p>
+<p>| Portable app does not launch | Blocked file, missing runtime file, endpoint policy, or AV quarantine | Re-extract package, unblock files, check endpoint logs, verify package hash. |</p>
+<p>| Writing Assistant missing | Outdated build or license-gated legacy package | Deploy latest package and confirm Extensions shows Writing Assistant as Core. |</p>
+<h2>23. Support Handoff Template</h2>
+<p>Collect:</p>
+<ul>
+<li>DocGuard AI version</li>
+<li>Installation type</li>
+<li>Windows version</li>
+<li>License source and tier, without full product key</li>
+<li>Command used or GUI workflow</li>
+<li>Source file type or folder type</li>
+<li>Profile and safety settings</li>
+<li>Report path</li>
+<li>Activity database path</li>
+<li>Error text or screenshot</li>
+<li>Whether the issue reproduces on a copied sample</li>
+<li>Any endpoint protection alert or quarantine detail</li>
+</ul>
+<h2>24. Appendix: Common Commands</h2>
+<pre><code>
+sanitize about
+sanitize plugins
+sanitize license
+sanitize scan &quot;C:\Source&quot; --profile aggressive --summary
+sanitize clean &quot;C:\Source&quot; --profile aggressive --html-report auto
+sanitize run &quot;C:\Source&quot; --profile aggressive
+sanitize history --last 20
+sanitize update-check --server-url https://&lt;tsg-platform-url&gt;
+</code></pre>
+</body></html>

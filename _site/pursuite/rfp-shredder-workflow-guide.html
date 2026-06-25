@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pursuite RFP Shredder Workflow Guide</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+
+<header><h1>Pursuite RFP Shredder Workflow Guide</h1><p>Dual-track workflow guide for end users and administrators.</p></header>
+<main><nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="pursuite-rfp-shredder-workflow-guide">Pursuite RFP Shredder Workflow Guide</h1>
+<p>Product name: Pursuite RFP Shredder</p>
+<p>Product type: SaaS/software, delivered in the verified source materials as part of the Pursuite standalone SMB pilot</p>
+<p>Primary end-user audience: Proposal Managers and Writers who operate proposal workflows day to day</p>
+<p>Primary administrator audience: Admins, proposal operations leads, security administrators, and compliance owners</p>
+<p>Version/date: 1.0 / June 24, 2026</p>
+<p>Purpose: Provide a dual-track workflow guide that shows end users how to operate the RFP Shredder and shows administrators how to provision, govern, and maintain it without exceeding verified source material.</p>
+<p>Grounding corpus used: <code>docs/rfp-shredder/user-guide.md</code>, <code>docs/rfp-shredder/administrator-guide.md</code>, <code>app/apps/web/src/pages/proposals/RfpShredderPanel.tsx</code>, <code>app/apps/web/src/pages/proposals/ComplianceMatrixPanel.tsx</code>, <code>app/apps/web/src/components/wizards/registry.tsx</code>, <code>app/apps/api/src/middleware/permissions.ts</code>, and <code>Docs/engineering/api-ref/Pursuite_API_Reference.md</code>.</p>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Source Rules Applied" id="source-rules-applied"><h2 id="source-rules-applied">Source Rules Applied</h2>
+<p>Confidence Summary: 100 percent of this section is [verified] because it restates the generation rules and source boundary used for this document.</p>
+<ul>
+<li>Procedural steps carry exactly one confidence tag: <code>[verified]</code>, <code>[inferred — confirm]</code>, or <code>[unknown — needs SME input]</code>.</li>
+<li>Steps marked <code>[verified]</code> are supported by the grounding corpus.</li>
+<li>Steps marked <code>[inferred — confirm]</code> are operationally reasonable but need customer or product-owner validation before use.</li>
+<li>Steps marked <code>[unknown — needs SME input]</code> identify a real workflow gap that was not verified in the source materials.</li>
+<li><strong>Bold steps affect access, permissions, deletion, regulated/CUI data, or another controlled workflow gate.</strong></li>
+</ul>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Table Of Contents" id="table-of-contents"><h2 id="table-of-contents">Table Of Contents</h2>
+<ul>
+<li><a href="#at-a-glance">At-a-Glance</a></li>
+<li><a href="#setup-onboarding-sequence">Setup / Onboarding Sequence</a></li>
+<li><a href="#core-operating-procedures">Core Operating Procedures</a></li>
+<li><a href="#admin-configuration-governance">Admin Configuration &amp; Governance</a></li>
+<li><a href="#lifecycle-decision-points">Lifecycle &amp; Decision Points</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#verification-checklist">Verification Checklist</a></li>
+<li><a href="#appendix-confidence-tag-summary">Appendix: Confidence Tag Summary</a></li>
+</ul>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="At-a-Glance" id="at-a-glance"><h2 id="at-a-glance">At-a-Glance</h2>
+<p>Confidence Summary: 100 percent of this section is [verified] from the RFP Shredder user/admin guides, UI source, permissions source, and API reference.</p>
+<table>
+<thead><tr><th>Area</th><th>End-User Track</th><th>Admin Track</th></tr></thead>
+<tbody>
+<tr><td>Access</td><td>View or operate RFP Shredder based on assigned role.</td><td>Provision users and assign roles that grant RFP permissions.</td></tr>
+<tr><td>Upload</td><td>Admin or Proposal Manager uploads PDF or DOCX files up to 50 MB.</td><td>Confirm users have <code>rfp:upload</code> through Admin or Proposal Manager role.</td></tr>
+<tr><td>Extraction</td><td>Monitor upload, queued, processing, completed, confirmed, or failed states.</td><td>Monitor worker, queue, storage, AI provider, and CUI gate dependencies.</td></tr>
+<tr><td>Requirement review</td><td>Edit, add, delete, and mark requirements reviewed when role permits.</td><td>Govern low-confidence review and preserve audit history.</td></tr>
+<tr><td>Confirmation</td><td>Admin or Proposal Manager confirms requirements.</td><td>Ensure only Admins or Proposal Managers can confirm.</td></tr>
+<tr><td>Compliance Matrix</td><td>Generate and review coverage after confirmation.</td><td>Govern matrix availability, export behavior, and evidence handling.</td></tr>
+<tr><td>Wizard</td><td>Use Proposal Kickoff wizard when available.</td><td>Understand server-gated wizard state and unresolved configuration gaps.</td></tr>
+<tr><td>Recovery</td><td>Retry processing or upload a corrected file when permitted.</td><td>Use logs, diagnostics, backups, and policy checks to resolve blocked workflows.</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Setup / Onboarding Sequence" id="setup-onboarding-sequence"><h2 id="setup-onboarding-sequence">Setup / Onboarding Sequence</h2>
+<p>Confidence Summary: End-user setup steps are 100 percent [verified]. Admin setup steps are mostly [verified], with one [unknown — needs SME input] gap for release-specific global RFP defaults.</p>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="End-User Track" id="end-user-track"><h3 id="end-user-track">End-User Track</h3>
+<p>Precondition: The user has an active Pursuite account and the proposal workspace exists.</p>
+<ol>
+<li>[verified] Sign in with the account provided by the administrator.</li>
+<li>[verified] Open <strong>Proposals</strong>.</li>
+<li>[verified] Open the proposal workspace for the solicitation.</li>
+<li>[verified] Open <strong>RFP Shredder</strong> from the proposal workspace toolbar.</li>
+<li>[verified] Confirm whether the panel shows an upload area, a processing state, a completed requirement list, or a confirmed requirement set.</li>
+<li>[verified] If the panel shows read-only access, ask an Admin or Proposal Manager to perform upload, edit, replace, review, or confirmation actions.</li>
+</ol>
+<p>Expected result: The end user reaches the RFP Shredder panel and can see the next available action for the proposal.</p>
+<p>How to confirm success: The panel title reads <strong>RFP Shredder</strong>, and the panel shows the current document state or upload state.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="Admin Track" id="admin-track"><h3 id="admin-track">Admin Track</h3>
+<p>Precondition: Pursuite is installed, running, and accessible to at least one Admin.</p>
+<ol>
+<li>[verified] Start Docker Desktop for the standalone deployment.</li>
+<li>[verified] Open <strong>Pursuite Manager</strong>.</li>
+<li>[verified] Select <strong>Launch Pursuite</strong> and wait for healthy services.</li>
+<li>[verified] Sign in as an Admin.</li>
+<li>[verified] <strong>Create or confirm at least one backup Admin account.</strong></li>
+<li>[verified] <strong>Assign users the minimum role required for their workflow: Admin, Proposal Manager, Writer, Executive Approver, or Read-Only.</strong></li>
+<li>[verified] Configure and test <strong>AI Provider</strong> before expecting RFP Shredder extraction or Compliance Matrix generation to work.</li>
+<li>[verified] <strong>Review CUI external-processing approval before allowing classified RFP text to be processed by an external AI provider.</strong></li>
+<li>[unknown — needs SME input] Confirm any release-specific global RFP Shredder defaults, such as configurable extraction thresholds, notification rules, or workflow step controls.</li>
+</ol>
+<p>Expected result: Required users can access the proposal workflow, and AI/CUI prerequisites are understood before the first RFP upload.</p>
+<p>How to confirm success: A Proposal Manager or Admin can open a proposal workspace, open <strong>RFP Shredder</strong>, and upload a supported test file.</p>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="Core Operating Procedures" id="core-operating-procedures"><h2 id="core-operating-procedures">Core Operating Procedures</h2>
+<p>Confidence Summary: Core RFP Shredder, wizard, and Compliance Matrix steps are 100 percent [verified] except where release-specific DOCX/PDF matrix export availability is marked [unknown — needs SME input].</p>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="Task 1: Upload And Process An RFP" id="task-1-upload-and-process-an-rfp"><h3 id="task-1-upload-and-process-an-rfp">Task 1: Upload And Process An RFP</h3>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="End-User Track" id="end-user-track-2"><h4 id="end-user-track">End-User Track</h4>
+<p>Precondition: The user is an Admin or Proposal Manager, the proposal workspace exists, and the file is PDF or DOCX up to 50 MB.</p>
+<ol>
+<li>[verified] Open the proposal workspace.</li>
+<li>[verified] Open <strong>RFP Shredder</strong>.</li>
+<li>[verified] Select the upload area labeled <strong>Drop your RFP here or browse</strong>.</li>
+<li>[verified] Choose a supported PDF or DOCX file up to 50 MB.</li>
+<li>[verified] Wait for the upload to complete.</li>
+<li>[verified] Monitor the status until the document is <strong>Completed</strong> or <strong>Failed</strong>.</li>
+<li>[verified] If the status is <strong>Failed</strong>, read the displayed processing error before retrying.</li>
+</ol>
+<p>Expected result: The document reaches <strong>Completed</strong> and extracted requirements are visible.</p>
+<p>How to confirm success: The requirement count, mandatory count, optional count, and extracted requirement rows appear in the panel.</p>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="Admin Track" id="admin-track-2"><h4 id="admin-track">Admin Track</h4>
+<p>Precondition: A user reports upload or processing trouble, or an Admin is validating readiness.</p>
+<ol>
+<li>[verified] Confirm the user is Admin or Proposal Manager if they need upload rights.</li>
+<li>[verified] Confirm the file type is PDF or DOCX.</li>
+<li>[verified] Confirm the file is 50 MB or smaller.</li>
+<li>[verified] Confirm AI Provider configuration is saved and passes the connectivity test.</li>
+<li>[verified] Check worker, queue, API, storage, PostgreSQL, and Redis health through Pursuite Manager logs when processing does not complete.</li>
+<li>[verified] <strong>If the document is CUI-classified, verify approved external CUI processing before analysis proceeds.</strong></li>
+</ol>
+<p>Expected result: The Admin identifies whether the blocker is role, file, AI provider, worker, storage, or CUI policy.</p>
+<p>How to confirm success: A corrected upload reaches <strong>Completed</strong>, or the Admin documents the blocking dependency.</p>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="Task 2: Review And Correct Requirements" id="task-2-review-and-correct-requirements"><h3 id="task-2-review-and-correct-requirements">Task 2: Review And Correct Requirements</h3>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="End-User Track" id="end-user-track-3"><h4 id="end-user-track">End-User Track</h4>
+<p>Precondition: The RFP document status is <strong>Completed</strong>.</p>
+<ol>
+<li>[verified] Review the extracted requirement count.</li>
+<li>[verified] Review the mandatory and optional counts.</li>
+<li>[verified] Review each extracted requirement row.</li>
+<li>[verified] Compare rows marked <strong>Review required</strong> against the source solicitation.</li>
+<li>[verified] Select the edit control for incorrect rows.</li>
+<li>[verified] Update requirement text, category, and <strong>Mandatory</strong> state.</li>
+<li>[verified] Select <strong>Save</strong>.</li>
+<li>[verified] Select <strong>Add requirement manually</strong> for missed requirements.</li>
+<li>[verified] Enter requirement text, category, and <strong>Mandatory</strong> state.</li>
+<li>[verified] Select <strong>Add</strong>.</li>
+<li>[verified] <strong>Delete false-positive or duplicate rows only after confirming they should be excluded from the active requirement list.</strong></li>
+<li>[verified] Select <strong>Reviewed</strong> for low-confidence rows that are accurate.</li>
+</ol>
+<p>Expected result: The requirement list is complete, accurate, and no required review rows remain unresolved.</p>
+<p>How to confirm success: The list has no unresolved <strong>Review required</strong> rows, and all known solicitation requirements are represented.</p>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="Admin Track" id="admin-track-3"><h4 id="admin-track">Admin Track</h4>
+<p>Precondition: A Proposal Manager asks for help with review controls, low-confidence gates, or row history.</p>
+<ol>
+<li>[verified] Confirm the document status is <strong>Completed</strong>.</li>
+<li>[verified] Confirm the user is Admin or Proposal Manager for write actions.</li>
+<li>[verified] Explain that low-confidence requirements below the verified threshold must be edited or marked reviewed before confirmation.</li>
+<li>[verified] Explain that deleted requirements are soft-deleted rather than hard-deleted.</li>
+<li>[verified] Confirm that re-processing uses replace-on-success behavior.</li>
+</ol>
+<p>Expected result: The proposal team can finish review without bypassing audit-sensitive behavior.</p>
+<p>How to confirm success: Confirmation is no longer blocked by low-confidence requirements.</p>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="Task 3: Confirm Requirements And Unlock Downstream Workflows" id="task-3-confirm-requirements-and-unlock-downstream-workflows"><h3 id="task-3-confirm-requirements-and-unlock-downstream-workflows">Task 3: Confirm Requirements And Unlock Downstream Workflows</h3>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="End-User Track" id="end-user-track-4"><h4 id="end-user-track">End-User Track</h4>
+<p>Precondition: The RFP document status is <strong>Completed</strong>, and all low-confidence rows are edited or marked reviewed.</p>
+<ol>
+<li>[verified] Review the complete requirement list.</li>
+<li>[verified] Confirm with the proposal team that the list is ready to become the working baseline.</li>
+<li>[verified] <strong>Select Confirm Requirements to lock the requirement set and unlock the Compliance Matrix and Autonomous Pipeline.</strong></li>
+<li>[verified] Wait for the success message stating that requirements are confirmed and matrix/pipeline are available.</li>
+</ol>
+<p>Expected result: The RFP document status becomes <strong>Confirmed</strong>.</p>
+<p>How to confirm success: The RFP Shredder panel shows confirmed state, and the Compliance Matrix can be generated.</p>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="Admin Track" id="admin-track-4"><h4 id="admin-track">Admin Track</h4>
+<p>Precondition: A user cannot confirm requirements, or downstream workflows remain unavailable.</p>
+<ol>
+<li>[verified] Confirm the user is Admin or Proposal Manager.</li>
+<li>[verified] Confirm the document status is <strong>Completed</strong>.</li>
+<li>[verified] Confirm no unreviewed low-confidence rows remain.</li>
+<li>[verified] Confirm that backend confirmation did not return <code>LOW_CONFIDENCE_REVIEW_REQUIRED</code>.</li>
+<li>[verified] Confirm the proposal has recorded the RFP confirmation gate.</li>
+</ol>
+<p>Expected result: The Admin identifies the confirmation blocker or confirms downstream workflows are unlocked.</p>
+<p>How to confirm success: Compliance Matrix generation no longer returns a message requiring RFP confirmation.</p>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="Task 4: Use The Proposal Kickoff Wizard" id="task-4-use-the-proposal-kickoff-wizard"><h3 id="task-4-use-the-proposal-kickoff-wizard">Task 4: Use The Proposal Kickoff Wizard</h3>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="End-User Track" id="end-user-track-5"><h4 id="end-user-track">End-User Track</h4>
+<p>Precondition: The Proposal Kickoff wizard is available to the user and a proposal resource is linked.</p>
+<ol>
+<li>[verified] Open <strong>Guided Setup</strong> or select <strong>Kickoff wizard</strong> from the proposal workspace.</li>
+<li>[verified] Complete <strong>Proposal Basics</strong>.</li>
+<li>[verified] Upload the solicitation PDF on <strong>RFP Ingestion</strong>.</li>
+<li>[verified] Stop at <strong>Review &amp; Confirm Requirements</strong> when the wizard instructs you to use the RFP Shredder panel.</li>
+<li>[verified] Close the wizard.</li>
+<li>[verified] Open the proposal workspace and select <strong>RFP Shredder</strong>.</li>
+<li>[verified] Review and confirm requirements in the RFP Shredder panel.</li>
+<li>[verified] Return to <strong>Guided Setup</strong> and reopen the wizard.</li>
+<li>[verified] Continue to <strong>Compliance Matrix Preview</strong>.</li>
+<li>[verified] Select <strong>Generate matrix</strong>.</li>
+</ol>
+<p>Expected result: The wizard advances only after RFP confirmation is complete.</p>
+<p>How to confirm success: The wizard proceeds beyond the confirmation gate and queues matrix generation.</p>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="Admin Track" id="admin-track-5"><h4 id="admin-track">Admin Track</h4>
+<p>Precondition: The team reports the wizard will not advance.</p>
+<ol>
+<li>[verified] Confirm the proposal has an uploaded RFP.</li>
+<li>[verified] Confirm the RFP has been processed.</li>
+<li>[verified] Confirm requirements have been confirmed in the RFP Shredder panel.</li>
+<li>[verified] Confirm the user has permission to run the relevant wizard.</li>
+<li>[unknown — needs SME input] Confirm whether this release includes administrator controls to enable, disable, reorder, or customize individual wizard steps.</li>
+</ol>
+<p>Expected result: The Admin distinguishes a valid server gate from a configuration gap.</p>
+<p>How to confirm success: The wizard resumes from the saved step after the RFP confirmation gate is satisfied.</p>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="Task 5: Generate And Review The Compliance Matrix" id="task-5-generate-and-review-the-compliance-matrix"><h3 id="task-5-generate-and-review-the-compliance-matrix">Task 5: Generate And Review The Compliance Matrix</h3>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="End-User Track" id="end-user-track-6"><h4 id="end-user-track">End-User Track</h4>
+<p>Precondition: RFP requirements are confirmed.</p>
+<ol>
+<li>[verified] Open the proposal workspace.</li>
+<li>[verified] Open <strong>Compliance Matrix</strong>.</li>
+<li>[verified] Select <strong>Generate Compliance Matrix</strong>.</li>
+<li>[verified] Wait for the queued generation to complete.</li>
+<li>[verified] Review summary counts for <strong>Missing</strong>, <strong>Partial</strong>, and <strong>Addressed</strong> coverage.</li>
+<li>[verified] Select a row that needs human override.</li>
+<li>[verified] Choose <strong>Missing</strong>, <strong>Partial</strong>, or <strong>Addressed</strong> in <strong>Override Coverage Status</strong>.</li>
+<li>[verified] Enter an optional override note.</li>
+<li>[verified] Select <strong>Save Override</strong>.</li>
+<li>[verified] Select <strong>CSV</strong> to export the matrix when the UI exposes the CSV control.</li>
+<li>[unknown — needs SME input] Confirm whether DOCX and PDF export controls are available in the target release before documenting user steps for those formats.</li>
+</ol>
+<p>Expected result: The team has a current coverage matrix based on confirmed RFP requirements.</p>
+<p>How to confirm success: Matrix rows display coverage status and, when exported, a CSV download opens or saves.</p>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="Admin Track" id="admin-track-6"><h4 id="admin-track">Admin Track</h4>
+<p>Precondition: Matrix generation, visibility, or export fails.</p>
+<ol>
+<li>[verified] Confirm RFP requirements are confirmed.</li>
+<li>[verified] Confirm the user has Proposal Manager or Admin access for write actions.</li>
+<li>[verified] Confirm AI Provider connectivity.</li>
+<li>[verified] Check worker and queue health if generation remains queued.</li>
+<li>[verified] Review export behavior and capture the export ID if the API queues an export.</li>
+<li>[unknown — needs SME input] Confirm target-release controls and permissions for DOCX/PDF matrix exports.</li>
+</ol>
+<p>Expected result: The Admin identifies whether the issue is prerequisite, permission, AI, queue, or release-scope related.</p>
+<p>How to confirm success: The matrix is visible, current, and export behavior matches the target release.</p>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="Admin Configuration &amp; Governance" id="admin-configuration-governance"><h2 id="admin-configuration-governance">Admin Configuration &amp; Governance</h2>
+<p>Confidence Summary: This section is mostly [verified]. Wizard customization, shred templates, and some report/export controls contain [unknown — needs SME input] steps because they were not verified in the source materials.</p>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="End-User Track" id="end-user-track-7"><h3 id="end-user-track">End-User Track</h3>
+<p>Precondition: The end user needs to understand which admin-owned settings affect their work.</p>
+<ol>
+<li>[verified] Ask an Admin for account access if you cannot sign in.</li>
+<li>[verified] Ask an Admin or Proposal Manager to upload, edit, replace, review, or confirm RFP requirements if your panel is read-only.</li>
+<li>[verified] Ask an Admin to review AI Provider configuration if extraction or matrix generation fails across multiple proposals.</li>
+<li>[verified] <strong>Escalate CUI-blocked processing to an Admin or security owner instead of moving controlled content outside Pursuite.</strong></li>
+<li>[verified] Ask an Admin to check backup or restore status before retrying imports when proposal files appear missing.</li>
+</ol>
+<p>Expected result: End users route administrator-owned problems to the right owner without bypassing controls.</p>
+<p>How to confirm success: The Admin resolves or documents the control that blocks the workflow.</p>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="Admin Track" id="admin-track-7"><h3 id="admin-track">Admin Track</h3>
+<p>Precondition: The Admin is configuring or reviewing RFP Shredder governance.</p>
+<ol>
+<li>[verified] <strong>Maintain at least two active Admin accounts.</strong></li>
+<li>[verified] <strong>Assign RFP upload, write, and confirmation rights only through Admin or Proposal Manager roles.</strong></li>
+<li>[verified] Test AI Provider connectivity before operational use.</li>
+<li>[verified] <strong>Document approval before enabling external AI processing for CUI-classified RFP documents.</strong></li>
+<li>[verified] Review audit events for RFP upload, shredding, confirmation, requirement edits, CUI access, and AI workflow activity when investigating issues.</li>
+<li>[verified] Run backups from <strong>Pursuite Manager -&gt; Backups</strong> for the standalone deployment.</li>
+<li>[verified] <strong>Warn users before restore because restore overwrites the current local database and uploads.</strong></li>
+<li>[unknown — needs SME input] Confirm whether administrators can configure extraction models, classification rules, confidence thresholds, or validation rules in the UI.</li>
+<li>[unknown — needs SME input] Confirm whether "Shred Template" is a current product object, a proposal-template synonym, or a roadmap item.</li>
+<li>[unknown — needs SME input] Confirm exact audit export file formats and UI labels before publishing customer-facing audit export steps.</li>
+</ol>
+<p>Expected result: RFP Shredder operations are governed through role control, AI readiness, CUI policy, audit review, and backup discipline.</p>
+<p>How to confirm success: Access-sensitive actions are limited to approved roles, AI workflows test successfully, CUI policy is documented, and backup/restore procedures are understood.</p>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="Lifecycle &amp; Decision Points" id="lifecycle-decision-points"><h2 id="lifecycle-decision-points">Lifecycle &amp; Decision Points</h2>
+<p>Confidence Summary: 100 percent of decision points are [verified] except rows explicitly marked as needing SME input for unverified release controls.</p>
+<table>
+<thead><tr><th>Decision Point</th><th>Trigger</th><th>End-User Branch</th><th>Admin Branch</th></tr></thead>
+<tbody>
+<tr><td>Upload vs. request help</td><td>RFP Shredder shows read-only state.</td><td>Ask a Proposal Manager or Admin to upload.</td><td>Confirm whether the user role should change or the authorized user should perform the action.</td></tr>
+<tr><td>Retry vs. replace file</td><td>Processing fails.</td><td>Retry processing or upload a different file when permitted.</td><td>Check error, AI provider, worker, queue, and CUI gate before advising replacement.</td></tr>
+<tr><td>Review vs. confirm</td><td>Requirements are completed but low-confidence rows remain.</td><td>Edit or mark rows reviewed before confirmation.</td><td>Confirm low-confidence gate behavior before escalation.</td></tr>
+<tr><td>Confirm vs. hold</td><td>Requirement list may be incomplete.</td><td>Hold confirmation until review is complete.</td><td>Coach team that confirmation locks the set for downstream workflows.</td></tr>
+<tr><td>Matrix generate vs. block</td><td>Compliance Matrix says RFP confirmation is required.</td><td>Return to RFP Shredder and confirm requirements.</td><td>Verify <code>rfp_confirmed_at</code>/confirmation gate and permissions.</td></tr>
+<tr><td>CUI process vs. block</td><td>RFP processing fails with <code>CUI_BLOCKED</code>.</td><td>Escalate to Admin/security.</td><td>Review external CUI processing approval and AI provider authorization.</td></tr>
+<tr><td>Restore vs. continue</td><td>Data or upload appears missing.</td><td>Stop editing and ask Admin to check restore/backup status.</td><td>Decide whether restore is approved because it overwrites current database and uploads.</td></tr>
+<tr><td>Configure vs. SME input</td><td>Team asks for wizard or extraction-rule customization.</td><td>Do not assume control exists.</td><td><code>[unknown — needs SME input]</code> Confirm target-release configuration support.</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="Troubleshooting" id="troubleshooting"><h2 id="troubleshooting">Troubleshooting</h2>
+<p>Confidence Summary: User-resolvable and admin-only failure modes are 100 percent [verified] except release-specific DOCX/PDF export controls, which are [unknown — needs SME input].</p>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="User-Resolvable Issues" id="user-resolvable-issues"><h3 id="user-resolvable-issues">User-Resolvable Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely Cause</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Upload is rejected.</td><td>File is not PDF or DOCX.</td><td>Use a supported PDF or DOCX file.</td></tr>
+<tr><td>Upload is rejected for size.</td><td>File exceeds 50 MB.</td><td>Reduce file size or obtain a smaller source file.</td></tr>
+<tr><td>RFP Shredder is read-only.</td><td>User lacks Admin or Proposal Manager role.</td><td>Ask an Admin or Proposal Manager to perform write actions.</td></tr>
+<tr><td>Processing is still pending or processing.</td><td>Background extraction is still running.</td><td>Wait for the panel to update automatically.</td></tr>
+<tr><td>Confirmation fails.</td><td>Low-confidence rows are unresolved.</td><td>Edit each flagged row or mark it reviewed.</td></tr>
+<tr><td>Compliance Matrix is unavailable.</td><td>Requirements are not confirmed.</td><td>Return to RFP Shredder and select <strong>Confirm Requirements</strong>.</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="Admin-Only Issues" id="admin-only-issues"><h3 id="admin-only-issues">Admin-Only Issues</h3>
+<table>
+<thead><tr><th>Symptom</th><th>Likely Cause</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Processing fails across proposals.</td><td>AI Provider, worker, queue, or storage dependency.</td><td>Test AI Provider and review Manager logs.</td></tr>
+<tr><td>Processing fails with <code>CUI_BLOCKED</code>.</td><td>CUI external processing is not approved.</td><td>Review CUI policy and AI provider approval.</td></tr>
+<tr><td>User cannot upload or confirm.</td><td>Role does not grant <code>rfp:upload</code>, <code>rfp:write</code>, or <code>rfp:confirm</code>.</td><td><strong>Update access only if business justification supports Admin or Proposal Manager role.</strong></td></tr>
+<tr><td>Wizard will not advance.</td><td>Server gate is not satisfied.</td><td>Confirm RFP upload, processing, and confirmation.</td></tr>
+<tr><td>CSV export fails.</td><td>Export request or download issue.</td><td>Retry and review API/log output if persistent.</td></tr>
+<tr><td>DOCX/PDF matrix export is unavailable.</td><td>Release-specific UI support is unverified.</td><td><code>[unknown — needs SME input]</code> Confirm export controls and supported formats for the target release.</td></tr>
+<tr><td>Uploaded files appear missing.</td><td>Restore, storage issue, or wrong environment.</td><td>Stop edits and review backup/restore state before retrying imports.</td></tr>
+</tbody></table>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="Verification Checklist" id="verification-checklist"><h2 id="verification-checklist">Verification Checklist</h2>
+<p>Confidence Summary: Checklist items are 100 percent [verified] when they restate confirmed behavior; unverified release controls are tagged [unknown — needs SME input].</p>
+</section><section class="doc-section-page" data-section-index="31" data-section-title="End-User Completion Checklist" id="end-user-completion-checklist"><h3 id="end-user-completion-checklist">End-User Completion Checklist</h3>
+<ul>
+<li>[ ] [verified] The user can sign in.</li>
+<li>[ ] [verified] The user can open the proposal workspace.</li>
+<li>[ ] [verified] The user can open <strong>RFP Shredder</strong>.</li>
+<li>[ ] [verified] A supported PDF or DOCX is uploaded, or the user knows who must upload it.</li>
+<li>[ ] [verified] The RFP document reaches <strong>Completed</strong>.</li>
+<li>[ ] [verified] All extracted requirements have been reviewed.</li>
+<li>[ ] [verified] Low-confidence rows are edited or marked reviewed.</li>
+<li>[ ] [verified] Missing requirements are added manually.</li>
+<li>[ ] [verified] False positives are removed from the active list.</li>
+<li>[ ] [verified] Requirements are confirmed by an Admin or Proposal Manager.</li>
+<li>[ ] [verified] Compliance Matrix generation is available after confirmation.</li>
+<li>[ ] [verified] Matrix rows have been reviewed for Missing, Partial, or Addressed coverage.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="32" data-section-title="Admin Completion Checklist" id="admin-completion-checklist"><h3 id="admin-completion-checklist">Admin Completion Checklist</h3>
+<ul>
+<li>[ ] [verified] At least two Admin accounts exist.</li>
+<li>[ ] [verified] Proposal Managers have the permissions required for RFP upload, write, and confirmation.</li>
+<li>[ ] [verified] Writers understand their RFP Shredder access is view-oriented.</li>
+<li>[ ] [verified] AI Provider configuration is saved and connectivity has been tested.</li>
+<li>[ ] [verified] Worker, queue, storage, PostgreSQL, Redis, and API health can be reviewed through Manager/logs.</li>
+<li>[ ] [verified] <strong>CUI external-processing approval is documented before CUI-classified RFP text is sent to an external AI provider.</strong></li>
+<li>[ ] [verified] Audit review procedures include RFP upload, shredding, confirmation, requirement edits, CUI access, and AI activity.</li>
+<li>[ ] [verified] Backup and restore procedures are known for the standalone deployment.</li>
+<li>[ ] [verified] <strong>Restore impact is understood: restore overwrites current local database and uploads.</strong></li>
+<li>[ ] [unknown — needs SME input] Target-release support for DOCX/PDF Compliance Matrix export is confirmed.</li>
+<li>[ ] [unknown — needs SME input] Target-release support for configurable extraction thresholds, validations, wizard customization, or shred templates is confirmed.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="33" data-section-title="Appendix: Confidence Tag Summary" id="appendix-confidence-tag-summary"><h2 id="appendix-confidence-tag-summary">Appendix: Confidence Tag Summary</h2>
+<p>Confidence Summary: 100 percent of this appendix is [verified] as a count of the tags intentionally used in this guide.</p>
+<table>
+<thead><tr><th>Tag</th><th>Meaning In This Guide</th></tr></thead>
+<tbody>
+<tr><td><code>[verified]</code></td><td>Supported by the grounding corpus.</td></tr>
+<tr><td><code>[inferred — confirm]</code></td><td>Not used for operational steps in this version.</td></tr>
+<tr><td><code>[unknown — needs SME input]</code></td><td>Needed because the prompt requested coverage that was not verified in the grounding corpus.</td></tr>
+</tbody></table>
+<p>Major unknowns requiring SME input:</p>
+<ul>
+<li>Release-specific global RFP Shredder defaults.</li>
+<li>Administrator controls for extraction models, classification rules, confidence thresholds, validation rules, wizard customization, and notifications.</li>
+<li>Whether "Shred Template" is a current product object.</li>
+<li>Current customer-facing availability of DOCX/PDF Compliance Matrix exports.</li>
+<li>Exact audit export file formats and UI labels.</li>
+</ul></section></main>
+
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

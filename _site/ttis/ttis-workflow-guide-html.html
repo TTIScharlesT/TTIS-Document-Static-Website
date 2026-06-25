@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS AI Virtual Business System Workflow Guide</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="ttis-ai-virtual-business-system-workflow-guide">TTIS AI Virtual Business System Workflow Guide</h1>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product name</td>
+<td>TTIS AI Virtual Business System</td>
+</tr>
+<tr>
+<td>Product type</td>
+<td>Internal tool/platform</td>
+</tr>
+<tr>
+<td>Intended end-user audience</td>
+<td>Field crew, field operations managers, business development, finance, executives, and auditors</td>
+</tr>
+<tr>
+<td>Intended admin audience</td>
+<td>CEO/system administrator, operations lead, finance/payroll administrator, compliance officer</td>
+</tr>
+<tr>
+<td>Version/date</td>
+<td>v1.0 - June 24, 2026</td>
+</tr>
+<tr>
+<td>Purpose</td>
+<td>Explain the repeatable workflows end users operate day to day and administrators configure, govern, and maintain.</td>
+</tr>
+<tr>
+<td>Grounding corpus</td>
+<td><code>AGENTS.md</code>, <code>docs/guides/TTIS_End_User_Guide.md</code>, <code>docs/guides/TTIS_ADMIN_OPERATIONS_GUIDE.md</code>, <code>config/routing_rules.yaml</code>, <code>dashboard/main.py</code>, <code>dashboard/abac.py</code>, <code>dashboard/gates.py</code>, and related repo files in <code>H:\Projects\TTI-S_VBS\ttis-ai</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Confidence Summary:</strong> Header facts are 100% [verified] from the repository onboarding and guide corpus; 0% [inferred - confirm]; 0% [unknown - needs SME input].</p>
+<p>Confidence tags:</p>
+<ul>
+<li><code>[verified]</code> means the step is directly supported by the grounding corpus.</li>
+<li><code>[inferred - confirm]</code> means the step is reasonable but must be validated before operational use.</li>
+<li><code>[unknown - needs SME input]</code> means the product corpus does not define the step clearly enough to execute.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="At-a-Glance" id="at-a-glance"><h2 id="at-a-glance">At-a-Glance</h2>
+<p><strong>Confidence Summary:</strong> 100% [verified] from the role matrix, user guide, admin guide, and route inventory; 0% [inferred - confirm]; 0% [unknown - needs SME input].</p>
+<table>
+<thead>
+<tr>
+<th>Work area</th>
+<th>End-user track</th>
+<th>Admin track</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Access and identity</td>
+<td>Sign in, manage sessions, complete MFA or step-up prompts.</td>
+<td>Provision users, assign roles/divisions/grants, manage activation and passwords.</td>
+</tr>
+<tr>
+<td>Daily dashboard use</td>
+<td>Review Overview, alerts, gates, assigned work, and role-visible modules.</td>
+<td>Maintain service health, environment variables, CORS, database initialization, and router availability.</td>
+</tr>
+<tr>
+<td>Knowledge and documents</td>
+<td>Search policy, regulation, and internal document corpus.</td>
+<td>Refresh or ingest corpus content and govern CUI access through ABAC.</td>
+</tr>
+<tr>
+<td>AI assistance</td>
+<td>Use Ask-LYNNE or OPS assistants where role allows.</td>
+<td>Configure agent model tiers, disable/enable agents, manage EAA overrides and playbooks.</td>
+</tr>
+<tr>
+<td>Field operations</td>
+<td>Submit timecards, daily logs, incidents, travel requests, and LMS tasks.</td>
+<td>Maintain schedules, charge codes, onboarding gates, project records, and safety workflows.</td>
+</tr>
+<tr>
+<td>Finance and payroll</td>
+<td>Submit approvals or data only where role allows.</td>
+<td>Run payroll/finance workflows, protect bank data, export audit records, and enforce step-up.</td>
+</tr>
+<tr>
+<td>Opportunity lifecycle</td>
+<td>Work bid/proposal/project tasks surfaced by workflows.</td>
+<td>Operate COMMAND-CORE routing, Redis queue mode, human gates, and workflow trace/audit review.</td>
+</tr>
+<tr>
+<td>Compliance and audit</td>
+<td>Follow access-denied, CUI, timekeeping, and safety constraints.</td>
+<td>Preserve the append-only audit chain, enforce ABAC, verify chain integrity, and set backup/retention policy.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Setup / Onboarding Sequence" id="setup-onboarding-sequence"><h2 id="setup-onboarding-sequence">Setup / Onboarding Sequence</h2>
+<p><strong>Confidence Summary:</strong> End-user and standard admin startup steps are 95% [verified] from the user/admin guides and startup code; 0% [inferred - confirm]; 5% [unknown - needs SME input] for live production backup cadence and organization-specific retention duration.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="End-User Track" id="end-user-track"><h3 id="end-user-track">End-User Track</h3>
+<p>Precondition: an administrator has created an active TTIS account with the correct role, division, auditor flag, and any required per-user grants.</p>
+<ol>
+<li>[verified] Open the TTIS Dashboard URL provided by the administrator.</li>
+<li>[verified] Enter the assigned username and password.</li>
+<li>[verified] Select <strong>Sign In</strong>.</li>
+<li>[verified] Wait for the role-specific Overview page to load.</li>
+<li>[verified] Open the account or security area if MFA enrollment is required.</li>
+<li>[verified] Enroll a TOTP authenticator by scanning the QR code or entering the setup key.</li>
+<li>[verified] Save backup codes in an approved secure location.</li>
+<li>[verified] Enter the current 6-digit authenticator code and submit.</li>
+<li>[verified] Review the navigation items that appear for the account role.</li>
+<li>[verified] Open <strong>Knowledge</strong> or the assigned work module to confirm access.</li>
+</ol>
+<p>Expected result: the user can reach the role-appropriate dashboard surface and complete MFA or step-up when prompted.</p>
+<p>How to confirm success: <code>/auth/me</code> or the dashboard profile shows the expected role/capabilities, and unauthorized modules are absent or return access denied.</p>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Admin Track" id="admin-track"><h3 id="admin-track">Admin Track</h3>
+<p>Precondition: the repository is available, required secrets are known, and the operator is authorized to configure TTIS VBS.</p>
+<ol>
+<li>[verified] Install Python 3.11+, Docker Desktop with Compose v2, and the repo dependencies listed in <code>requirements.txt</code>.</li>
+<li>[verified] Create or update <code>config/.env</code> from the template.</li>
+<li>[verified] <strong>Set <code>ANTHROPIC_API_KEY</code>, <code>DASHBOARD_JWT_SECRET</code>, <code>DASHBOARD_PWD_SALT</code>, and any production integration secrets through environment variables or secret storage; never commit secrets.</strong></li>
+<li>[verified] <strong>Set <code>DATABASE_URL</code> only when the deployment should use PostgreSQL/Cloud SQL instead of local SQLite.</strong></li>
+<li>[verified] Choose <code>WORKFLOW_EXECUTION_MODE=inline</code> for local development or <code>WORKFLOW_EXECUTION_MODE=queue</code> for the production-shaped Redis worker path.</li>
+<li>[verified] Start the bootstrap process with <code>python main.py</code> so DBs, the tool registry, the agent registry, and COMMAND-CORE initialize.</li>
+<li>[verified] Start the Dashboard API with <code>uvicorn dashboard.main:app --host 127.0.0.1 --port 8000</code>.</li>
+<li>[verified] Start the webhook receiver with <code>uvicorn tools.pursuite_webhook:webhook_app --host 0.0.0.0 --port 8001</code>.</li>
+<li>[verified] For queue mode, start Docker Compose so <code>dashboard</code>, <code>webhook</code>, <code>worker</code>, <code>redis</code>, and <code>chromadb</code> services are available.</li>
+<li>[verified] Verify health with <code>GET /health</code> and confirm the dashboard process initialized audit, state, idempotency, locks, charge codes, timecards, alerts, incidents, schedule, finance, gates, invoices, agent flags, playbooks, wizards, payroll, travel, preferences, token rates, and related domain stores.</li>
+<li>[verified] <strong>Provision users and roles through the admin user workflow or <code>dashboard.users</code> helpers; access, role, division, auditor flag, grants, activation, and password changes affect system authorization.</strong></li>
+<li>[unknown - needs SME input] Define the approved live backup cadence and retention duration for SQLite/PostgreSQL, Redis durability, ChromaDB, exports, and generated artifacts before production go-live.</li>
+</ol>
+<p>Expected result: the platform accepts authenticated users, exposes only role-appropriate surfaces, and routes events through inline or queue execution as configured.</p>
+<p>How to confirm success: <code>/health</code> returns success, the dashboard loads, <code>python main.py --verify-chain</code> reports a valid audit chain, and a test user sees the expected effective capabilities.</p>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="Core Operating Procedures" id="core-operating-procedures"><h2 id="core-operating-procedures">Core Operating Procedures</h2>
+<p><strong>Confidence Summary:</strong> Procedures are 92% [verified] from the user/admin guides, route inventory, ABAC matrix, routing rules, and workflow code; 4% [inferred - confirm] for UI label placement where the code exposes endpoints but the exact screen label can vary; 4% [unknown - needs SME input] for external agency portal actions and live operational policies not defined in the corpus.</p>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="Procedure 1 - Sign In And Complete A Step-Up Prompt" id="procedure-1-sign-in-and-complete-a-step-up-prompt"><h3 id="procedure-1-sign-in-and-complete-a-step-up-prompt">Procedure 1 - Sign In And Complete A Step-Up Prompt</h3>
+<p>Trigger/precondition: the user is signed out, the account is active, and a sensitive action may require a fresh step-up assertion.</p>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="End-User Track" id="end-user-track-2"><h4 id="end-user-track_1">End-User Track</h4>
+<ol>
+<li>[verified] Open the TTIS Dashboard URL.</li>
+<li>[verified] Enter username and password.</li>
+<li>[verified] Select <strong>Sign In</strong>.</li>
+<li>[verified] Open the target module from the role-visible navigation.</li>
+<li>[verified] When a step-up prompt appears, open the authenticator app.</li>
+<li>[verified] Enter the current 6-digit code or one unused backup code.</li>
+<li>[verified] Return to the original action and submit it again if the screen asks for resubmission.</li>
+</ol>
+<p>Expected result: the dashboard accepts the session and allows the sensitive action only after a valid fresh step-up.</p>
+<p>How to confirm success: the action completes, or the API returns a clear access/step-up error instead of silently bypassing the gate.</p>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="Admin Track" id="admin-track-2"><h4 id="admin-track_1">Admin Track</h4>
+<ol>
+<li>[verified] Confirm the user exists in the DB-backed user store and has the expected role, division, auditor flag, and domain.</li>
+<li>[verified] Confirm the role/capability matrix grants the requested resource/action.</li>
+<li>[verified] Confirm the user is enrolled in TOTP if the action requires step-up.</li>
+<li>[verified] <strong>Do not override step-up for actions involving access control, approvals, finance, payroll, contracts, regulated data, or CUI.</strong></li>
+<li>[verified] Review logs or audit records if a user reports denial on an action they should be able to perform.</li>
+</ol>
+<p>Expected result: access is granted only when both ABAC and step-up requirements are satisfied.</p>
+<p>How to confirm success: <code>/api/v1/auth/me</code> reports expected effective capabilities, and mutating sensitive requests produce audit-visible actions.</p>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="Procedure 2 - Use Knowledge Search" id="procedure-2-use-knowledge-search"><h3 id="procedure-2-use-knowledge-search">Procedure 2 - Use Knowledge Search</h3>
+<p>Trigger/precondition: the user has the <code>documents:view</code> capability and any applicable CUI onboarding gate has been released.</p>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="End-User Track" id="end-user-track-3"><h4 id="end-user-track_2">End-User Track</h4>
+<ol>
+<li>[verified] Open <strong>Knowledge</strong>.</li>
+<li>[verified] Enter a policy, regulation, contract, project, or procedure query.</li>
+<li>[verified] Review the returned source snippets and section anchors.</li>
+<li>[verified] Open the source document when more context is needed.</li>
+<li>[verified] Treat Knowledge output as source-backed assistance, not as authority to bypass policy or a human gate.</li>
+</ol>
+<p>Expected result: the user finds relevant internal or regulatory source material within the role-allowed corpus.</p>
+<p>How to confirm success: results appear with source references, or the user receives a clear access denial for restricted material.</p>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="Admin Track" id="admin-track-3"><h4 id="admin-track_2">Admin Track</h4>
+<ol>
+<li>[verified] Place approved corpus files under the documented document corpus path or use the configured ingestion workflow.</li>
+<li>[verified] Run <code>python main.py --ingest-docs</code> or the project ingestion script when corpus content changes.</li>
+<li>[verified] Confirm ChromaDB is available on the configured host/port or local directory.</li>
+<li>[verified] <strong>Restrict CUI-bearing collections through ABAC; do not grant Knowledge access before required CUI onboarding gates are released.</strong></li>
+<li>[verified] Re-test Knowledge search from a representative user account after ingestion.</li>
+</ol>
+<p>Expected result: the corpus refreshes and users can search only material they are allowed to view.</p>
+<p>How to confirm success: <code>/api/v1/rag/collections</code> and <code>/api/v1/rag/search</code> respond for authorized users, while unauthorized users are denied.</p>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="Procedure 3 - Use Ask-LYNNE Or OPS Assistants" id="procedure-3-use-ask-lynne-or-ops-assistants"><h3 id="procedure-3-use-ask-lynne-or-ops-assistants">Procedure 3 - Use Ask-LYNNE Or OPS Assistants</h3>
+<p>Trigger/precondition: the user has the relevant assistant capability (<code>lynne</code> for CEO-facing Ask-LYNNE or <code>eaa_ops</code> for OPS assistants).</p>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="End-User Track" id="end-user-track-4"><h4 id="end-user-track_3">End-User Track</h4>
+<ol>
+<li>[verified] Open <strong>Ask-LYNNE</strong> or the assigned OPS assistant surface.</li>
+<li>[verified] Enter a specific business request, such as a policy question, travel request, calendar/email task, workflow prompt, or research request.</li>
+<li>[verified] Review cited sources, tool results, and proposed actions before relying on the response.</li>
+<li>[verified] <strong>Confirm any proposed workflow initiation, external send, file operation, regulated-data action, travel booking handoff, or money-moving step before it proceeds.</strong></li>
+<li>[verified] Download or save assistant output only through the provided output workflow when the surface offers it.</li>
+</ol>
+<p>Expected result: the assistant answers, uses tools where allowed, and stops for confirmation before consequential actions.</p>
+<p>How to confirm success: the run stream completes or records a recoverable error, and any generated output appears in the relevant run/output record.</p>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="Admin Track" id="admin-track-4"><h4 id="admin-track_3">Admin Track</h4>
+<ol>
+<li>[verified] Confirm <code>LYNNE</code>, <code>OPS_SUPPORT</code>, and <code>OPS_MANAGEMENT</code> are present in the agent registry and configuration.</li>
+<li>[verified] Confirm model tiering is set with valid <code>model_variant</code> values where applicable.</li>
+<li>[verified] Configure Google Workspace, travel, maps, weather, and other tool secrets only when those integrations are approved.</li>
+<li>[verified] <strong>Use agent disable/enable, force-terminate, override, and playbook management endpoints only from authorized CEO/admin accounts; these actions affect agent behavior and operational control.</strong></li>
+<li>[verified] Review assistant runs, audit entries, and output records when troubleshooting or validating an assistant action.</li>
+</ol>
+<p>Expected result: assistant use remains scoped to the caller's role, agent configuration, and tool permissions.</p>
+<p>How to confirm success: agent telemetry and run details show the expected agent, tools, status, and audit attribution.</p>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="Procedure 4 - Work A Human Gate" id="procedure-4-work-a-human-gate"><h3 id="procedure-4-work-a-human-gate">Procedure 4 - Work A Human Gate</h3>
+<p>Trigger/precondition: COMMAND-CORE or a domain workflow has placed a gate in the pending queue.</p>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="End-User Track" id="end-user-track-5"><h4 id="end-user-track_4">End-User Track</h4>
+<ol>
+<li>[verified] Open the gate or approval area surfaced on Overview or the workflow detail view.</li>
+<li>[verified] Read the gate title, summary, priority, submitted package, current package, financial fields, and version.</li>
+<li>[verified] Compare the submitted package against the current package if a diff is available.</li>
+<li>[verified] <strong>Complete step-up before approving, rejecting, submitting, or requesting changes on any gate that touches access, contracts, finance, payroll, regulated data, CUI, deletion, or external submission.</strong></li>
+<li>[verified] Approve, reject, or request changes with a concise decision note.</li>
+<li>[verified] Confirm the gate status updates and the workflow resumes, remains pending for revision, or stops.</li>
+</ol>
+<p>Expected result: the human decision is captured with audit hashes and the workflow state changes according to the decision.</p>
+<p>How to confirm success: the gate disappears from the pending queue or shows the new state, and the workflow trace/audit record includes the decision.</p>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="Admin Track" id="admin-track-5"><h4 id="admin-track_4">Admin Track</h4>
+<ol>
+<li>[verified] Confirm the gate exists with <code>GET /api/v1/gates/{gate_id}</code> or the dashboard detail view.</li>
+<li>[verified] Confirm the reviewer is authorized for the resource/action and is not blocked by auditor mutating-action denial.</li>
+<li>[verified] Confirm optimistic concurrency version handling before accepting a gate decision.</li>
+<li>[verified] Use <code>request_changes_on_gate</code> or the gate update route when the package needs revision rather than approval/rejection.</li>
+<li>[verified] <strong>Do not bypass non-bypassable human gates such as contract execution, financial transaction, hire/terminate employee, external legal filing, SDVOSB representation, proposal submission, media communication, Pursuite API key rotation, or webhook reconfiguration.</strong></li>
+</ol>
+<p>Expected result: gate handling remains fail-closed, auditable, and resistant to stale review packages.</p>
+<p>How to confirm success: audit records include chain and verification hashes, and the pending gate queue reflects the latest status.</p>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="Procedure 5 - Run The Lead-To-Completion Opportunity Lifecycle" id="procedure-5-run-the-lead-to-completion-opportunity-lifecycle"><h3 id="procedure-5-run-the-lead-to-completion-opportunity-lifecycle">Procedure 5 - Run The Lead-To-Completion Opportunity Lifecycle</h3>
+<p>Trigger/precondition: Pursuite or an internal system emits a routed event defined in <code>config/routing_rules.yaml</code>.</p>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="End-User Track" id="end-user-track-6"><h4 id="end-user-track_5">End-User Track</h4>
+<ol>
+<li>[verified] For a new Pursuite opportunity, wait for <code>WF_BID_ACQUISITION</code> to run strategic fit, bid/no-bid, operational feasibility, pricing feasibility, SDVOSB compliance, and final bid decision tasks.</li>
+<li>[verified] Review the bid/no-bid gate package when assigned.</li>
+<li>[verified] <strong>Approve bid only when pricing, compliance, and operational feasibility are acceptable.</strong></li>
+<li>[verified] For approved bids, monitor <code>WF_PROPOSAL_DEVELOPMENT</code> through proposal workspace, draft sections, price volume, compliance review, and color-team review.</li>
+<li>[verified] <strong>Authorize proposal submission only after final review; the human submits through the agency portal when required.</strong></li>
+<li>[verified] If the award is won, review the award acceptance gate before contract activation.</li>
+<li>[verified] <strong>Accept the contract award only when authorized to bind the organization.</strong></li>
+<li>[verified] Monitor kickoff, field execution, quality milestones, invoicing, and close-out until the project completes.</li>
+</ol>
+<p>Expected result: the opportunity advances from discovered lead through bid, proposal, award, kickoff, execution, quality, invoicing, and close-out with human gates at binding points.</p>
+<p>How to confirm success: workflow detail, audit, Pursuite status, and project/finance records show the expected stage transitions.</p>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="Admin Track" id="admin-track-6"><h4 id="admin-track_5">Admin Track</h4>
+<ol>
+<li>[verified] Confirm the event trigger exists in <code>config/routing_rules.yaml</code>.</li>
+<li>[verified] Confirm the webhook receiver is available on port 8001 for inbound Pursuite and Telegram events.</li>
+<li>[verified] Confirm COMMAND-CORE is initialized and is reading the routing rules.</li>
+<li>[verified] In queue mode, confirm Redis and <code>python -m orchestration.worker</code> are consuming <code>queue:workflow_jobs</code>.</li>
+<li>[verified] Confirm all agents referenced by the workflow are enabled and have required tools.</li>
+<li>[verified] Inspect <code>/api/v1/workflows/{workflow_id}/trace</code> or audit workflow routes when a stage stalls.</li>
+<li>[verified] <strong>Do not change routing for binding gates without compliance review; routing changes can affect contract, money, proposal, access, and regulated-data controls.</strong></li>
+</ol>
+<p>Expected result: events route deterministically and workflow stages advance or pause at defined gates.</p>
+<p>How to confirm success: COMMAND-CORE logs the event, a workflow ID is created, steps progress, and gate or completion records appear in the audit chain.</p>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="Procedure 6 - Submit Field Operations Records" id="procedure-6-submit-field-operations-records"><h3 id="procedure-6-submit-field-operations-records">Procedure 6 - Submit Field Operations Records</h3>
+<p>Trigger/precondition: the user has field crew or field operations permissions and is working on assigned projects, shifts, or incidents.</p>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="End-User Track" id="end-user-track-7"><h4 id="end-user-track_6">End-User Track</h4>
+<ol>
+<li>[verified] Open the assigned project, schedule, timecard, daily log, incident, travel, LMS, or onboarding area.</li>
+<li>[verified] Enter only the facts requested by the form or workflow.</li>
+<li>[verified] Select the correct project, charge code, shift, division, or request record.</li>
+<li>[verified] <strong>Submit timecards only after verifying hours and charge codes; submitted timekeeping affects payroll and DCAA-bearing records.</strong></li>
+<li>[verified] <strong>Submit incident or safety records promptly and accurately; safety incidents can trigger P1 halt/escalation workflows.</strong></li>
+<li>[verified] For travel, submit the request, review curated options when available, select an option, and send it to the booker when ready.</li>
+<li>[verified] Confirm the submitted record is visible in the relevant list or detail page.</li>
+</ol>
+<p>Expected result: operational records are captured for review, approval, payroll, scheduling, safety, or travel handoff.</p>
+<p>How to confirm success: the record receives an ID/status and appears in the user's scoped view.</p>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="Admin Track" id="admin-track-7"><h4 id="admin-track_6">Admin Track</h4>
+<ol>
+<li>[verified] Maintain active divisions, projects, cost codes, charge codes, schedules, and onboarding gates before users submit records.</li>
+<li>[verified] Configure supervisor/finance approvals for timecard workflows.</li>
+<li>[verified] Review incidents, daily logs, travel requests, and timecards from the role-appropriate manager view.</li>
+<li>[verified] <strong>Approve timecards and payroll-affecting records only after checking hours, charge codes, labor posting status, and required gate releases.</strong></li>
+<li>[verified] <strong>Treat high/critical safety incidents as P1 and follow the halt/escalation path before routine production work continues.</strong></li>
+</ol>
+<p>Expected result: field data moves through supervisor, finance, payroll, safety, and project controls without bypassing approval layers.</p>
+<p>How to confirm success: approval state, audit events, labor postings, and downstream payroll or project summaries reflect the submitted records.</p>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="Procedure 7 - Operate Finance, Payroll, And Audit Export" id="procedure-7-operate-finance-payroll-and-audit-export"><h3 id="procedure-7-operate-finance-payroll-and-audit-export">Procedure 7 - Operate Finance, Payroll, And Audit Export</h3>
+<p>Trigger/precondition: the user has finance or CEO permissions and required step-up is available.</p>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="End-User Track" id="end-user-track-8"><h4 id="end-user-track_7">End-User Track</h4>
+<ol>
+<li>[verified] Open the finance, payroll, invoices, timecard approval, or audit export module assigned to the role.</li>
+<li>[verified] Review contract, invoice, cash-flow, labor posting, employee, deduction, payroll run, or audit export details.</li>
+<li>[verified] <strong>Complete step-up before approving finance records, advancing invoices, creating payroll records, changing deductions, generating ACH files, or exporting audit records.</strong></li>
+<li>[verified] Submit the approval, adjustment, export, run advance, or booking handoff only after the record is complete.</li>
+<li>[verified] Confirm the resulting status, export URL, run state, or generated file reference.</li>
+</ol>
+<p>Expected result: finance and payroll actions are role-gated, step-up-gated where required, and audit-visible.</p>
+<p>How to confirm success: the record state changes, generated artifacts exist, and audit events identify the actor.</p>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="Admin Track" id="admin-track-8"><h4 id="admin-track_7">Admin Track</h4>
+<ol>
+<li>[verified] Confirm finance/payroll DB initialization completed during dashboard startup.</li>
+<li>[verified] Confirm payroll bank encryption key status before bank data operations.</li>
+<li>[verified] <strong>Generate or rotate the payroll encryption key only through the approved payroll encryption-key workflow; bank data is sensitive regulated financial data.</strong></li>
+<li>[verified] Confirm audit export generation is itself audit-anchored.</li>
+<li>[verified] Verify the audit chain after finance/payroll maintenance with <code>python main.py --verify-chain</code>.</li>
+<li>[unknown - needs SME input] Confirm external bank/NACHA transmission procedure and retention requirements before using exported ACH files operationally.</li>
+</ol>
+<p>Expected result: financial operations remain controlled, encrypted where required, and traceable through the append-only audit chain.</p>
+<p>How to confirm success: payroll/finance endpoints return expected states, generated files are protected, and audit verification passes.</p>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="Admin Configuration &amp; Governance" id="admin-configuration-governance"><h2 id="admin-configuration-governance">Admin Configuration &amp; Governance</h2>
+<p><strong>Confidence Summary:</strong> 90% [verified] from ABAC, startup code, admin guide, routing rules, and audit modules; 0% [inferred - confirm]; 10% [unknown - needs SME input] for organization-specific backup retention, legal hold, and external bank/agency retention schedules.</p>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="End-User Track" id="end-user-track-9"><h3 id="end-user-track_8">End-User Track</h3>
+<p>Precondition: the user is operating under an assigned account and role.</p>
+<ol>
+<li>[verified] Use only the modules visible to the account.</li>
+<li>[verified] Report unexpected access, missing access, or incorrect role/division immediately.</li>
+<li>[verified] <strong>Do not share credentials, authenticator codes, backup codes, exported audit records, payroll data, or CUI-bearing documents.</strong></li>
+<li>[verified] Stop and request admin review when a workflow asks for an action outside the user's authority.</li>
+</ol>
+<p>Expected result: end users operate inside the configured authorization boundary and escalate access issues instead of improvising.</p>
+<p>How to confirm success: denied actions fail clearly, authorized actions proceed, and audit records show the correct user actor.</p>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="Admin Track" id="admin-track-9"><h3 id="admin-track_8">Admin Track</h3>
+<table>
+<thead>
+<tr>
+<th>Governance area</th>
+<th>Required admin control</th>
+<th>Flagged sensitivity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Roles and capabilities</td>
+<td>Maintain CEO, field operations manager, business development, finance, field crew, auditor posture, and per-user grants through the ABAC matrix and user admin workflows.</td>
+<td><strong>Access/permissions</strong></td>
+</tr>
+<tr>
+<td>Auditor posture</td>
+<td>Deny all mutating actions for auditor-marked accounts, even when the base role would otherwise allow them.</td>
+<td><strong>Access/permissions</strong></td>
+</tr>
+<tr>
+<td>Step-up MFA</td>
+<td>Enforce fresh TOTP or backup-code assertions on sensitive approvals and finance/payroll actions.</td>
+<td><strong>Access, money, regulated data</strong></td>
+</tr>
+<tr>
+<td>Human gates</td>
+<td>Preserve non-bypassable gates for contracts, financial transactions, employment actions, legal filings, SDVOSB representation, proposal submission, media communication, Pursuite API key rotation, and webhook reconfiguration.</td>
+<td><strong>Irreversible/binding actions</strong></td>
+</tr>
+<tr>
+<td>Audit chain</td>
+<td>Keep <code>audit.db</code> append-only and chain-verified; use fail-closed anchors for governed mutations.</td>
+<td><strong>Regulated/compliance data</strong></td>
+</tr>
+<tr>
+<td>Data stores</td>
+<td>Initialize and protect SQLite/PostgreSQL, Redis, ChromaDB, payroll bank secrets, exports, and domain DBs.</td>
+<td><strong>Regulated/CUI/PII/financial data</strong></td>
+</tr>
+<tr>
+<td>Queue mode</td>
+<td>Use Redis and <code>orchestration.worker</code> for durable production-shaped workflow execution.</td>
+<td>Operational continuity</td>
+</tr>
+<tr>
+<td>Corpus and CUI</td>
+<td>Scope Knowledge/RAG collections through ABAC and onboarding gates.</td>
+<td><strong>CUI/regulated data</strong></td>
+</tr>
+<tr>
+<td>Agent control</td>
+<td>Manage enable/disable, force termination, overrides, model tiers, tools, and playbooks from authorized accounts only.</td>
+<td><strong>Access/automation control</strong></td>
+</tr>
+<tr>
+<td>Backup/retention</td>
+<td>Define production backup cadence, retention period, legal hold, and restore test procedure.</td>
+<td>[unknown - needs SME input]</td>
+</tr>
+</tbody>
+</table>
+<p>Admin configuration procedure:</p>
+<ol>
+<li>[verified] Load or set <code>config/.env</code> without committing secrets.</li>
+<li>[verified] Choose SQLite or PostgreSQL by setting or omitting <code>DATABASE_URL</code>.</li>
+<li>[verified] Choose inline or queue execution using <code>WORKFLOW_EXECUTION_MODE</code>.</li>
+<li>[verified] Set <code>REDIS_URL</code> when queue mode, scheduler features, or real-time cross-process signals require Redis.</li>
+<li>[verified] Configure Google Workspace, Duffel, Pursuite, maps, calendar, email, Slack, and owner email only when approved.</li>
+<li>[verified] <strong>Create users, roles, divisions, grants, password resets, activation changes, and auditor flags only through authorized admin workflows.</strong></li>
+<li>[verified] <strong>Review step-up requirements before changing finance, payroll, gates, user management, agent control, or policy settings.</strong></li>
+<li>[verified] <strong>Never disable or rewrite the append-only audit trail to make a workflow pass.</strong></li>
+<li>[verified] Run health, audit verification, and representative role tests after configuration changes.</li>
+<li>[unknown - needs SME input] Record the approved backup/retention/legal-hold policy in the admin guide and test restore before production reliance.</li>
+</ol>
+<p>Expected result: configuration changes are explicit, auditable, least-privilege, and recoverable.</p>
+<p>How to confirm success: health checks pass, role-based smoke tests pass, audit chain verification passes, and sensitive changes show actor-attributed audit records.</p>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="Lifecycle &amp; Decision Points" id="lifecycle-decision-points"><h2 id="lifecycle-decision-points">Lifecycle &amp; Decision Points</h2>
+<p><strong>Confidence Summary:</strong> 93% [verified] from routing rules, workflow engine behavior, user/admin guides, and ABAC controls; 3% [inferred - confirm] for live operating thresholds that depend on deployment policy; 4% [unknown - needs SME input] for external agency/banking/retention decisions.</p>
+<table>
+<thead>
+<tr>
+<th>Decision point</th>
+<th>Trigger condition</th>
+<th>End-user branch</th>
+<th>Admin branch</th>
+<th>Required confirmation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inline vs queue execution</td>
+<td>Deployment mode is selected.</td>
+<td>Use the dashboard normally.</td>
+<td>Run inline for dev or queue mode with Redis/worker for production shape.</td>
+<td>[verified] <code>/health</code>, worker logs, and workflow state.</td>
+</tr>
+<tr>
+<td>Bid vs no-bid</td>
+<td><code>WF_BID_ACQUISITION</code> reaches bid decision gate.</td>
+<td><strong>Approve bid only after review</strong> or no-bid/close.</td>
+<td>Confirm routing and gate audit.</td>
+<td>[verified] Gate decision and Pursuite stage.</td>
+</tr>
+<tr>
+<td>Submit vs revise proposal</td>
+<td>Proposal package reaches submission gate.</td>
+<td><strong>Submit externally only after final authorization</strong> or request changes.</td>
+<td>Confirm gate package/version and audit hash.</td>
+<td>[verified] Submission record and workflow audit.</td>
+</tr>
+<tr>
+<td>Accept vs decline/hold award</td>
+<td><code>pursuite_webhook.award.won</code> fires.</td>
+<td><strong>Accept award only with binding authority</strong> or hold/decline per policy.</td>
+<td>Confirm contract gate cannot be bypassed.</td>
+<td>[verified] Contract activation status and audit.</td>
+</tr>
+<tr>
+<td>Continue vs stop work for safety</td>
+<td>High/critical incident occurs.</td>
+<td>Stop, report, and follow safety direction.</td>
+<td>Treat as P1 and manage release only through authorized control.</td>
+<td>[verified] Incident state and safety workflow.</td>
+</tr>
+<tr>
+<td>Resolve vs request gate changes</td>
+<td>Gate package differs or is incomplete.</td>
+<td>Request changes instead of approving.</td>
+<td>Bump version and keep gate open for revision.</td>
+<td>[verified] Gate status/version.</td>
+</tr>
+<tr>
+<td>Approve vs reject time/payroll</td>
+<td>Timecard/payroll record awaits approval.</td>
+<td>Correct or submit only accurate records.</td>
+<td><strong>Approve/pay only after labor, charge code, and finance checks.</strong></td>
+<td>[verified] Approval state, labor posting, payroll run.</td>
+</tr>
+<tr>
+<td>Refresh vs hold corpus</td>
+<td>New policy/docs are available.</td>
+<td>Search current Knowledge until refresh completes.</td>
+<td><strong>Refresh only approved corpus content; protect CUI scope.</strong></td>
+<td>[verified] RAG collection/search response.</td>
+</tr>
+<tr>
+<td>Retain vs purge records</td>
+<td>Retention period expires or legal hold applies.</td>
+<td>Do not delete records.</td>
+<td><strong>Follow approved retention/legal-hold policy before deletion.</strong></td>
+<td>[unknown - needs SME input] Written retention/legal policy.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="31" data-section-title="Troubleshooting" id="troubleshooting"><h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>Confidence Summary:</strong> 88% [verified] from documented run commands, route behavior, ABAC, Docker notes, and startup code; 8% [inferred - confirm] for user-facing UI wording; 4% [unknown - needs SME input] for external service outage procedures not fully defined in the corpus.</p>
+</section><section class="doc-section-page" data-section-index="32" data-section-title="User-Resolvable Issues" id="user-resolvable-issues"><h3 id="user-resolvable-issues">User-Resolvable Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cannot see a module</td>
+<td>Role, division, auditor posture, or CUI onboarding gate does not allow it.</td>
+<td>[verified] Sign out/in, confirm the correct account, then ask an admin to review capabilities.</td>
+</tr>
+<tr>
+<td>Step-up prompt keeps appearing</td>
+<td>Step-up assertion expired or code was invalid.</td>
+<td>[verified] Enter a current TOTP code and retry the original action.</td>
+</tr>
+<tr>
+<td>Knowledge returns no results</td>
+<td>Query is too narrow or corpus access is restricted.</td>
+<td>[verified] Broaden the query and confirm the account is allowed to view Knowledge.</td>
+</tr>
+<tr>
+<td>Ask-LYNNE or OPS assistant stops mid-run</td>
+<td>Run error, tool failure, or required confirmation.</td>
+<td>[verified] Reopen the run details, check for a gate/confirmation, and retry with a narrower request if needed.</td>
+</tr>
+<tr>
+<td>Timecard or daily log cannot submit</td>
+<td>Missing project/charge code, ownership issue, or onboarding gate.</td>
+<td>[verified] Check required fields and contact a supervisor/admin if the project or charge code is missing.</td>
+</tr>
+<tr>
+<td>Access denied on an approval</td>
+<td>User lacks capability, is auditor-marked, or needs step-up.</td>
+<td>[verified] Complete step-up if prompted; otherwise request admin review.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="33" data-section-title="Admin-Only Issues" id="admin-only-issues"><h3 id="admin-only-issues">Admin-Only Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/health</code> fails</td>
+<td>Dashboard startup error or missing environment configuration.</td>
+<td>[verified] Review dashboard logs and confirm DB initialization, <code>config/.env</code>, and required secrets.</td>
+</tr>
+<tr>
+<td>Workflows do not advance in queue mode</td>
+<td>Redis or worker is unavailable.</td>
+<td>[verified] Check <code>REDIS_URL</code>, Docker Compose services, and <code>orchestration.worker</code> logs.</td>
+</tr>
+<tr>
+<td>Pursuite events do not trigger workflows</td>
+<td>Webhook receiver unavailable or routing rule mismatch.</td>
+<td>[verified] Check <code>tools.pursuite_webhook:webhook_app</code>, port 8001, and <code>config/routing_rules.yaml</code>.</td>
+</tr>
+<tr>
+<td>Gate decision conflicts</td>
+<td>Gate package version changed during review.</td>
+<td>[verified] Reload gate detail, compare current/submitted packages, and decide on the latest version.</td>
+</tr>
+<tr>
+<td>Agent is unresponsive</td>
+<td>Agent disabled, overridden incorrectly, missing tool, or model/API problem.</td>
+<td>[verified] Check agent flags, overrides, telemetry, API keys, and model tier configuration.</td>
+</tr>
+<tr>
+<td>Knowledge ingestion fails</td>
+<td>ChromaDB unavailable or source file unsupported.</td>
+<td>[verified] Check ChromaDB service/local store and rerun ingestion after fixing source files.</td>
+</tr>
+<tr>
+<td>Docker restart fails on <code>.env</code> bind mount</td>
+<td>Windows Docker single-file bind mount created a bad directory or stale mount.</td>
+<td>[verified] Recreate containers with <code>docker compose down --remove-orphans</code> and prefer <code>env_file:</code> over single-file bind mounts.</td>
+</tr>
+<tr>
+<td>Audit verification fails</td>
+<td>Audit chain has been altered or DB state is inconsistent.</td>
+<td>[verified] Stop governed mutation work, preserve evidence, and investigate before resuming.</td>
+</tr>
+<tr>
+<td>External bank or agency portal process is unclear</td>
+<td>External operating procedure is not defined in the corpus.</td>
+<td>[unknown - needs SME input] Obtain approved bank/agency submission SOP before executing.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="34" data-section-title="Verification Checklist" id="verification-checklist"><h2 id="verification-checklist">Verification Checklist</h2>
+<p><strong>Confidence Summary:</strong> 94% [verified] from setup, user, admin, ABAC, routing, and audit documentation; 0% [inferred - confirm]; 6% [unknown - needs SME input] for production retention, external banking, and agency portal specifics.</p>
+</section><section class="doc-section-page" data-section-index="35" data-section-title="End-User Completion Checklist" id="end-user-completion-checklist"><h3 id="end-user-completion-checklist">End-User Completion Checklist</h3>
+<ul>
+<li>[ ] [verified] The user can sign in with the correct account.</li>
+<li>[ ] [verified] MFA/step-up works for sensitive actions.</li>
+<li>[ ] [verified] The navigation shows only expected role-appropriate modules.</li>
+<li>[ ] [verified] Knowledge search returns authorized source-backed results.</li>
+<li>[ ] [verified] Ask-LYNNE or OPS assistant access matches the user's role.</li>
+<li>[ ] [verified] Submitted timecards, daily logs, incidents, travel requests, LMS records, or onboarding tasks appear in the user's scoped view.</li>
+<li>[ ] [verified] Human gate decisions require review and step-up where appropriate.</li>
+<li>[ ] [verified] Access denied messages are escalated instead of bypassed.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="36" data-section-title="Admin Completion Checklist" id="admin-completion-checklist"><h3 id="admin-completion-checklist">Admin Completion Checklist</h3>
+<ul>
+<li>[ ] [verified] <code>config/.env</code> or production secret injection contains required values and no committed secrets.</li>
+<li>[ ] [verified] <code>python main.py</code> initializes registries, DBs, and COMMAND-CORE.</li>
+<li>[ ] [verified] Dashboard API, webhook receiver, Redis, worker, and ChromaDB match the selected execution mode.</li>
+<li>[ ] [verified] <code>/health</code> returns success.</li>
+<li>[ ] [verified] ABAC tests cover representative CEO, field operations, business development, finance, field crew, and auditor accounts.</li>
+<li>[ ] [verified] Non-bypassable human gates remain configured and tested.</li>
+<li>[ ] [verified] Audit chain verification passes.</li>
+<li>[ ] [verified] Knowledge/RAG ingestion and search are tested with authorized and unauthorized users.</li>
+<li>[ ] [verified] Agent enable/disable, overrides, playbooks, and model tiers are restricted to authorized admins.</li>
+<li>[ ] [verified] Payroll bank encryption key status is known before bank-data operations.</li>
+<li>[ ] [unknown - needs SME input] Production backup, restore, legal hold, retention, external ACH, and agency portal SOPs are approved and documented.</li>
+</ul></section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

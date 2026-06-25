@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pursuite Workflow Guide</title>
+  <style>
+:root{--ink:#172033;--muted:#5f6978;--line:#d9dee8;--soft:#f7f8fa;--brand:#0f5f73;--accent:#b98a18}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}.page{max-width:1080px;margin:0 auto;padding:42px 30px 76px}.header{border-bottom:4px solid var(--brand);margin-bottom:28px;padding-bottom:18px}.eyebrow{margin:0 0 8px;color:var(--brand);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}h1,h2,h3{line-height:1.2;letter-spacing:0}h1{font-size:34px;margin:0 0 10px}h2{font-size:24px;margin:34px 0 12px;padding-top:12px;border-top:1px solid var(--line)}h3{font-size:18px;margin:24px 0 10px}p{margin:10px 0}table{width:100%;border-collapse:collapse;margin:16px 0 22px;font-size:14px}th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}th{background:var(--soft);color:#0a3d4b;text-align:left}tr:nth-child(even) td{background:#fbfcfe}.pdf-page{margin-top:22px}.source-note{color:var(--muted);font-size:14px}code{background:#eef2f7;border-radius:4px;padding:1px 5px;font-family:Consolas,"Courier New",monospace}@media print{.page{max-width:none;padding:.5in}table{page-break-inside:avoid}h2,h3{page-break-after:avoid}}
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="header">
+      <p class="eyebrow">Pursuite</p>
+      <h1>Pursuite Workflow Guide</h1>
+      <p class="source-note">Converted from Pursuite_Workflow_Guide.pdf. Page sections preserve the PDF's original pagination.</p>
+    </section>
+    <section class="pdf-page" id="page-1">
+<h2>Page 1</h2>
+<h3>Pursuite Workflow Guide</h3>
+<h2>Header Block</h2>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Product name</td><td>Pursuite</td></tr>
+<tr><td>Product type</td><td>SaaS/software; Pursuite 1.0 is delivered as a standalone Windows SMB pilot</td></tr>
+<tr><td>Intended end-user audience</td><td>Capture managers, proposal managers, BD leads, writers, reviewers, executive approvers, and proposal contributors</td></tr>
+<tr><td>Intended admin audience</td><td>System administrators, proposal operations leads, security administrators, compliance owners, and tenant implementation teams</td></tr>
+<tr><td>Version/date</td><td>Workflow Guide 1.0 draft, June 24, 2026</td></tr>
+<tr><td>Environment notes</td><td>Windows 10 or Windows 11, Docker Desktop, Pursuite Manager, local Docker stack, local Docker volumes, role-based access, MFA, AI provider controls, CUI/ITAR classification controls, audit exports, and local backup/restore</td></tr>
+<tr><td>Grounding corpus</td><td>Pursuite End-User Guide, Pursuite Admin User Guide, Pursuite Installation Guide, in-app guide chunks, and RFP Shredder implementation specification in this repository</td></tr>
+<tr><td>Purpose statement</td><td>Give end users and administrators one operating guide for taking Pursuite from first access through proposal delivery, governance, troubleshooting, and verification.</td></tr>
+</tbody></table>
+<h2>At-a-Glance</h2>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<table>
+<thead><tr><th>Workflow area</th><th>End-user track</th><th>Admin track</th></tr></thead>
+<tbody>
+<tr><td>Access</td><td>Launch Pursuite and sign in with the account provided by an administrator.</td><td>Install Docker Desktop, run the installer or portable launcher, start Pursuite Manager, and bootstrap first-run access.</td></tr>
+<tr><td>Customer records</td><td>Create or open accounts, contacts, opportunities, and pipeline records.</td><td>Configure organization defaults, supported roles, and access boundaries.</td></tr>
+<tr><td>Pursuit qualification</td><td>Complete bid/no-bid scoring and record pursuit decisions where authorized.</td><td>Govern criteria, executive approval boundaries, and audit-ready decision records.</td></tr>
+<tr><td>Proposal kickoff</td><td>Create a proposal workspace, select a template, assign sections, upload the RFP, and confirm requirements.</td><td>Configure AI provider access, CUI processing policy, proposal workspace roles, and template governance.</td></tr>
+<tr><td>Writing and review</td><td>Draft sections, use approved content, run AI assistance where permitted, resolve comments, and move sections through review.</td><td>Manage role gates, section locks, workspace membership, and compliance escalation.</td></tr>
+<tr><td>Compliance and export</td><td>Generate the compliance matrix, run scans, resolve findings, assemble/export, and record debriefs.</td><td>Export audit evidence, monitor CUI access, manage records retention, and control scheduled reports.</td></tr>
+</tbody></table>
+<p>Pursuite Workflow Guide Page 1</p>
+</section><section class="pdf-page" id="page-2">
+<h2>Page 2</h2>
+<table>
+<thead><tr><th>Workflow area</th><th>End-user track</th><th>Admin track</th></tr></thead>
+<tbody>
+<tr><td>Continuity</td><td>Report blockers with screen, record, error, and timing detail.</td><td>Run backups, restore only when approved, collect diagnostics, and preserve logs.</td></tr>
+</tbody></table>
+<p>Setup / Onboarding Sequence</p>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<p>End-User Track</p>
+<p>Precondition: An administrator has installed or launched Pursuite, created your account, and assigned your</p>
+<p>system role and any proposal workspace role.</p>
+<p>1. [verified] Confirm Docker Desktop is running if you operate the standalone workstation directly.</p>
+<p>2. [verified] Launch Pursuite from the desktop shortcut, Start Menu entry, or portable launcher.</p>
+<p>3. [verified] Wait for Pursuite Manager to start the local stack and open the local Pursuite web app.</p>
+<p>4. [verified] Sign in with the organization, email, and password provided by your administrator.</p>
+<p>5. [verified] If MFA is enabled, enter the current 6-digit authenticator code when prompted.</p>
+<p>6. [verified] Open Home and confirm the screen shows your name, role-aware panels, and current pipeline</p>
+<p>or work data.</p>
+<p>7. [verified] Open Contacts -&gt; Accounts and create or open the customer account you will use for pursuit</p>
+<p>work.</p>
+<p>8. [verified] Add the relevant contact, then create or open the opportunity associated with the pursuit.</p>
+<p>9. [verified] Complete bid/no-bid scoring if your role and process allow it.</p>
+<p>10. [verified] Create or open the proposal workspace after the opportunity is approved for pursuit.</p>
+<p>11. [verified] Upload the RFP PDF or DOCX in the RFP Shredder, review extracted requirements, edit or</p>
+<p>add rows as needed, and confirm the requirement set.</p>
+<p>12. [verified] Open the Compliance Matrix after requirements are confirmed and generate the first matrix.</p>
+<p>13. [verified] Draft assigned sections, review compliance alerts, resolve comments, and move each section</p>
+<p>to the next status when ready.</p>
+<p>14. [verified] Assemble/export only after required sections, pricing, attachments, and compliance findings</p>
+<p>are ready for final production.</p>
+<p>Expected result: You can reach Home, open core records, work inside a proposal workspace, and see</p>
+<p>confirmed RFP requirements feeding compliance tools.</p>
+<p>Confirm success: Confirm your assigned proposal appears in Proposals, your section assignments are</p>
+<p>visible, the RFP requirement set is confirmed, and the Compliance Matrix is usable.</p>
+<p>Admin Track</p>
+<p>Pursuite Workflow Guide Page 2</p>
+</section><section class="pdf-page" id="page-3">
+<h2>Page 3</h2>
+<p>Precondition: You have a supported Windows workstation, Docker Desktop is installed and healthy, and</p>
+<p>you have the signed Pursuite installer or portable launcher for the release under test.</p>
+<p>1. [verified] Install Docker Desktop current stable release on Windows 10 or Windows 11.</p>
+<p>2. [verified] Run Pursuite-Standalone-Setup-1.0.0.exe or</p>
+<p>Pursuite-Standalone-Launcher-1.0.0.exe.</p>
+<p>3. [verified] Open Pursuite Manager and confirm the Dashboard shows Standalone 1.0 Pilot, version</p>
+<p>v1.0.0, and local paths for data, environment, backups, logs, and bundled images.</p>
+<p>4. [verified] Click Launch Pursuite and wait for the Manager to prepare %APPDATA%\Pursuite, backfill</p>
+<p>.env.production, load bundled images, start the stack, and report healthy services.</p>
+<p>5. [verified] Sign in with the first-run Admin account from</p>
+<p>%APPDATA%\Pursuite\first-run-admin.txt; rotate the temporary credential immediately</p>
+<p>after initial access.</p>
+<p>6. [verified] Add at least one backup Admin tied to a named employee, not a shared mailbox.</p>
+<p>7. [verified] Review organization settings, display name, domain, timezone, feature flags, and plan</p>
+<p>entitlements.</p>
+<p>8. [verified] Configure SSO where required and confirm a pilot account can sign in.</p>
+<p>9. [verified] Configure MFA policy and confirm Admins and Proposal Managers are enrolled</p>
+<p>according to company policy.</p>
+<p>10. [verified] Configure approved AI provider credentials and test provider connectivity before enabling</p>
+<p>AI-dependent workflows.</p>
+<p>11. [verified] Configure CUI/ITAR policy and enable external CUI processing only when the provider</p>
+<p>and organization approval are documented.</p>
+<p>12. [verified] Invite users, assign least-privilege system roles, and assign workspace roles only where</p>
+<p>proposal access is needed.</p>
+<p>13. [verified] Publish or approve proposal templates and seed the content library with reusable, approved</p>
+<p>material.</p>
+<p>14. [verified] Run an initial backup from Pursuite Manager -&gt; Backups after confirming login and basic</p>
+<p>object creation.</p>
+<p>Expected result: The standalone stack is healthy, named administrators exist, security and AI controls</p>
+<p>match policy, and users can begin governed proposal work.</p>
+<p>Confirm success: Confirm at least two Admins can sign in, a backup completes, AI provider test succeeds if</p>
+<p>enabled, and user roles match the approved access model.</p>
+<p>Core Operating Procedures</p>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<p>End-User Track</p>
+<p>Procedure 1: Create and Qualify a New Pursuit</p>
+<p>Pursuite Workflow Guide Page 3</p>
+</section><section class="pdf-page" id="page-4">
+<h2>Page 4</h2>
+<p>Trigger/precondition: A new solicitation, customer opportunity, or possible bid enters the pipeline.</p>
+<p>1. [verified] Open Pipeline.</p>
+<p>2. [verified] Click New Opportunity, From Email, From RFP, or Import according to the source.</p>
+<p>3. [verified] Enter or verify the opportunity name, agency or customer, solicitation number, due date,</p>
+<p>estimated value, NAICS, set-aside, bid type, and source.</p>
+<p>4. [verified] Save the opportunity.</p>
+<p>5. [verified] Open the opportunity detail page.</p>
+<p>6. [verified] Upload source documents on the Documents tab when they are available.</p>
+<p>7. [verified] Complete bid/no-bid scoring.</p>
+<p>8. [verified] Submit the bid/no-bid decision for approval when your organization requires executive</p>
+<p>approval.</p>
+<p>9. [verified] Record the approved, declined, or more-info decision only when your role authorizes that</p>
+<p>decision.</p>
+<p>10. [verified] Create a proposal workspace only after the pursuit is approved for bidding.</p>
+<p>Expected result: The opportunity is active, core metadata is complete, the decision is recorded, and a</p>
+<p>proposal workspace exists when the organization intends to bid.</p>
+<p>Confirm success: Confirm the opportunity status, decision history, and proposal link are visible on the</p>
+<p>opportunity detail page.</p>
+<p>Procedure 2: Build a Proposal Workspace From an RFP</p>
+<p>Trigger/precondition: The pursuit is approved and the team is ready to structure proposal work.</p>
+<p>1. [verified] Open the approved opportunity.</p>
+<p>2. [verified] Create or open the proposal workspace.</p>
+<p>3. [verified] Confirm proposal name, due date, page limit, target format, bid type, and owner.</p>
+<p>4. [verified] Add team members in the Team panel.</p>
+<p>5. [verified] Assign each participant the correct proposal workspace role.</p>
+<p>6. [verified] Select a published template or manually create volumes and sections.</p>
+<p>7. [verified] Open RFP Shredder from the proposal workspace.</p>
+<p>8. [verified] Upload the solicitation PDF or DOCX.</p>
+<p>9. [verified] Wait for extraction to complete.</p>
+<p>10. [verified] Review each extracted requirement, edit incorrect rows, add missing requirements, remove</p>
+<p>false positives, and mark low-confidence rows reviewed.</p>
+<p>11. [verified] Confirm requirements only after the requirement set is complete; confirmation unlocks</p>
+<p>the Compliance Matrix and Autonomous Pipeline.</p>
+<p>12. [verified] Open Compliance Matrix and generate the matrix.</p>
+<p>13. [verified] Assign proposal sections to writers.</p>
+<p>Pursuite Workflow Guide Page 4</p>
+</section><section class="pdf-page" id="page-5">
+<h2>Page 5</h2>
+<p>14. [verified] Begin drafting only after requirements, structure, and section ownership are in place.</p>
+<p>Expected result: The proposal has a team, structure, confirmed RFP requirements, and a generated</p>
+<p>compliance baseline.</p>
+<p>Confirm success: Confirm the RFP status is confirmed, the matrix panel is available, and each writer sees</p>
+<p>assigned sections.</p>
+<p>Procedure 3: Draft, Review, and Approve Proposal Sections</p>
+<p>Trigger/precondition: You have an assigned proposal section and the proposal workspace is available.</p>
+<p>1. [verified] Open the proposal workspace.</p>
+<p>2. [verified] Select your assigned section.</p>
+<p>3. [verified] Read the section instructions, page limit, source material, and related RFP requirements.</p>
+<p>4. [verified] Draft manually, insert approved content library material, or use AI assistance where permitted.</p>
+<p>5. [verified] Review AI-generated content for accuracy, grounding, customer relevance, and compliance</p>
+<p>before relying on it.</p>
+<p>6. [verified] Save frequently.</p>
+<p>7. [verified] Check compliance alerts and page or word guidance.</p>
+<p>8. [verified] Move the section to the next status when ready.</p>
+<p>9. [verified] Request review or notify the assigned reviewer.</p>
+<p>10. [verified] Address comments and requested changes.</p>
+<p>11. [verified] Mark the section approved only when the reviewer or Proposal Manager accepts it.</p>
+<p>Expected result: Required sections have current content, comments are resolved, and section status</p>
+<p>reflects the team&#x27;s review process.</p>
+<p>Confirm success: Confirm the section status, comments, and review state match the team&#x27;s gate criteria.</p>
+<p>Procedure 4: Use Compliance Tools Before Final Review</p>
+<p>Trigger/precondition: RFP requirements are confirmed and proposal text has enough content to evaluate.</p>
+<p>1. [verified] Confirm the RFP requirement set is confirmed in RFP Shredder.</p>
+<p>2. [verified] Open Compliance Matrix.</p>
+<p>3. [verified] Generate or refresh the compliance assessment.</p>
+<p>4. [verified] Review every requirement for covered, partial, or missing coverage.</p>
+<p>5. [verified] Assign missing or weak requirements to the right section owner.</p>
+<p>6. [verified] Open Compliance and run a compliance scan when available.</p>
+<p>7. [verified] Review critical and warning findings.</p>
+<p>8. [verified] Fix proposal text or waive findings only when the waiver is justified and reviewable.</p>
+<p>Pursuite Workflow Guide Page 5</p>
+</section><section class="pdf-page" id="page-6">
+<h2>Page 6</h2>
+<p>9. [verified] Re-run the scan after major corrections.</p>
+<p>10. [verified] Export or save the matrix for review when the team needs evidence.</p>
+<p>Expected result: Critical gaps are resolved or formally waived, and the team can explain how each RFP</p>
+<p>requirement is addressed.</p>
+<p>Confirm success: Confirm the compliance score, matrix coverage, and open findings are acceptable for the</p>
+<p>next review gate.</p>
+<p>Procedure 5: Assemble, Export, and Close Out a Proposal</p>
+<p>Trigger/precondition: Required sections are approved and final production is authorized.</p>
+<p>1. [verified] Confirm all required sections are approved.</p>
+<p>2. [verified] Confirm compliance findings are resolved or accepted.</p>
+<p>3. [verified] Confirm pricing, quote totals, attachments, and supporting files are current before</p>
+<p>assembly.</p>
+<p>4. [verified] Open the export or assembly panel.</p>
+<p>5. [verified] Choose the target format such as DOCX, PDF, or PDF/A.</p>
+<p>6. [verified] Start assembly.</p>
+<p>7. [verified] Review the generated file.</p>
+<p>8. [verified] Download the file before the signed link expires.</p>
+<p>9. [verified] Store the final file in the approved repository or submission workflow.</p>
+<p>10. [verified] Update proposal and opportunity status.</p>
+<p>11. [verified] Record closeout and debrief information after submission or award decision.</p>
+<p>Expected result: The team has a final export, proposal status is current, and the opportunity record reflects</p>
+<p>the latest business outcome.</p>
+<p>Confirm success: Confirm the export history, proposal status, opportunity status, and debrief record are</p>
+<p>current.</p>
+<p>Admin Track</p>
+<p>Procedure 6: Manage User Lifecycle</p>
+<p>Trigger/precondition: A user must be invited, changed, deactivated, or reviewed.</p>
+<p>1. [verified] Open Admin or the user management area.</p>
+<p>2. [verified] Invite the user with the least-privilege system role required for the work.</p>
+<p>3. [verified] Add optional request context where your organization tracks approvals.</p>
+<p>4. [verified] Assign workspace roles only for proposals the user needs to access.</p>
+<p>Pursuite Workflow Guide Page 6</p>
+</section><section class="pdf-page" id="page-7">
+<h2>Page 7</h2>
+<p>5. [verified] Review the user&#x27;s role, workspace membership, and CUI or export-controlled access during</p>
+<p>access reviews.</p>
+<p>6. [verified] Deactivate former employees or subcontractors when access is no longer justified.</p>
+<p>7. [verified] Retain audit history for deactivated users; do not delete audit records.</p>
+<p>Expected result: Users have the right access for current work, and deactivation preserves traceability.</p>
+<p>Confirm success: Confirm role assignments, workspace memberships, and deactivation state in the user</p>
+<p>record.</p>
+<p>Procedure 7: Govern AI Provider and RFP Shredder Controls</p>
+<p>Trigger/precondition: AI-assisted drafting, RFP extraction, compliance matrix generation, or autonomous</p>
+<p>workflows must be enabled or reviewed.</p>
+<p>1. [verified] Open AI Provider settings.</p>
+<p>2. [verified] Add or update approved provider credentials.</p>
+<p>3. [verified] Test provider connectivity before saving the workflow as ready.</p>
+<p>4. [verified] Confirm approved use cases and data-handling policy.</p>
+<p>5. [verified] Confirm CUI/ITAR policy before allowing controlled documents to use AI processing.</p>
+<p>6. [verified] Enable external CUI processing only when the organization and provider are approved</p>
+<p>for the data type.</p>
+<p>7. [verified] Review RFP Shredder failures for file type, size, AI provider health, CUI gate, and extraction</p>
+<p>status.</p>
+<p>8. [verified] Preserve audit events for upload, OCR fallback, requirement edits, confirmation, and CUI</p>
+<p>blocks.</p>
+<p>Expected result: AI-dependent workflows are available only within approved data and security boundaries.</p>
+<p>Confirm success: Confirm AI test success, CUI processing status, RFP Shredder status, and relevant audit</p>
+<p>events.</p>
+<p>Procedure 8: Run Backup, Restore, and Diagnostic Workflows</p>
+<p>Trigger/precondition: You are validating the installation, preparing for maintenance, responding to support,</p>
+<p>or recovering from data issues.</p>
+<p>1. [verified] Open Pursuite Manager.</p>
+<p>2. [verified] Confirm services are healthy before routine backup.</p>
+<p>3. [verified] Run a backup from Manager -&gt; Backups.</p>
+<p>4. [verified] Confirm the backup file appears under %APPDATA%\Pursuite\backups.</p>
+<p>5. [verified] Before restore, confirm approval because restore overwrites the current local database</p>
+<p>and uploads.</p>
+<p>6. [verified] Select the approved backup file.</p>
+<p>Pursuite Workflow Guide Page 7</p>
+</section><section class="pdf-page" id="page-8">
+<h2>Page 8</h2>
+<p>7. [verified] Run restore and restart the stack after completion.</p>
+<p>8. [verified] Copy diagnostics and preserve %APPDATA%\Pursuite\launcher.log when escalation is</p>
+<p>required.</p>
+<p>Expected result: Backups are available for recovery, restores are controlled, and support has enough</p>
+<p>evidence to investigate issues.</p>
+<p>Confirm success: Confirm backup presence, restored records after restart, service health, and attached</p>
+<p>diagnostics.</p>
+<h3>Admin Configuration &amp; Governance</h3>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<p>End-User Track</p>
+<p>Precondition: Your organization has defined role, security, proposal, and data-handling policies.</p>
+<p>1. [verified] Follow your assigned role boundaries when creating records, drafting, reviewing, or exporting.</p>
+<p>2. [verified] Ask a Proposal Manager or Admin when a control is missing or permission-gated.</p>
+<p>3. [verified] Do not route CUI, proposal-sensitive, customer-sensitive, or export-controlled material</p>
+<p>outside approved Pursuite and company repositories.</p>
+<p>4. [verified] Treat AI output as draft assistance and verify it against source documents before relying on it.</p>
+<p>5. [verified] Use Archive rather than Delete where the record carries institutional memory.</p>
+<p>Admin Track</p>
+<p>Precondition: You are responsible for tenant governance, security, compliance, or operations.</p>
+<p>1. [verified] Maintain at least two named Admin accounts and review Admin access quarterly.</p>
+<p>2. [verified] Configure SSO, MFA, and MFA reset procedures according to company policy.</p>
+<p>3. [verified] Assign users least-privilege system roles and proposal workspace roles.</p>
+<p>4. [verified] Configure organization profile, primary domain, timezone, feature flags, and plan entitlements.</p>
+<p>5. [verified] Configure AI provider credentials, test connectivity, and review approved use cases before</p>
+<p>enabling AI workflows.</p>
+<p>6. [verified] Configure CUI/ITAR classification controls, minimum clearance rules, and</p>
+<p>external-processing approval only where policy allows.</p>
+<p>7. [verified] Publish templates only after review; keep proposal-saved templates as drafts until approved.</p>
+<p>8. [verified] Govern content library approval so reusable content is reviewed before writers rely on it.</p>
+<p>9. [verified] Export audit evidence for compliance review and restrict access when evidence contains CUI or</p>
+<p>sensitive proposal data.</p>
+<p>10. [verified] Review storage, AI usage, plan limits, scheduled reports, integration health, and stale</p>
+<p>workspaces on the documented cadence.</p>
+<p>Pursuite Workflow Guide Page 8</p>
+</section><section class="pdf-page" id="page-9">
+<h2>Page 9</h2>
+<p>11. [verified] Archive proposals for retention and traceability; delete or destroy data only when policy</p>
+<p>and approval allow it.</p>
+<p>12. [verified] Preserve audit logs, CUI classification history, backup evidence, and support diagnostics</p>
+<p>according to records policy.</p>
+<table>
+<thead><tr><th>Governance area</th><th>Admin control</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Roles and permissions</td><td>Least-privilege system roles plus proposal workspace roles</td><td>Prevents overexposure of proposal and tenant data.</td></tr>
+<tr><td>Identity</td><td>SSO where required, MFA for privileged and CUI-handling users</td><td>Supports account protection and CMMC-aligned access control.</td></tr>
+<tr><td>CUI/ITAR</td><td>Classification, clearance thresholds, external-processing approval, access logging</td><td>Protects controlled data and records access attempts.</td></tr>
+<tr><td>AI provider</td><td>Approved provider credentials, test-before-use, usage review</td><td>Prevents unapproved data flows and runtime failures.</td></tr>
+<tr><td>RFP Shredder</td><td>Upload gates, OCR fallback review, requirement edits, confirmation audit</td><td>Keeps requirement extraction reviewable before compliance tools run.</td></tr>
+<tr><td>Audit evidence</td><td>Export, restrict, and preserve audit records</td><td>Supports compliance review and incident response.</td></tr>
+<tr><td>Backup/restore</td><td>Manager-driven backup, controlled restore, launcher logs</td><td>Protects local standalone continuity.</td></tr>
+<tr><td>Retention</td><td>Archive proposals, retain classification and audit history</td><td>Preserves institutional memory and traceability.</td></tr>
+</tbody></table>
+<p>Lifecycle &amp; Decision Points</p>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<table>
+<thead><tr><th>Decision point</th><th>Trigger condition</th><th>End-user branch</th><th>Admin branch</th></tr></thead>
+<tbody>
+<tr><td>Start new pursuit vs. hold</td><td>A solicitation, customer opportunity, or potential bid appears.</td><td>[verified] Create or import the opportunity and complete bid/no-bid scoring.</td><td>[verified] Confirm criteria, role gates, and approval ownership are configured.</td></tr>
+<tr><td>Bid vs. no-bid vs. more information</td><td>Scoring, customer fit, or executive review reaches a decision gate.</td><td>[verified] Record supporting context and proceed only when the decision is approved.</td><td>[verified] Preserve decision history and ensure executive authority is respected.</td></tr>
+<tr><td>Template vs. blank proposal</td><td>Proposal workspace is created after an approved pursuit.</td><td>[verified] Select a published template or start blank when no suitable template exists.</td><td>[verified] Publish templates only after review and maintain version history.</td></tr>
+<tr><td>Confirm vs. revise RFP requirements</td><td>Shredder extraction completes.</td><td>[verified] Edit, add, or remove requirements before confirmation.</td><td>[verified] Review blocked confirmation, CUI gate, AI provider status, and audit events.</td></tr>
+<tr><td>Fix vs. waive compliance finding</td><td>Matrix or scan shows missing, partial, critical, or warning coverage.</td><td>[verified] Fix content or request a justified waiver.</td><td>[verified] Review waiver discipline and keep evidence for proposal gates.</td></tr>
+<tr><td>Export vs. hold</td><td>Final assembly is requested.</td><td>[verified] Export only after sections, findings, pricing, and attachments are current.</td><td>[verified] Control overrides and retain export evidence where needed.</td></tr>
+</tbody></table>
+<p>Pursuite Workflow Guide Page 9</p>
+</section><section class="pdf-page" id="page-10">
+<h2>Page 10</h2>
+<table>
+<thead><tr><th>Decision point</th><th>Trigger condition</th><th>End-user branch</th><th>Admin branch</th></tr></thead>
+<tbody>
+<tr><td>Archive vs. delete</td><td>Proposal, opportunity, account, or content is no longer active.</td><td>[verified] Archive records that carry proposal history or reusable knowledge.</td><td>[verified] Approve deletion only under records policy and preserve audit history.</td></tr>
+<tr><td>Restore vs. troubleshoot in place</td><td>Local data appears missing, corrupted, or inconsistent.</td><td>[verified] Stop editing and report the issue with screen, record, and time details.</td><td>[verified] Restore only after approval because restore overwrites current local data.</td></tr>
+<tr><td>Enable vs. block external CUI processing</td><td>A CUI-classified RFP needs AI processing.</td><td>[verified] Wait for Admin review when CUI processing is blocked.</td><td>[verified] Enable external processing only with formal organizational and provider approval.</td></tr>
+<tr><td>Scale use vs. review limits</td><td>Usage approaches plan, storage, AI, seat, or workflow limits.</td><td>[verified] Report plan-limit banners or missing controls.</td><td>[verified] Review billing, storage, user count, AI usage, and entitlements before expansion.</td></tr>
+</tbody></table>
+<h3>Troubleshooting</h3>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<p>User-Resolvable Issues</p>
+<table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th><th>Confirm success</th></tr></thead>
+<tbody>
+<tr><td>Pursuite does not open</td><td>Docker Desktop is not running or services are still starting.</td><td>[verified] Start Docker Desktop, relaunch Pursuite, and wait for Pursuite Manager to report healthy services.</td><td>The local web app opens.</td></tr>
+<tr><td>Browser shows stale UI</td><td>Browser cache or service worker retained old assets.</td><td>[verified] Hard refresh with Ctrl+Shift+R and ask an Admin to clear local site data if the issue remains.</td><td>Current UI appears.</td></tr>
+<tr><td>Cannot sign in</td><td>Wrong organization, expired or reset password, MFA issue, or account state.</td><td>[verified] Verify organization and credentials, then ask an Admin for password or MFA help.</td><td>You reach Home after login.</td></tr>
+<tr><td>Expected button is missing</td><td>System role, workspace role, archived state, or prerequisite gate blocks the action.</td><td>[verified] Confirm your role, workspace role, record status, and prerequisite gates before escalating.</td><td>The button appears or the correct owner performs the action.</td></tr>
+<tr><td>Compliance scan has no useful results</td><td>Requirements are not confirmed or content is too thin.</td><td>[verified] Confirm RFP requirements and add proposal content before re-running the scan.</td><td>Findings or coverage results reflect current content.</td></tr>
+<tr><td>RFP extraction seems incomplete</td><td>Low-confidence AI output, scanned document, or poor source quality.</td><td>[verified] Review requirements, edit rows, add missing items, and upload a better scan if no text can be extracted.</td><td>Confirmed requirements reflect the solicitation.</td></tr>
+<tr><td>Export shows coverage warning</td><td>A win theme, section, or requirement remains unaddressed.</td><td>[verified] Address the flagged content or ask a manager to review any deliberate override.</td><td>Export proceeds with known gaps resolved or accepted.</td></tr>
+</tbody></table>
+<p>Pursuite Workflow Guide Page 10</p>
+</section><section class="pdf-page" id="page-11">
+<h2>Page 11</h2>
+<p>Admin-Only Issues</p>
+<table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th><th>Confirm success</th></tr></thead>
+<tbody>
+<tr><td>Containers unhealthy</td><td>Docker engine, image load, API, web, PostgreSQL, or Redis issue.</td><td>[verified] Open Manager -&gt; Logs, review service output, copy diagnostics, and preserve %APPD ATA%\Pursuite\launcher.l og.</td><td>Services return to healthy state or support has full diagnostics.</td></tr>
+<tr><td>Port conflict</td><td>Another service is using the configured web port.</td><td>[verified] Stop the conflicting service or change HTTP_PORT in %APPDATA%\Pursuite\.env. production.</td><td>Web service binds successfully.</td></tr>
+<tr><td>First-run admin file missing</td><td>Stack is not healthy yet or an Admin already exists.</td><td>[verified] Wait for stack health, then check launcher logs and existing Admin state.</td><td>Admin access path is confirmed.</td></tr>
+<tr><td>Backup fails</td><td>Stack is unhealthy, storage is unavailable, or Docker operation failed.</td><td>[verified] Confirm services are running and retry Manager -&gt; Backups.</td><td>A backup appears under %APPDA TA%\Pursuite\backups.</td></tr>
+<tr><td>Restore fails</td><td>Invalid backup, stack conflict, or storage issue.</td><td>[verified] Preserve logs, restart the stack, and retry only with a known-good backup.</td><td>Restored records appear after restart.</td></tr>
+<tr><td>RFP upload or processing fails</td><td>File type, size, AI provider, queue, OCR, or CUI gate problem.</td><td>[verified] Check supported file type, 50 MB cap, provider health, processing status, and CUI approval state.</td><td>RFP status reaches completed or a documented failure code is available.</td></tr>
+<tr><td>CUI processing is blocked</td><td>Organization external CUI processing approval is false or provider approval is missing.</td><td>[verified] Confirm CUI policy, provider approval, organization approval, and user clearance before enabling processing.</td><td>CUI behavior matches policy and audit events record the decision.</td></tr>
+<tr><td>AI features unavailable</td><td>Provider credentials, plan limit, provider outage, CUI policy, or rate limits.</td><td>[verified] Test AI provider connectivity, review usage, and confirm data policy before reopening workflows.</td><td>AI-dependent workflow succeeds.</td></tr>
+<tr><td>Integration sync fails</td><td>Credentials, permissions, endpoint, rate limit, or webhook health issue.</td><td>[verified] Review integration settings, test connection, review logs, and disable the integration if it is no longer approved.</td><td>Sync resumes or the integration is safely disabled.</td></tr>
+</tbody></table>
+<h3>Verification Checklist</h3>
+<p>Confidence Summary: 100% verified, 0% inferred - confirm, 0% unknown.</p>
+<h3>End-User Completion Checklist</h3>
+<p>- [ ] [verified] Confirm you can sign in and reach Home.</p>
+<p>- [ ] [verified] Confirm your assigned system role and proposal workspace role match your responsibility.</p>
+<p>- [ ] [verified] Confirm the customer account, contact, opportunity, and proposal records are current.</p>
+<p>- [ ] [verified] Confirm bid/no-bid status is recorded before proposal creation.</p>
+<p>Pursuite Workflow Guide Page 11</p>
+</section><section class="pdf-page" id="page-12">
+<h2>Page 12</h2>
+<p>- [ ] [verified] Confirm the proposal workspace has the right template, volumes, sections, due date, and team</p>
+<p>assignments.</p>
+<p>- [ ] [verified] Confirm RFP requirements are reviewed, corrected, and confirmed.</p>
+<p>- [ ] [verified] Confirm Compliance Matrix and scan results reflect current proposal content.</p>
+<p>- [ ] [verified] Confirm AI-assisted content has been reviewed against source documents before use.</p>
+<p>- [ ] [verified] Confirm pricing, quote totals, attachments, and export files are approved before</p>
+<p>submission.</p>
+<p>- [ ] [verified] Confirm final export, proposal status, opportunity status, and debrief records are current.</p>
+<h3>Admin Completion Checklist</h3>
+<p>- [ ] [verified] Confirm Pursuite Manager shows healthy services and version v1.0.0.</p>
+<p>- [ ] [verified] Confirm %APPDATA%\Pursuite\.env.production, backups, bundled images, and</p>
+<p>launcher.log paths are known.</p>
+<p>- [ ] [verified] Confirm the first-run Admin credential has been rotated and at least two named Admins</p>
+<p>exist.</p>
+<p>- [ ] [verified] Confirm SSO, MFA, role assignments, and workspace access match approved policy.</p>
+<p>- [ ] [verified] Confirm CUI/ITAR classification, clearance, and external-processing controls match</p>
+<p>organizational approval.</p>
+<p>- [ ] [verified] Confirm AI provider connectivity has been tested before AI workflows are used.</p>
+<p>- [ ] [verified] Confirm templates and content library items are reviewed before publication or reuse.</p>
+<p>- [ ] [verified] Confirm audit export, evidence handling, and access review cadence are documented.</p>
+<p>- [ ] [verified] Confirm backup succeeds before maintenance, reinstall, restore testing, or major</p>
+<p>configuration change.</p>
+<p>- [ ] [verified] Confirm restore is approved before use because it overwrites current local database</p>
+<p>and uploads.</p>
+<p>- [ ] [verified] Confirm support escalation includes app version, artifact hash, Windows version, Docker</p>
+<p>version, Manager diagnostics, launcher log, reproduction steps, and backup status.</p>
+<p>Pursuite Workflow Guide Page 12</p>
+</section>
+  </main>
+</body>
+</html>

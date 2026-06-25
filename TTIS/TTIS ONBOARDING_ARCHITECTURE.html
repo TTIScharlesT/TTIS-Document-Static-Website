@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TTIS Onboarding Solution — Technical Architecture</title>
+<style>
+  :root {
+    --ink:#1a2332; --muted:#5b6b7f; --line:#e3e8ef; --bg:#f4f7fb; --card:#fff;
+    --brand:#1c3a5e; --accent:#1c64f2; --accent-soft:#e7effe; --warn:#b45309; --ok:#0f9d58;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); line-height:1.6;
+         font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:980px; margin:0 auto; padding:48px 28px 80px; }
+  .doc { background:var(--card); border:1px solid var(--line); border-radius:14px;
+          padding:40px 48px; box-shadow:0 1px 3px rgba(20,30,50,.04); }
+  h1 { font-size:28px; margin:0 0 6px; line-height:1.25; }
+  h2 { font-size:20px; margin:40px 0 12px; padding-bottom:7px; border-bottom:2px solid var(--line); }
+  h3 { font-size:15px; margin:26px 0 8px; color:var(--brand); }
+  p, li { font-size:14.5px; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  code { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12.8px;
+          background:#eef2f8; padding:1px 5px; border-radius:5px; }
+  blockquote { margin:0 0 22px; padding:12px 18px; background:var(--accent-soft);
+                border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+                color:var(--ink); font-size:13.5px; }
+  blockquote p { margin:3px 0; font-size:13.5px; }
+  table { width:100%; border-collapse:collapse; margin:14px 0 24px; font-size:13px;
+           border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th { text-align:left; background:#fafbfd; color:var(--muted); font-size:11px;
+        text-transform:uppercase; letter-spacing:.04em; padding:9px 12px;
+        border-bottom:1px solid var(--line); }
+  td { padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  tbody tr:hover { background:#f7f9fc; }
+  td code, th code { font-size:12px; }
+  hr { border:0; border-top:1px solid var(--line); margin:34px 0; }
+  figure.diagram { margin:18px 0 26px; border:1px solid var(--line); border-radius:12px;
+                    padding:14px; background:#fff; overflow-x:auto; }
+  figure.diagram svg { width:100%; height:auto; min-width:760px; display:block; }
+  em { color:var(--muted); }
+  .meta { color:var(--muted); font-size:12.5px; margin-top:46px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <article class="doc">
+      <h1 id="ttis-onboarding-solution-technical-architecture-summary">TTIS Onboarding Solution — Technical Architecture Summary</h1>
+<blockquote>
+<p><strong>Document</strong> — Onboarding Module (R-OB-01) architecture &amp; 90-day process reference
+<strong>Audience</strong> — systems architects, GovCon compliance, engineering
+<strong>Status</strong> — as built and merged to <code>main</code> (PRs #83–#94)
+<strong>Companion</strong> — Product Design Spec: <a href="PDS_ONBOARDING_MODULE.md"><code>PDS_ONBOARDING_MODULE.md</code></a></p>
+</blockquote>
+<p>This is the authoritative design reference for the Onboarding Module: what it is,
+how it is built, and the step-by-step 90-day end-to-end process — triggers, gates,
+agents, and owners.</p>
+<hr />
+<h2 id="1-what-it-is-where-it-sits">1. What it is &amp; where it sits</h2>
+<p>The Onboarding Module turns the <strong>TTIS Employee Onboarding Policy v1.0</strong> (§1–§20) into
+a VBS subsystem: a per-hire <strong>record</strong> with a phase timeline, a policy-derived <strong>task
+checklist</strong>, a versioned <strong>acknowledgment ledger</strong>, a <strong>training roster</strong> with
+transactionally-enforced <strong>access gates</strong>, screening, asset issuance, milestone
+check-ins, deadline reminders, and chain-anchored sign-offs.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Artifact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service / domain logic</td>
+<td><code>dashboard/onboarding.py</code></td>
+</tr>
+<tr>
+<td>Program-as-data (the policy)</td>
+<td><code>config/onboarding_program.yaml</code></td>
+</tr>
+<tr>
+<td>HTTP API</td>
+<td><code>dashboard/main.py</code> → <code>/api/v1/onboarding/*</code> (17 routes)</td>
+</tr>
+<tr>
+<td>AuthZ</td>
+<td><code>dashboard/abac.py</code> — <code>onboarding</code> resource + CUI keystone</td>
+</tr>
+<tr>
+<td>Web UI</td>
+<td><code>dashboard/web.py</code> + templates — board / detail / self-view / assistant</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td><code>db.py</code> abstraction — SQLite (local) ↔ Cloud SQL Postgres (prod)</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td><code>orchestration/audit_logger.py</code> — SHA-256 hash chain</td>
+</tr>
+</tbody>
+</table>
+<h3 id="design-principles-deliberate">Design principles (deliberate)</h3>
+<ul>
+<li><strong>Deterministic, zero-LLM core.</strong> Creation, tasks, acks, training, gates, completion,
+  sweep, and exports are pure CRUD + FSM. <strong>0 model calls</strong> in any core flow.</li>
+<li><strong>Domain FSM lives in the database, not the workflow engine.</strong> The workflow engine's
+  context is Redis with a 72-hour TTL; a 90-day process needs durable relational state.
+  The module follows the timecard pattern (DB rows + OCC + step-up + strict anchors).</li>
+<li><strong>Fail-closed evidence.</strong> Every governed mutation writes a <code>log_event_strict</code> anchor
+  <em>inside the same DB transaction</em>; if the anchor fails, the transaction rolls back. No
+  signed / released / completed-but-unanchored state can exist.</li>
+<li><strong>Pointers-only, no PII.</strong> No PII column exists in the schema. <code>doc_ref</code> /
+  <code>evidence_ref</code> / <code>result_ref</code> / <code>case_ref</code> are opaque references into the personnel
+  store. Notifications and exports carry IDs + codes only.</li>
+<li><strong>Stateless / externally triggered.</strong> No in-process timers; correct on Cloud Run or
+  compose-on-VM.</li>
+</ul>
+<hr />
+<h2 id="2-data-model-the-onboarding-logical-db">2. Data model (the <code>onboarding</code> logical DB)</h2>
+<p><code>onboarding_records</code> (FSM + phase + FR-2 flags + <code>completion_hash</code> + OCC <code>version</code>) is
+the parent of:</p>
+<p><code>onboarding_tasks</code> · <code>onboarding_acknowledgments</code> · <code>onboarding_training</code> ·
+<code>onboarding_access_gates</code> · <code>onboarding_screening</code> · <code>onboarding_assets</code> ·
+<code>onboarding_checkins</code>, plus a reference table <code>compliance_refs</code> (FAR clause citations,
+counsel-confirmed).</p>
+<p>All IDs are module-generated TEXT; timestamps ISO-8601 TEXT; booleans INTEGER 0/1; every
+mutation carries an OCC <code>version</code> (<code>v1</code>, <code>v2</code>…). DDL is dialect-portable (passes
+<code>_pg_adapt</code>).</p>
+<hr />
+<h2 id="3-triggers-how-onboarding-starts-and-is-driven">3. Triggers (how onboarding starts and is driven)</h2>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Mechanism</th>
+<th>Owner / actor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Create (primary)</strong></td>
+<td><code>POST /api/v1/onboarding/records</code> — capability <code>onboarding:create</code> (<strong>CEO-only</strong> today; OQ-2)</td>
+<td>HR (as CEO) or service principal</td>
+</tr>
+<tr>
+<td><strong>Create (auto on hire)</strong></td>
+<td><code>HRDB.write(operation=hire\|onboard, data={"onboarding": {...}})</code> → best-effort hook → <code>create_record(...)</code>. Opt-in (no <code>onboarding</code> directive ⇒ no record); never fails the hire</td>
+<td><strong>NEXUS</strong> (HR agent) or HR via the HR tool</td>
+</tr>
+<tr>
+<td><strong>Asset-recovery (separation)</strong></td>
+<td><code>HRDB.write(terminate\|offboard)</code> → <code>flag_assets_for_recovery()</code> → issued assets → <code>recovery_due</code> + P2 notice</td>
+<td>HR / NEXUS</td>
+</tr>
+<tr>
+<td><strong>Deadline sweep (reminders)</strong></td>
+<td><code>POST /api/v1/onboarding/sweep</code> — idempotent, capability <code>onboarding:trigger</code>. <strong>No in-process timer</strong> — wired to an external Cloud Scheduler job / VM cron (OQ-1/OQ-3)</td>
+<td>Scheduler / service principal</td>
+</tr>
+</tbody>
+</table>
+<p>At creation, the caller supplies <strong>FR-2 flags</strong> that tailor the program:</p>
+<p><code>is_field</code> · <code>is_time_charging</code> · <code>is_cui_authorized</code> · <code>everify_required</code> ·
+<code>screening_level</code> (<code>none|standard|contract</code>) · <code>labor_standards_covered</code>
+(<code>none|sca|dba|both</code>) · <code>division</code>.</p>
+<p>The service then instantiates <strong>only the applicable</strong> tasks, courses, gates, and
+screenings from config. A field + time-charging + CUI hire gets PPE/OSHA tasks, DCAA +
+CMMC + CUI training, and both access gates; an office hire gets none of those.</p>
+<hr />
+<h2 id="4-the-90-day-end-to-end-process">4. The 90-day end-to-end process</h2>
+<p><figure class="diagram"><svg viewBox="0 0 1060 600" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <title>TTIS 90-day onboarding swimlane</title>
+  <desc>Owners (HR, Hiring Manager, IT/Security, New Hire) by phase (Pre-board, Day 1, Week 1, Day 30/60/90), with the two access gates releasing as training completes and the completion sign-off at day 90.</desc>
+  <style>
+    .bg{fill:#ffffff;}
+    .lbl{fill:#1a2332;font-size:12px;font-weight:600;}
+    .phase{fill:#1a2332;font-size:12.5px;font-weight:700;}
+    .sub{fill:#5b6b7f;font-size:10px;}
+    .cell{fill:#1a2332;font-size:11px;}
+    .cellm{fill:#5b6b7f;font-size:11px;}
+    .tiny{fill:#5b6b7f;font-size:10px;}
+    .gate{fill:#b45309;font-size:11px;font-weight:600;}
+  </style>
+  <rect class="bg" x="0" y="0" width="1060" height="600"/>
+
+  <!-- Trigger banner -->
+  <rect x="0" y="8" width="1060" height="34" rx="7" fill="#e7effe"/>
+  <text x="14" y="29" class="lbl" fill="#1c64f2">&#9654; Trigger</text>
+  <text x="90" y="29" class="cell">POST /api/v1/onboarding/records  (CEO)   &#8212;or&#8212;   HRDB.write(hire, {onboarding:&#8230;}) auto-hook   &#8594;   record created, tasks/training/gates instantiated per FR-2 flags</text>
+
+  <!-- Phase header -->
+  <g>
+    <rect x="160" y="52" width="146" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <rect x="306" y="52" width="148" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <rect x="454" y="52" width="148" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <rect x="602" y="52" width="148" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <rect x="750" y="52" width="148" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <rect x="898" y="52" width="150" height="38" fill="#eef2f8" stroke="#dfe5ec"/>
+    <text x="233" y="70" class="phase" text-anchor="middle">Pre-board</text><text x="233" y="83" class="sub" text-anchor="middle">offer &#8594; Day 0</text>
+    <text x="380" y="70" class="phase" text-anchor="middle">Day One</text><text x="380" y="83" class="sub" text-anchor="middle">Day 0&#8211;3</text>
+    <text x="528" y="70" class="phase" text-anchor="middle">First Week</text><text x="528" y="83" class="sub" text-anchor="middle">Day 7</text>
+    <text x="676" y="70" class="phase" text-anchor="middle">Day 30</text><text x="676" y="83" class="sub" text-anchor="middle">ramp</text>
+    <text x="824" y="70" class="phase" text-anchor="middle">Day 60</text><text x="824" y="83" class="sub" text-anchor="middle">ramp</text>
+    <text x="973" y="70" class="phase" text-anchor="middle">Day 90</text><text x="973" y="83" class="sub" text-anchor="middle">&#8594; Complete</text>
+  </g>
+
+  <!-- Owner lane labels -->
+  <g>
+    <rect x="0" y="90" width="160" height="72" fill="#fbfcfe" stroke="#dfe5ec"/>
+    <rect x="0" y="162" width="160" height="72" fill="#fbfcfe" stroke="#dfe5ec"/>
+    <rect x="0" y="234" width="160" height="72" fill="#fbfcfe" stroke="#dfe5ec"/>
+    <rect x="0" y="306" width="160" height="72" fill="#fbfcfe" stroke="#dfe5ec"/>
+    <text x="14" y="122" class="lbl">HR</text><text x="14" y="138" class="tiny">&#8594; CEO role</text>
+    <text x="14" y="194" class="lbl">Hiring Manager</text><text x="14" y="210" class="tiny">&#8594; Field-Ops Mgr</text>
+    <text x="14" y="266" class="lbl">IT / Security</text><text x="14" y="282" class="tiny">&#8594; CEO role</text>
+    <text x="14" y="338" class="lbl">New Hire</text><text x="14" y="354" class="tiny">&#8594; Field Crew (self)</text>
+  </g>
+
+  <!-- grid -->
+  <g stroke="#dfe5ec" fill="none">
+    <line x1="160" y1="90" x2="160" y2="378"/><line x1="306" y1="90" x2="306" y2="378"/>
+    <line x1="454" y1="90" x2="454" y2="378"/><line x1="602" y1="90" x2="602" y2="378"/>
+    <line x1="750" y1="90" x2="750" y2="378"/><line x1="898" y1="90" x2="898" y2="378"/>
+    <line x1="160" y1="162" x2="1048" y2="162"/><line x1="160" y1="234" x2="1048" y2="234"/>
+    <line x1="160" y1="306" x2="1048" y2="306"/><line x1="1048" y1="90" x2="1048" y2="378"/>
+    <line x1="160" y1="90" x2="1048" y2="90"/>
+  </g>
+
+  <!-- HR row -->
+  <text x="170" y="122" class="cell">Offer packet sent</text><text x="170" y="138" class="cellm">Screening initiated</text>
+  <text x="316" y="120" class="cell">&#9940; I-9 &#167;2 verify</text><text x="316" y="136" class="cellm">Payroll &#183; E-Verify*</text>
+  <text x="464" y="124" class="cellm">Wage determination*</text>
+  <text x="612" y="124" class="cell">Benefits enrollment</text>
+  <text x="908" y="124" class="cell" fill="#0f9d58">&#10004; Completion sign-off</text><text x="908" y="139" class="tiny">step-up &#183; cert hash</text>
+
+  <!-- Hiring Manager row -->
+  <text x="170" y="196" class="cellm">Day-1 schedule</text>
+  <text x="316" y="196" class="cellm">PPE issued (field)</text>
+  <text x="464" y="190" class="cell">Role + goals</text><text x="464" y="205" class="cellm">Site safety brief</text>
+  <text x="612" y="196" class="cell">&#9670; 30-day check-in</text>
+  <text x="760" y="196" class="cell">&#9670; 60-day check-in</text>
+  <text x="908" y="196" class="cell">&#9670; 90-day check-in</text><text x="908" y="211" class="tiny">needs 30 + 60</text>
+
+  <!-- IT / Security row -->
+  <text x="170" y="268" class="cellm">Provisioning prep</text>
+  <text x="316" y="262" class="cell">Accounts (least-priv)</text><text x="316" y="278" class="cellm">MFA confirmed</text>
+  <text x="464" y="268" class="cellm">HSPD-12 / PIV*</text>
+  <text x="612" y="268" class="tiny">&#8212;</text><text x="760" y="268" class="tiny">&#8212;</text><text x="908" y="268" class="tiny">&#8212;</text>
+
+  <!-- New Hire row -->
+  <text x="316" y="334" class="cell">&#9940; I-9 &#167;1</text><text x="316" y="350" class="cellm">Sign acknowledgments</text>
+  <text x="464" y="334" class="cell">Training begins</text><text x="464" y="350" class="cellm">(DCAA due Day 5)</text>
+  <text x="612" y="338" class="cellm">&#167;9 / &#167;12 courses due</text>
+  <text x="760" y="338" class="cellm">OSHA module* due</text>
+  <text x="908" y="338" class="tiny">all training done</text>
+
+  <!-- Gates / checkpoints band -->
+  <rect x="0" y="386" width="1048" height="74" rx="7" fill="#fdf0e1" stroke="#dfe5ec"/>
+  <text x="14" y="414" class="lbl" fill="#b45309">&#128274; Access gates</text>
+  <text x="14" y="432" class="tiny">held &#8594; released</text>
+  <text x="14" y="448" class="tiny">(enforced authZ)</text>
+  <text x="316" y="412" class="gate">held at creation</text>
+  <text x="464" y="412" class="gate">DCAA done &#8594;</text><text x="464" y="427" class="gate">time-charging released</text><text x="464" y="442" class="tiny">unblocks timecard submit</text>
+  <text x="612" y="412" class="gate">CMMC + CUI done &#8594;</text><text x="612" y="427" class="gate">cui-provisioning released</text><text x="612" y="442" class="tiny">unblocks pipeline/knowledge/LYNNE/EAAs</text>
+  <text x="908" y="420" class="cell" fill="#0f9d58">all gates released &#10003;</text><text x="908" y="436" class="tiny">required for completion</text>
+
+  <!-- Legend -->
+  <g>
+    <text x="14" y="490" class="tiny">&#9940; statutory (non-waivable, holds the phase)   &#183;   &#128274; access gate (OCC + step-up + strict anchor)   &#183;   &#9670; milestone check-in (strict-anchored, sequence-enforced)   &#183;   * conditional on FR-2 flags</text>
+    <text x="14" y="510" class="tiny">Phase advances on date + completion of phase-blocking statutory tasks.  Every sign-off / ack / training / gate / check-in writes a fail-closed audit-chain anchor (verify_chain).</text>
+    <text x="14" y="530" class="tiny">Core flow is deterministic (0 LLM calls).  Agents at the edges only: NEXUS triggers the hire; a read-only assistant answers the hire's own-record questions.</text>
+  </g>
+</svg>
+</figure></p>
+<p><strong>Record FSM:</strong> <code>preboarding → active → completed</code> (+ <code>cancelled</code> from any non-terminal
+state).
+<strong>Phase pointer:</strong> <code>preboarding → day_one → week_1 → day_30 → day_60 → day_90 →
+complete</code>.</p>
+<p><strong>Phase is computed</strong>, never client-set: derived from <code>start_date</code> (config offsets:
+week_1=+7, day_30/60/90=+30/60/90) <strong>and held back by any open statutory task</strong> — e.g.
+an unverified I-9 keeps the record at <code>day_one</code> regardless of the calendar. Due dates are
+stamped at instantiation as offsets from <code>start_date</code>.</p>
+<p>Legend — <strong>Owner</strong> (<code>owner_role</code>): <strong>HR</strong>, <strong>HM</strong> = Hiring Manager, <strong>IT</strong>,
+<strong>SEC</strong> = Security Officer, <strong>NH</strong> = New Hire. ⛔ = statutory (non-waivable).
+🔒 = gate-relevant. <code>*</code> = conditional on FR-2 flags.</p>
+<h3 id="phase-0-pre-boarding-offer-accept-day-0">Phase 0 — Pre-boarding (offer-accept → Day 0)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner</th>
+<th>Day</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offer packet &amp; new-hire paperwork sent</td>
+<td>HR</td>
+<td>−5</td>
+<td></td>
+</tr>
+<tr>
+<td>Background screening <strong>initiated</strong></td>
+<td>HR</td>
+<td>−5</td>
+<td>if <code>screening_level≥standard</code>; <code>onboarding_screening</code> row opens</td>
+</tr>
+<tr>
+<td>Accounts/equipment provisioning prepared (least-privilege)</td>
+<td>IT</td>
+<td>−2</td>
+<td>§14</td>
+</tr>
+<tr>
+<td>Day-one schedule communicated</td>
+<td>HM</td>
+<td>−2</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><em>Status <code>preboarding</code>. Screening rows (<code>background</code>, <code>hspd12_piv</code> if contract,
+<code>everify_case</code> if enabled) start as multi-day external processes. Record auto-activates
+when <code>start_date</code> arrives.</em></p>
+<h3 id="phase-1-day-one-day-0-3">Phase 1 — Day One (Day 0 → 3)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner</th>
+<th>Day</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Form I-9 Section 1</strong></td>
+<td>NH</td>
+<td>0</td>
+<td>⛔ statutory · requires <code>doc_ref</code> · <strong>holds the phase</strong></td>
+</tr>
+<tr>
+<td>System accounts provisioned (least-privilege)</td>
+<td>IT</td>
+<td>1</td>
+<td>§14</td>
+</tr>
+<tr>
+<td>PPE issued &amp; fit-checked</td>
+<td>HM</td>
+<td>1</td>
+<td>field only</td>
+</tr>
+<tr>
+<td><strong>Form I-9 Section 2 verification</strong></td>
+<td>HR</td>
+<td>3</td>
+<td>⛔ statutory · requires <code>doc_ref</code> · <strong>holds the phase</strong></td>
+</tr>
+<tr>
+<td>E-Verify case created</td>
+<td>HR</td>
+<td>3</td>
+<td>only if a FAR E-Verify clause flows down (OQ-4; default off)</td>
+</tr>
+<tr>
+<td>Payroll enrollment (W-4, direct deposit)</td>
+<td>HR</td>
+<td>3</td>
+<td>§15</td>
+</tr>
+<tr>
+<td>MFA enrollment confirmed</td>
+<td>IT</td>
+<td>3</td>
+<td>§11</td>
+</tr>
+</tbody>
+</table>
+<p><em>Acknowledgments become due (in-page signable on the self-view): Employee Handbook,
+Standards of Conduct, IT Acceptable Use, Workplace Safety — plus site-specific safety for
+field personnel.</em></p>
+<h3 id="phase-2-first-week-day-7">Phase 2 — First Week (Day 7)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner</th>
+<th>Day</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Role expectations &amp; initial goals set</td>
+<td>HM</td>
+<td>7</td>
+<td>§5.3</td>
+</tr>
+<tr>
+<td>Job-site safety briefing</td>
+<td>HM</td>
+<td>7</td>
+<td>field</td>
+</tr>
+<tr>
+<td>Wage-determination communicated</td>
+<td>HR</td>
+<td>7</td>
+<td>SCA/DBA hires (OQ-6)</td>
+</tr>
+<tr>
+<td>HSPD-12 / PIV credentialing initiated</td>
+<td>SEC</td>
+<td>7</td>
+<td>contract hires; <strong>blocked until the <code>hspd12_piv</code> screening is <code>cleared</code></strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Training is assigned with due dates (see §5). DCAA timekeeping is due </em><em>Day 5</em><em> —
+earliest, because it gates time-charging.</em></p>
+<h3 id="phase-3-30-60-90-day-ramp">Phase 3 — 30 / 60 / 90-day ramp</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Owner</th>
+<th>Day</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Benefits enrollment (or written waiver on file)</td>
+<td>HR</td>
+<td>30</td>
+<td>§15, evidence pointer</td>
+</tr>
+<tr>
+<td><strong>Day-30 check-in</strong></td>
+<td>HM</td>
+<td>30</td>
+<td>first-class <code>onboarding_checkins</code> row · strict-anchored</td>
+</tr>
+<tr>
+<td>OSHA outreach module due</td>
+<td>(training)</td>
+<td>60</td>
+<td>field (OSHA 10/30 per role — OQ-7)</td>
+</tr>
+<tr>
+<td><strong>Day-60 check-in</strong></td>
+<td>HM</td>
+<td>60</td>
+<td>strict-anchored</td>
+</tr>
+<tr>
+<td><strong>Day-90 check-in</strong></td>
+<td>HM</td>
+<td>90</td>
+<td><strong>sequence-enforced — requires 30 &amp; 60 first</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Access gates are released across this window as their precondition training completes
+(below).</em></p>
+<h3 id="phase-4-completion-sign-off-day-90">Phase 4 — Completion sign-off (≈ Day 90)</h3>
+<p><code>POST /records/{id}/complete</code> (capability <code>approve</code> + <strong>step-up MFA</strong> + <code>If-Match</code>)
+server-verifies the entire program in one query set: <strong>no open required tasks · all
+required acks signed at current version · all required training completed/waived · all
+gates released · all three check-ins recorded.</strong> On pass → fail-closed
+<code>log_event_strict</code> → <code>completion_hash</code> stored on the record → status <code>completed</code>, phase
+<code>complete</code>. The <strong>completion certificate</strong> is the record view + its chain hash, verifiable
+via <code>verify_chain()</code> and exportable.</p>
+<p><em>Counterpart: <code>POST /records/{id}/cancel</code> — step-up + written reason + strict anchor —
+terminates a no-show / rescinded offer.</em></p>
+<hr />
+<h2 id="5-training-roster-the-two-access-gates-the-compliance-teeth">5. Training roster &amp; the two access gates (the compliance teeth)</h2>
+<p><strong>Courses</strong> (config catalog; instantiated by flag):</p>
+<table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Required for</th>
+<th>Due (day)</th>
+<th>Hard-gate?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ethics_conduct, mandatory_disclosure, anti_kickback</td>
+<td>all (§9)</td>
+<td>30</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>dcaa_timekeeping</strong></td>
+<td>time-charging (§9)</td>
+<td><strong>5</strong></td>
+<td>🔒 unwaivable</td>
+</tr>
+<tr>
+<td>cyber_awareness</td>
+<td>all (§11)</td>
+<td>14</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>cui_handling, cmmc_nist_awareness</strong></td>
+<td>CUI-authorized (§11)</td>
+<td>14</td>
+<td>🔒 unwaivable</td>
+</tr>
+<tr>
+<td>eeo_anti_harassment</td>
+<td>all (§12)</td>
+<td>30</td>
+<td>—</td>
+</tr>
+<tr>
+<td>safety_orientation</td>
+<td>all (§13)</td>
+<td>14</td>
+<td>—</td>
+</tr>
+<tr>
+<td>osha_module</td>
+<td>field (§13)</td>
+<td>60</td>
+<td>—</td>
+</tr>
+<tr>
+<td>labor_standards_orientation</td>
+<td>SCA/DBA (§10)</td>
+<td>14</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Gates</strong> (<code>onboarding_access_gates</code>, durable rows, <code>held → released</code>). Release =
+<code>PATCH /gates/{id}/release</code> — <strong>OCC match + precondition verification + step-up + strict
+anchor, all inside one transaction</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Created when</th>
+<th>Preconditions</th>
+<th>Enforcement while <strong>held</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>time_charging</code></strong></td>
+<td><code>is_time_charging</code></td>
+<td><code>dcaa_timekeeping</code> completed</td>
+<td>The hire <strong>cannot submit a timecard</strong> → <code>403 onboarding_gate_held</code>. Enforced <strong>in-handler at timecard submit</strong> (drafts still allowed). Turns §9 into authorization.</td>
+</tr>
+<tr>
+<td><strong><code>cui_provisioning</code></strong></td>
+<td><code>is_cui_authorized</code></td>
+<td><code>cmmc_nist_awareness</code> <strong>and</strong> <code>cui_handling</code> completed (passing)</td>
+<td>The hire is <strong>held out of CUI-bearing resources</strong> for <em>any</em> action → <code>403</code>. Enforced in <code>require_capability</code> (the universal auth dependency) for resources <code>pipeline</code>, <code>documents</code>, <code>lynne</code>, <code>eaa_ops</code> (OQ-10). Turns §11 "no access until trained" into authorization.</td>
+</tr>
+</tbody>
+</table>
+<p>The §9/§11 hard-gate courses can <strong>never be waived</strong> (server-enforced <code>422</code>), and a gate
+cannot be released as a side effect of a training write — two deliberate actions = two
+audit anchors. CEO is exempt from the keystone (predicate #1 precedes); the lookup is
+defensive (no record/gate ⇒ no block), so it is a no-op for everyone not mid-onboarding.</p>
+<hr />
+<h2 id="6-owners-roles-accountability-model">6. Owners &amp; roles (accountability model)</h2>
+<p>Each task carries an <strong><code>owner_role</code></strong> (the accountable human function). The ABAC PDP maps
+those to enforced capabilities:</p>
+<table>
+<thead>
+<tr>
+<th><code>owner_role</code></th>
+<th>ABAC role (enforced)</th>
+<th>Onboarding capabilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hr / it / security</td>
+<td><strong>CEO</strong> (allow-all today — OQ-2: dedicated HR/IT roles deferred)</td>
+<td>create, update, approve, waive, release, complete, export</td>
+</tr>
+<tr>
+<td>hiring_manager</td>
+<td><strong>FIELD_OPS_MGR</strong></td>
+<td>view, update, approve — <strong>division-scoped</strong> (predicate #5)</td>
+</tr>
+<tr>
+<td>(benefits / payroll)</td>
+<td><strong>FINANCE</strong></td>
+<td>view + <strong>export</strong> (incl. the auditor view/export-only posture)</td>
+</tr>
+<tr>
+<td><strong>new_hire</strong></td>
+<td><strong>FIELD_CREW</strong></td>
+<td>view + <strong>submit</strong> — <strong>own record only</strong> (server-side ownership predicate); may sign own acks and complete own <code>new_hire</code> tasks in-page</td>
+</tr>
+<tr>
+<td>BUSINESS_DEV</td>
+<td>—</td>
+<td>no access · auditor flag → mutations denied everywhere</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-agents-deliberately-agent-light">7. Agents (deliberately agent-light)</h2>
+<p>The onboarding <strong>core is deterministic — it dispatches no AI agents.</strong> Agent involvement
+is at the <strong>edges</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Agent / surface</th>
+<th>Role in onboarding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NEXUS</strong> (HR agent — A10, Sonnet; tools <code>hr_db_read/write</code>, <code>document_search</code>, <code>notification_send</code>)</td>
+<td>Its authorized-hire path (<code>HRDB.write hire/onboard</code>) is the <strong>auto-create trigger</strong> (P4 hook). NEXUS <em>initiates</em>; it does not run the program.</td>
+</tr>
+<tr>
+<td><strong>Onboarding assistant</strong> (read-only, FIELDAIDE-style, EAA Claude client)</td>
+<td>New-hire-facing Q&amp;A — <code>get_my_onboarding_status</code> + <code>search_policy</code>, <strong>principal-bound</strong> (can only read the caller's own record), zero writes. Exposed at <code>POST /api/v1/onboarding/assistant</code> and the <code>/app/onboarding/assistant</code> chat page.</td>
+</tr>
+<tr>
+<td>COMMAND-CORE (deterministic event router)</td>
+<td><strong>Not used</strong> for onboarding — the FSM is DB-resident by design; only edge events (creation in, notifications out) touch it.</td>
+</tr>
+<tr>
+<td>CIPHER (IT), SENTINEL (Safety), NEXUS as reviewer</td>
+<td>Exist in the fleet and align to the IT/Safety/HR owner roles, but are <strong>not wired into the onboarding FSM</strong>. The <code>mark_own_task_complete</code> write tool is the one deferred agent capability (gated on a decision to let an LLM mutate tasks).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-cross-cutting-controls">8. Cross-cutting controls</h2>
+<ul>
+<li><strong>OCC</strong> on every mutation (<code>If-Match</code> → 428 missing / 409 stale).</li>
+<li><strong>Step-up MFA</strong> (<code>X-Step-Up</code>) on gate release, waivers, completion, cancellation
+  (returns <strong>403 <code>step_up_required</code></strong> — the dashboard-wide convention; drives an MFA flow,
+  not a logout).</li>
+<li><strong>Idempotency</strong> on create / ack / sweep (replay-safe).</li>
+<li><strong>Audit:</strong> every sign-off, ack, training result, gate pass, waiver, screening clear, and
+  completion writes a fail-closed <code>log_event_strict</code> whose chain hash is stored on the row;
+  the whole trail is <code>verify_chain()</code>-able.</li>
+<li><strong>Reminders:</strong> the sweep emits P2 (owner-email) for statutory items, P3 otherwise,
+  idempotently (per-item/-tier stamps), with <code>employee_id</code> + code only.</li>
+<li><strong>Realtime:</strong> <code>record_created</code> / <code>gate_released</code> / <code>completed</code> / <code>cancelled</code> publish
+  best-effort on the existing <code>workflows</code> channel.</li>
+</ul>
+<p><strong>Verification posture:</strong> validated at unit (80+ service tests), HTTP-integration
+(TestClient driving real auth → ABAC → endpoint → DB → audit chain, incl. the live
+keystone), and live-server levels (booted against real Redis; board / detail / self-view,
+the assistant chat, and the in-page sign / complete bridges all confirmed end-to-end).</p>
+<hr />
+<h2 id="9-open-questions-baked-into-the-timeline">9. Open questions baked into the timeline</h2>
+<p>The engine enforces the <em>structure</em> today; the values below drop into
+<code>config/onboarding_program.yaml</code> and <code>compliance_refs</code> when HR/legal confirm — <strong>no code
+change</strong> required:</p>
+<table>
+<thead>
+<tr>
+<th>OQ</th>
+<th>Item</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OQ-1 / OQ-3</td>
+<td>Sweep trigger wiring (Cloud Scheduler vs VM cron)</td>
+</tr>
+<tr>
+<td>OQ-2</td>
+<td>Dedicated HR / IT / Security ABAC roles (mapped to CEO today)</td>
+</tr>
+<tr>
+<td>OQ-4</td>
+<td>E-Verify applicability (FAR clause / Texas) — default off</td>
+</tr>
+<tr>
+<td>OQ-6</td>
+<td>SCA / DBA wage determinations; HSPD-12 / PIV contracts</td>
+</tr>
+<tr>
+<td>OQ-7</td>
+<td>OSHA 10 vs 30 by role; drug/alcohol screening policy</td>
+</tr>
+<tr>
+<td>OQ-9</td>
+<td>Retention periods (I-9, personnel, training records)</td>
+</tr>
+<tr>
+<td>OQ-10</td>
+<td>CUI-bearing resource set (wired: <code>pipeline</code>, <code>documents</code>, <code>lynne</code>, <code>eaa_ops</code>)</td>
+</tr>
+<tr>
+<td>OQ-12</td>
+<td>Passing scores, benefits window, ack document versions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Every component referenced as existing is implemented and merged to <code>main</code>. Bracketed
+<code>[VERIFY]</code> / <code>[PLACEHOLDER]</code> items require counsel/compliance review and are config-driven,
+not code.</em></p>
+    </article>
+    <p class="meta">TTIS AI Virtual Business System — Onboarding Module (R-OB-01). Generated from
+      <code>docs/ONBOARDING_ARCHITECTURE.md</code>; diagram inlined from
+      <code>docs/onboarding_90day_swimlane.svg</code>.</p>
+  </div>
+</body>
+</html>

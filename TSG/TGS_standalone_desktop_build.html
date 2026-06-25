@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TSG Platform Standalone Desktop Build</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.55; margin: 32px; color: #172033; max-width: 980px; }
+    h1, h2 { color: #0f2f57; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    pre { background: #f5f7fb; border: 1px solid #d8deea; border-radius: 8px; padding: 14px; overflow-x: auto; }
+    li { margin: 5px 0; }
+    .note { background: #fff8e6; border-left: 4px solid #e6a700; padding: 10px 14px; }
+  </style>
+</head>
+<body>
+  <h1>TSG Platform Standalone Desktop Build</h1>
+  <p>This guide describes the portable Windows desktop package for running TSG Platform as a local standalone service. The desktop build is intended for demos, operator workstations, isolated lab installs, and customer-support environments that need the admin and portal UI without a cloud deployment.</p>
+
+  <h2>Included files</h2>
+  <ul>
+    <li><code>desktop/TSG-Platform-Launcher.ps1</code></li>
+    <li><code>desktop/setup/Install-TSG-Platform-Desktop.ps1</code></li>
+    <li>Application source under <code>api</code>, <code>core</code>, <code>database</code>, <code>seed_data</code>, and <code>scripts</code></li>
+    <li><code>requirements.txt</code></li>
+    <li>Product and deployment documentation in Markdown and HTML</li>
+    <li><code>desktop-manifest.json</code></li>
+  </ul>
+  <p>The launcher creates a local Python virtual environment, installs dependencies, initializes a SQLite database, starts Uvicorn on <code>127.0.0.1:8010</code>, and opens the admin console.</p>
+
+  <h2>Build the package</h2>
+  <pre>powershell -ExecutionPolicy Bypass -File scripts\build_desktop_standalone.ps1</pre>
+  <p>The default output is:</p>
+  <pre>dist\desktop\TSG-Platform-Desktop-0.2.0-rc.1.zip
+dist\desktop\TSG-Platform-Desktop-0.2.0-rc.1.zip.sha256</pre>
+  <p>Use <code>-SkipTests</code> only for a quick local packaging check:</p>
+  <pre>powershell -ExecutionPolicy Bypass -File scripts\build_desktop_standalone.ps1 -SkipTests</pre>
+
+  <h2>Install on Windows</h2>
+  <ol>
+    <li>Extract the ZIP package.</li>
+    <li>Run the installer:</li>
+  </ol>
+  <pre>powershell -ExecutionPolicy Bypass -File desktop\setup\Install-TSG-Platform-Desktop.ps1 -CreateDesktopShortcut</pre>
+  <p>The default install location is:</p>
+  <pre>%LOCALAPPDATA%\Programs\TSGPlatform</pre>
+  <p>The installer creates a Start Menu shortcut and, when requested, a desktop shortcut.</p>
+
+  <h2>Launch manually</h2>
+  <pre>powershell -ExecutionPolicy Bypass -File desktop\TSG-Platform-Launcher.ps1</pre>
+  <p>Useful options:</p>
+  <pre>powershell -ExecutionPolicy Bypass -File desktop\TSG-Platform-Launcher.ps1 -Port 8020
+powershell -ExecutionPolicy Bypass -File desktop\TSG-Platform-Launcher.ps1 -NoBrowser
+powershell -ExecutionPolicy Bypass -File desktop\TSG-Platform-Launcher.ps1 -DataDir "$env:USERPROFILE\TSGPlatformData"</pre>
+
+  <h2>Runtime data</h2>
+  <p>By default, the launcher stores data under:</p>
+  <pre>%LOCALAPPDATA%\TSGPlatform</pre>
+  <p>The SQLite database is:</p>
+  <pre>%LOCALAPPDATA%\TSGPlatform\tsg_platform.db</pre>
+  <p>The launcher sets these local defaults when they are not already present:</p>
+  <pre>TSG_ENV=development
+TSG_DB_BACKEND=sqlite
+TSG_DB_PATH=&lt;DataDir&gt;\tsg_platform.db
+TSG_ALLOWED_HOSTS=127.0.0.1,localhost</pre>
+  <p>For a custom environment file, pass <code>-EnvFile path\to\.env.local</code>. Values in that file are loaded before startup.</p>
+
+  <h2>Verify the desktop service</h2>
+  <pre>Invoke-RestMethod http://127.0.0.1:8010/health
+Invoke-RestMethod http://127.0.0.1:8010/ready</pre>
+  <p>Open the admin console:</p>
+  <pre>http://127.0.0.1:8010/admin</pre>
+  <p>Development credentials are shown on the login page only when <code>TSG_ENV</code> is not <code>production</code>.</p>
+
+  <h2>Operational notes</h2>
+  <ul>
+    <li>The desktop build uses SQLite and is not a public internet deployment.</li>
+    <li>Keep the generated <code>.zip.sha256</code> file with the package for transfer validation.</li>
+    <li>If dependency installation is pre-provisioned, use <code>-SkipDependencyInstall</code>.</li>
+    <li>Stop the service by closing the PowerShell window that is running the launcher.</li>
+    <li>Back up the SQLite database before replacing or moving the workstation install.</li>
+  </ul>
+</body>
+</html>

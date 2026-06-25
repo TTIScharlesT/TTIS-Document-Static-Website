@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS AI Virtual Business System - End User Guide</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+
+<main class="page"><nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><section class="header">
+<p class="eyebrow">Thompson Telecom Infrastructure Solutions</p>
+<h1>TTIS AI Virtual Business System - End User Guide</h1>
+</section>
+<p><strong>Audience:</strong> field crew, field operations managers, business development, finance, executives, auditors<br/>
+<strong>Version:</strong> 1.0<br/>
+<strong>Last updated:</strong> June 21, 2026<br/>
+<strong>Classification:</strong> Internal Use Only<br/>
+<strong>Purpose:</strong> Step-by-step guide for using the TTIS Dashboard and AI-assisted business workflows</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="Table Of Contents" id="table-of-contents"><h2 id="table-of-contents">Table Of Contents</h2>
+<ol>
+<li><a href="#1-welcome-to-ttis-vbs">Welcome To TTIS VBS</a></li>
+<li><a href="#2-what-you-can-do-by-role">What You Can Do By Role</a></li>
+<li><a href="#3-sign-in-and-session-basics">Sign In And Session Basics</a></li>
+<li><a href="#4-set-up-mfa-and-step-up-verification">Set Up MFA And Step-Up Verification</a></li>
+<li><a href="#5-navigate-the-dashboard">Navigate The Dashboard</a></li>
+<li><a href="#6-use-overview">Use Overview</a></li>
+<li><a href="#7-use-knowledge-search">Use Knowledge Search</a></li>
+<li><a href="#8-use-ask-lynne-and-ops-assistants">Use Ask-LYNNE And OPS Assistants</a></li>
+<li><a href="#9-field-crew-workflows">Field Crew Workflows</a></li>
+<li><a href="#10-field-operations-manager-workflows">Field Operations Manager Workflows</a></li>
+<li><a href="#11-business-development-workflows">Business Development Workflows</a></li>
+<li><a href="#12-finance-and-payroll-workflows">Finance And Payroll Workflows</a></li>
+<li><a href="#13-learning-certifications-and-onboarding">Learning, Certifications, And Onboarding</a></li>
+<li><a href="#14-approvals-gates-and-step-up-prompts">Approvals, Gates, And Step-Up Prompts</a></li>
+<li><a href="#15-notifications-errors-and-access-denied-messages">Notifications, Errors, And Access Denied Messages</a></li>
+<li><a href="#16-safe-use-of-ai-outputs">Safe Use Of AI Outputs</a></li>
+<li><a href="#17-quick-start-checklists">Quick Start Checklists</a></li>
+<li><a href="#18-getting-help">Getting Help</a></li>
+</ol>
+<hr/>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="1. Welcome To TTIS VBS" id="1-welcome-to-ttis-vbs"><h2 id="1-welcome-to-ttis-vbs">1. Welcome To TTIS VBS</h2>
+<p>The TTIS AI Virtual Business System is the internal dashboard and automation platform for Thompson Telecom Infrastructure Solutions. It helps teams manage field operations, timecards, incidents, schedules, travel, finance, payroll, contracts, documents, Knowledge search, training, workflows, approvals, and AI-assisted work.</p>
+<p>The system is role-aware. You will only see and use the tools your account is allowed to access.</p>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="1.1 Key Ideas" id="1-1-key-ideas"><h3 id="11-key-ideas">1.1 Key Ideas</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td>The browser interface for daily work.</td>
+</tr>
+<tr>
+<td>VBS</td>
+<td>The backend system that powers workflows, approvals, and records.</td>
+</tr>
+<tr>
+<td>ABAC</td>
+<td>Attribute-based access control; your role, division, auditor status, and task context determine access.</td>
+</tr>
+<tr>
+<td>Gate</td>
+<td>A human approval point in a workflow.</td>
+</tr>
+<tr>
+<td>Step-up</td>
+<td>A short second-factor verification used before sensitive actions.</td>
+</tr>
+<tr>
+<td>Knowledge</td>
+<td>Searchable internal document and regulation corpus.</td>
+</tr>
+<tr>
+<td>LYNNE</td>
+<td>CEO-facing executive assistant.</td>
+</tr>
+<tr>
+<td>OPS assistants</td>
+<td>Operations-facing assistant surfaces for field support and management.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="2. What You Can Do By Role" id="2-what-you-can-do-by-role"><h2 id="2-what-you-can-do-by-role">2. What You Can Do By Role</h2>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="2.1 CEO / Executive Administrator" id="2-1-ceo-executive-administrator"><h3 id="21-ceo-executive-administrator">2.1 CEO / Executive Administrator</h3>
+<p>Typical access:</p>
+<ul>
+<li>Overview and command center.</li>
+<li>Ask-LYNNE.</li>
+<li>User and agent administration.</li>
+<li>Gates and workflow decisions.</li>
+<li>Finance, payroll, travel, Knowledge, LMS, onboarding, audit, and telemetry.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="2.2 Field Operations Manager" id="2-2-field-operations-manager"><h3 id="22-field-operations-manager">2.2 Field Operations Manager</h3>
+<p>Typical access:</p>
+<ul>
+<li>Division-scoped projects.</li>
+<li>Schedules and assignments.</li>
+<li>Safety, incidents, timecards, daily logs.</li>
+<li>OPS assistant.</li>
+<li>Knowledge and LMS.</li>
+<li>Operations approvals.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="2.3 Business Development" id="2-3-business-development"><h3 id="23-business-development">2.3 Business Development</h3>
+<p>Typical access:</p>
+<ul>
+<li>Pipeline and opportunity workflows.</li>
+<li>Business development documents.</li>
+<li>Knowledge search.</li>
+<li>Workflow and agent visibility.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="2.4 Finance" id="2-4-finance"><h3 id="24-finance">2.4 Finance</h3>
+<p>Typical access:</p>
+<ul>
+<li>Contracts, cash flow, invoices, labor postings.</li>
+<li>Payroll views and payroll operations.</li>
+<li>Finance approvals.</li>
+<li>Travel booking or approval handoff.</li>
+<li>Audit export.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="2.5 Field Crew" id="2-5-field-crew"><h3 id="25-field-crew">2.5 Field Crew</h3>
+<p>Typical access:</p>
+<ul>
+<li>Own schedule and projects.</li>
+<li>Timecards.</li>
+<li>Daily logs.</li>
+<li>Incident or hazard reports.</li>
+<li>Travel requests.</li>
+<li>LMS and onboarding tasks.</li>
+<li>Knowledge search.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="2.6 Auditor" id="2-6-auditor"><h3 id="26-auditor">2.6 Auditor</h3>
+<p>Auditor status is not a separate job role. It is a read-only posture. If your account is marked as auditor, you may be able to view records but you cannot create, update, approve, reject, submit, disable, or delete.</p>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="3. Sign In And Session Basics" id="3-sign-in-and-session-basics"><h2 id="3-sign-in-and-session-basics">3. Sign In And Session Basics</h2>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="3.1 Sign In" id="3-1-sign-in"><h3 id="31-sign-in">3.1 Sign In</h3>
+<ol>
+<li>Open the TTIS Dashboard URL provided by your administrator.</li>
+<li>Enter your username.</li>
+<li>Enter your password.</li>
+<li>Select <strong>Sign In</strong>.</li>
+<li>Wait for the dashboard to load your role-specific home view.</li>
+</ol>
+<p>Expected result: your Overview page opens and the navigation reflects your permissions.</p>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="3.2 Change Your Password" id="3-2-change-your-password"><h3 id="32-change-your-password">3.2 Change Your Password</h3>
+<ol>
+<li>Open your account or security menu.</li>
+<li>Select <strong>Change Password</strong>.</li>
+<li>Enter your current password.</li>
+<li>Enter your new password.</li>
+<li>Confirm the new password.</li>
+<li>Save.</li>
+</ol>
+<p>Expected result: future sign-ins use the new password.</p>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="3.3 Session Timeout" id="3-3-session-timeout"><h3 id="33-session-timeout">3.3 Session Timeout</h3>
+<p>For security, sessions expire after inactivity. If your session expires:</p>
+<ol>
+<li>Save any work if the page allows it.</li>
+<li>Sign in again.</li>
+<li>Return to the task.</li>
+</ol>
+<p>If you were performing a sensitive approval, you may also need to repeat step-up verification.</p>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="3.4 Sign Out" id="3-4-sign-out"><h3 id="34-sign-out">3.4 Sign Out</h3>
+<ol>
+<li>Open your account menu.</li>
+<li>Select <strong>Sign Out</strong>.</li>
+<li>Close the browser tab if using a shared workstation.</li>
+</ol>
+<p>Always sign out from shared or field devices.</p>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="4. Set Up MFA And Step-Up Verification" id="4-set-up-mfa-and-step-up-verification"><h2 id="4-set-up-mfa-and-step-up-verification">4. Set Up MFA And Step-Up Verification</h2>
+<p>MFA protects sensitive actions. Even if you can sign in, some approvals or financial actions require a fresh step-up code.</p>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="4.1 Enroll An Authenticator App" id="4-1-enroll-an-authenticator-app"><h3 id="41-enroll-an-authenticator-app">4.1 Enroll An Authenticator App</h3>
+<ol>
+<li>Sign in.</li>
+<li>Open <strong>Security</strong> or <strong>MFA Setup</strong>.</li>
+<li>Select <strong>Enroll TOTP</strong> or <strong>Set Up Authenticator</strong>.</li>
+<li>Open your authenticator app on your phone.</li>
+<li>Scan the QR code or enter the setup key.</li>
+<li>Save backup codes in a secure place.</li>
+<li>Enter the current 6-digit code.</li>
+<li>Submit.</li>
+</ol>
+<p>Expected result: the dashboard confirms MFA enrollment.</p>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="4.2 Complete A Step-Up Prompt" id="4-2-complete-a-step-up-prompt"><h3 id="42-complete-a-step-up-prompt">4.2 Complete A Step-Up Prompt</h3>
+<p>When prompted:</p>
+<ol>
+<li>Open your authenticator app.</li>
+<li>Enter the current 6-digit code.</li>
+<li>Select <strong>Verify</strong>.</li>
+<li>Return to the action and submit again if needed.</li>
+</ol>
+<p>Step-up assertions are short-lived. If you wait too long, the system may ask again.</p>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="4.3 Use A Backup Code" id="4-3-use-a-backup-code"><h3 id="43-use-a-backup-code">4.3 Use A Backup Code</h3>
+<p>Use a backup code only if your authenticator app is unavailable.</p>
+<ol>
+<li>Choose backup-code verification if offered.</li>
+<li>Enter one unused backup code.</li>
+<li>Mark that code as used in your secure record.</li>
+<li>Contact an administrator if you are running out of backup codes.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="5. Navigate The Dashboard" id="5-navigate-the-dashboard"><h2 id="5-navigate-the-dashboard">5. Navigate The Dashboard</h2>
+<p>The navigation changes by role, but most users will see some of these areas.</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overview</td>
+<td>Daily status, alerts, gates, workflows, and quick actions.</td>
+</tr>
+<tr>
+<td>Knowledge</td>
+<td>Search internal policies, regulations, documents, and references.</td>
+</tr>
+<tr>
+<td>Ask-LYNNE</td>
+<td>Executive assistant for CEO-authorized work.</td>
+</tr>
+<tr>
+<td>Agents</td>
+<td>Agent status and activity, usually limited to administrators.</td>
+</tr>
+<tr>
+<td>Field Ops</td>
+<td>Projects, timecards, daily logs, incidents, and schedule.</td>
+</tr>
+<tr>
+<td>Finance</td>
+<td>Contracts, invoices, cash flow, labor postings, payroll.</td>
+</tr>
+<tr>
+<td>LMS</td>
+<td>Learning, certifications, quizzes, and credentials.</td>
+</tr>
+<tr>
+<td>Onboarding</td>
+<td>New-hire tasks, acknowledgements, and training steps.</td>
+</tr>
+<tr>
+<td>Admin</td>
+<td>User, policy, and system administration.</td>
+</tr>
+</tbody>
+</table>
+<p>If you do not see an area, your account likely does not have that capability.</p>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="6. Use Overview" id="6-use-overview"><h2 id="6-use-overview">6. Use Overview</h2>
+<p>Overview is your starting point.</p>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="6.1 Check Daily Status" id="6-1-check-daily-status"><h3 id="61-check-daily-status">6.1 Check Daily Status</h3>
+<ol>
+<li>Open <strong>Overview</strong>.</li>
+<li>Review alerts.</li>
+<li>Review pending tasks or gates.</li>
+<li>Review workflow status.</li>
+<li>Select any item to open details.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="6.2 Respond To An Alert" id="6-2-respond-to-an-alert"><h3 id="62-respond-to-an-alert">6.2 Respond To An Alert</h3>
+<ol>
+<li>Open the alert.</li>
+<li>Read severity, source, and recommended action.</li>
+<li>Open the linked record if present.</li>
+<li>Complete the action required by your role.</li>
+<li>Confirm the alert state updates or the next owner is notified.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="7. Use Knowledge Search" id="7-use-knowledge-search"><h2 id="7-use-knowledge-search">7. Use Knowledge Search</h2>
+<p>Knowledge Search helps you find internal documents, policies, regulations, and reference material.</p>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="7.1 Search" id="7-1-search"><h3 id="71-search">7.1 Search</h3>
+<ol>
+<li>Open <strong>Knowledge</strong>.</li>
+<li>Enter a question or phrase.</li>
+<li>Select <strong>Search</strong>.</li>
+<li>Review results and citations.</li>
+<li>Open a section result to inspect context.</li>
+</ol>
+<p>Good searches:</p>
+<ul>
+<li>"travel reimbursement policy"</li>
+<li>"timecard approval deadline"</li>
+<li>"DFARS cybersecurity clause"</li>
+<li>"OSHA trenching requirements"</li>
+<li>"proposal color review steps"</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="7.2 Review Results Safely" id="7-2-review-results-safely"><h3 id="72-review-results-safely">7.2 Review Results Safely</h3>
+<ol>
+<li>Read the cited source.</li>
+<li>Confirm date and context.</li>
+<li>Do not rely on snippets alone for policy decisions.</li>
+<li>If the result affects finance, payroll, safety, HR, or contract compliance, confirm with the responsible owner.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="7.3 When Search Returns No Results" id="7-3-when-search-returns-no-results"><h3 id="73-when-search-returns-no-results">7.3 When Search Returns No Results</h3>
+<p>Try:</p>
+<ul>
+<li>fewer words</li>
+<li>exact phrase from the document</li>
+<li>alternate name for the policy</li>
+<li>related regulation number</li>
+</ul>
+<p>If the document should exist, contact an administrator to confirm ingestion.</p>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="8. Use Ask-LYNNE And OPS Assistants" id="8-use-ask-lynne-and-ops-assistants"><h2 id="8-use-ask-lynne-and-ops-assistants">8. Use Ask-LYNNE And OPS Assistants</h2>
+<p>Assistant access is role-scoped.</p>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="8.1 Ask-LYNNE" id="8-1-ask-lynne"><h3 id="81-ask-lynne">8.1 Ask-LYNNE</h3>
+<p>Ask-LYNNE is CEO-scoped. It can help with executive summaries, project context, Knowledge-grounded answers, calendar/workflow proposals, research, and structured outputs.</p>
+<p>Steps:</p>
+<ol>
+<li>Open <strong>Ask-LYNNE</strong>.</li>
+<li>Type a clear request.</li>
+<li>Review sources before acting.</li>
+<li>If LYNNE proposes an action, review the action card.</li>
+<li>Confirm only if the action is correct.</li>
+<li>Complete step-up if prompted.</li>
+</ol>
+<p>Example prompts:</p>
+<ul>
+<li>"Summarize open gates by risk."</li>
+<li>"Draft a status update for active VA opportunities."</li>
+<li>"Find policy references for travel reimbursement."</li>
+<li>"Prepare a project kickoff checklist for this award."</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="8.2 OPS Assistants" id="8-2-ops-assistants"><h3 id="82-ops-assistants">8.2 OPS Assistants</h3>
+<p>OPS assistants support operations-facing requests.</p>
+<p>Steps:</p>
+<ol>
+<li>Open the operations assistant available to your role.</li>
+<li>Ask a specific operational question.</li>
+<li>Review grounded context and suggested next steps.</li>
+<li>Use normal dashboard forms for final submissions and approvals.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="31" data-section-title="8.3 Assistant Safety Rules" id="8-3-assistant-safety-rules"><h3 id="83-assistant-safety-rules">8.3 Assistant Safety Rules</h3>
+<ul>
+<li>Treat AI answers as decision support, not automatic approval.</li>
+<li>Check citations.</li>
+<li>Do not paste secrets, passwords, private keys, or unnecessary personal data.</li>
+<li>Confirm action cards carefully.</li>
+<li>If the answer conflicts with policy, follow policy and escalate.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="32" data-section-title="9. Field Crew Workflows" id="9-field-crew-workflows"><h2 id="9-field-crew-workflows">9. Field Crew Workflows</h2>
+</section><section class="doc-section-page" data-section-index="33" data-section-title="9.1 View Your Schedule" id="9-1-view-your-schedule"><h3 id="91-view-your-schedule">9.1 View Your Schedule</h3>
+<ol>
+<li>Open <strong>Schedule</strong> or <strong>Field Ops &gt; Schedule</strong>.</li>
+<li>Review assigned shifts and project locations.</li>
+<li>Open a shift for details.</li>
+<li>Contact your manager if anything is missing or incorrect.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="34" data-section-title="9.2 Submit A Timecard" id="9-2-submit-a-timecard"><h3 id="92-submit-a-timecard">9.2 Submit A Timecard</h3>
+<ol>
+<li>Open <strong>Timecards</strong>.</li>
+<li>Choose the current pay period.</li>
+<li>Add an entry for each work date.</li>
+<li>Enter hours.</li>
+<li>Select the correct charge code.</li>
+<li>Select labor class.</li>
+<li>Add a note if needed.</li>
+<li>Save as draft if still editing.</li>
+<li>Review totals.</li>
+<li>Check the attestation statement.</li>
+<li>Submit.</li>
+</ol>
+<p>Expected result: the timecard moves to submitted status for manager review.</p>
+</section><section class="doc-section-page" data-section-index="35" data-section-title="9.3 Correct A Timecard" id="9-3-correct-a-timecard"><h3 id="93-correct-a-timecard">9.3 Correct A Timecard</h3>
+<ol>
+<li>Open the timecard.</li>
+<li>Check status.</li>
+<li>If returned, read the manager or finance note.</li>
+<li>Edit the requested entries.</li>
+<li>Add a correction reason.</li>
+<li>Resubmit.</li>
+</ol>
+<p>If the timecard is locked or already approved, contact your manager.</p>
+</section><section class="doc-section-page" data-section-index="36" data-section-title="9.4 Submit A Daily Log" id="9-4-submit-a-daily-log"><h3 id="94-submit-a-daily-log">9.4 Submit A Daily Log</h3>
+<ol>
+<li>Open <strong>Daily Logs</strong>.</li>
+<li>Select project.</li>
+<li>Select date.</li>
+<li>Enter crew count.</li>
+<li>Describe work performed.</li>
+<li>Add metrics such as footage, connections, or tests if applicable.</li>
+<li>Attach or reference supporting information if available.</li>
+<li>Submit.</li>
+</ol>
+<p>Expected result: the daily log is recorded for project reporting.</p>
+</section><section class="doc-section-page" data-section-index="37" data-section-title="9.5 Report An Incident Or Hazard" id="9-5-report-an-incident-or-hazard"><h3 id="95-report-an-incident-or-hazard">9.5 Report An Incident Or Hazard</h3>
+<ol>
+<li>Open <strong>Incidents</strong>.</li>
+<li>Select incident type:
+   - injury
+   - near miss
+   - property damage
+   - hazard</li>
+<li>Enter location.</li>
+<li>Enter severity.</li>
+<li>Describe what happened.</li>
+<li>Add body part if injury-related.</li>
+<li>Submit immediately.</li>
+<li>Notify your supervisor according to safety policy.</li>
+</ol>
+<p>Do not wait until the end of the day for safety incidents.</p>
+</section><section class="doc-section-page" data-section-index="38" data-section-title="9.6 Submit A Travel Request" id="9-6-submit-a-travel-request"><h3 id="96-submit-a-travel-request">9.6 Submit A Travel Request</h3>
+<ol>
+<li>Open <strong>Travel</strong>.</li>
+<li>Select <strong>New Request</strong>.</li>
+<li>Enter destination.</li>
+<li>Enter dates.</li>
+<li>Enter business purpose.</li>
+<li>Enter traveler count.</li>
+<li>Submit.</li>
+<li>Review options when they are provided.</li>
+<li>Select the preferred option if your role allows.</li>
+</ol>
+<p>Expected result: the travel request moves through review and booking handoff.</p>
+</section><section class="doc-section-page" data-section-index="39" data-section-title="10. Field Operations Manager Workflows" id="10-field-operations-manager-workflows"><h2 id="10-field-operations-manager-workflows">10. Field Operations Manager Workflows</h2>
+</section><section class="doc-section-page" data-section-index="40" data-section-title="10.1 Review Submitted Timecards" id="10-1-review-submitted-timecards"><h3 id="101-review-submitted-timecards">10.1 Review Submitted Timecards</h3>
+<ol>
+<li>Open <strong>Timecards</strong>.</li>
+<li>Filter for submitted timecards in your division.</li>
+<li>Open each timecard.</li>
+<li>Review hours, project, charge code, labor class, and notes.</li>
+<li>Approve or return with a clear reason.</li>
+</ol>
+<p>If a timecard affects payroll readiness, review carefully before approving.</p>
+</section><section class="doc-section-page" data-section-index="41" data-section-title="10.2 Manage Schedule" id="10-2-manage-schedule"><h3 id="102-manage-schedule">10.2 Manage Schedule</h3>
+<ol>
+<li>Open <strong>Schedule</strong>.</li>
+<li>Create a shift or open an existing shift.</li>
+<li>Assign crew.</li>
+<li>Confirm date, time, project, and division.</li>
+<li>Save.</li>
+<li>Review the roster.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="42" data-section-title="10.3 Review Incidents" id="10-3-review-incidents"><h3 id="103-review-incidents">10.3 Review Incidents</h3>
+<ol>
+<li>Open <strong>Incidents</strong>.</li>
+<li>Filter by severity or division.</li>
+<li>Open the incident.</li>
+<li>Confirm details.</li>
+<li>Add follow-up action if needed.</li>
+<li>Escalate critical or high severity events immediately.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="43" data-section-title="10.4 Use OPS Assistant" id="10-4-use-ops-assistant"><h3 id="104-use-ops-assistant">10.4 Use OPS Assistant</h3>
+<ol>
+<li>Open the OPS assistant.</li>
+<li>Ask for an operational summary, crew readiness, schedule impact, or follow-up draft.</li>
+<li>Verify source records before taking action.</li>
+<li>Complete any final submission through the dashboard form.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="44" data-section-title="11. Business Development Workflows" id="11-business-development-workflows"><h2 id="11-business-development-workflows">11. Business Development Workflows</h2>
+</section><section class="doc-section-page" data-section-index="45" data-section-title="11.1 Review Pipeline" id="11-1-review-pipeline"><h3 id="111-review-pipeline">11.1 Review Pipeline</h3>
+<ol>
+<li>Open <strong>Pipeline</strong> or the business-development area.</li>
+<li>Review opportunities and stage.</li>
+<li>Open the opportunity detail.</li>
+<li>Review agency, NAICS, due date, pWin, set-aside, and workflow status.</li>
+<li>Add or update allowed information if your role permits.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="46" data-section-title="11.2 Use Knowledge For Proposals" id="11-2-use-knowledge-for-proposals"><h3 id="112-use-knowledge-for-proposals">11.2 Use Knowledge For Proposals</h3>
+<ol>
+<li>Open <strong>Knowledge</strong>.</li>
+<li>Search for relevant past performance, policy, or regulation.</li>
+<li>Open cited sections.</li>
+<li>Use citations to support proposal drafting.</li>
+<li>Do not copy unverified AI output directly into final submissions.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="47" data-section-title="11.3 Respond To Review Requests" id="11-3-respond-to-review-requests"><h3 id="113-respond-to-review-requests">11.3 Respond To Review Requests</h3>
+<ol>
+<li>Open the assigned workflow or gate.</li>
+<li>Review requested action.</li>
+<li>Open source documents.</li>
+<li>Add your review notes.</li>
+<li>Submit or route to the next owner.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="48" data-section-title="12. Finance And Payroll Workflows" id="12-finance-and-payroll-workflows"><h2 id="12-finance-and-payroll-workflows">12. Finance And Payroll Workflows</h2>
+</section><section class="doc-section-page" data-section-index="49" data-section-title="12.1 Review Contracts And Cash Flow" id="12-1-review-contracts-and-cash-flow"><h3 id="121-review-contracts-and-cash-flow">12.1 Review Contracts And Cash Flow</h3>
+<ol>
+<li>Open <strong>Finance</strong>.</li>
+<li>Choose <strong>Contracts</strong> or <strong>Cash Flow</strong>.</li>
+<li>Review active records.</li>
+<li>Open contract detail when needed.</li>
+<li>Confirm values against source documents before acting.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="50" data-section-title="12.2 Review Labor Postings" id="12-2-review-labor-postings"><h3 id="122-review-labor-postings">12.2 Review Labor Postings</h3>
+<ol>
+<li>Open <strong>Finance &gt; Labor Postings</strong>.</li>
+<li>Review source timecards.</li>
+<li>Confirm approval status.</li>
+<li>Investigate missing or unexpected postings.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="51" data-section-title="12.3 Create Or Review An Invoice" id="12-3-create-or-review-an-invoice"><h3 id="123-create-or-review-an-invoice">12.3 Create Or Review An Invoice</h3>
+<ol>
+<li>Open <strong>Finance &gt; Invoices</strong>.</li>
+<li>Select <strong>New Invoice</strong> or open an existing invoice.</li>
+<li>Confirm contract.</li>
+<li>Add line items or select approved timecards.</li>
+<li>Review total amount.</li>
+<li>Save or submit according to your process.</li>
+<li>Complete step-up if prompted.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="52" data-section-title="12.4 Approve A Finance Item" id="12-4-approve-a-finance-item"><h3 id="124-approve-a-finance-item">12.4 Approve A Finance Item</h3>
+<ol>
+<li>Open the item.</li>
+<li>Review source records.</li>
+<li>Confirm amount and reason.</li>
+<li>Select approve, reject, advance, or adjust as appropriate.</li>
+<li>Enter a clear note.</li>
+<li>Complete step-up if prompted.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="53" data-section-title="12.5 Payroll Run Review" id="12-5-payroll-run-review"><h3 id="125-payroll-run-review">12.5 Payroll Run Review</h3>
+<ol>
+<li>Open <strong>Payroll</strong>.</li>
+<li>Select the pay period.</li>
+<li>Review employees and hours.</li>
+<li>Review deductions.</li>
+<li>Review net pay and register.</li>
+<li>Confirm all timecard approvals are complete.</li>
+<li>Generate final artifacts only when authorized.</li>
+<li>Complete step-up if prompted.</li>
+</ol>
+<p>Payroll actions are sensitive. If anything looks wrong, stop and escalate.</p>
+</section><section class="doc-section-page" data-section-index="54" data-section-title="13. Learning, Certifications, And Onboarding" id="13-learning-certifications-and-onboarding"><h2 id="13-learning-certifications-and-onboarding">13. Learning, Certifications, And Onboarding</h2>
+</section><section class="doc-section-page" data-section-index="55" data-section-title="13.1 View Assigned Learning" id="13-1-view-assigned-learning"><h3 id="131-view-assigned-learning">13.1 View Assigned Learning</h3>
+<ol>
+<li>Open <strong>LMS</strong>.</li>
+<li>Review assigned courses.</li>
+<li>Open a course.</li>
+<li>Complete modules and lessons.</li>
+<li>Take quizzes or assessments when assigned.</li>
+<li>Confirm completion status.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="56" data-section-title="13.2 Submit External Credentials" id="13-2-submit-external-credentials"><h3 id="132-submit-external-credentials">13.2 Submit External Credentials</h3>
+<p>If your role allows external credential submission:</p>
+<ol>
+<li>Open the credential area.</li>
+<li>Select the certification.</li>
+<li>Enter provider and reference number.</li>
+<li>Enter issue date and expiration date.</li>
+<li>Attach or reference evidence if required.</li>
+<li>Add attestation note.</li>
+<li>Submit.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="57" data-section-title="13.3 Complete Onboarding Tasks" id="13-3-complete-onboarding-tasks"><h3 id="133-complete-onboarding-tasks">13.3 Complete Onboarding Tasks</h3>
+<ol>
+<li>Open <strong>Onboarding</strong>.</li>
+<li>Review assigned tasks.</li>
+<li>Complete required forms, acknowledgements, or training.</li>
+<li>Submit each task.</li>
+<li>Watch for tasks that require manager, finance, or CEO action.</li>
+</ol>
+</section><section class="doc-section-page" data-section-index="58" data-section-title="14. Approvals, Gates, And Step-Up Prompts" id="14-approvals-gates-and-step-up-prompts"><h2 id="14-approvals-gates-and-step-up-prompts">14. Approvals, Gates, And Step-Up Prompts</h2>
+</section><section class="doc-section-page" data-section-index="59" data-section-title="14.1 What A Gate Means" id="14-1-what-a-gate-means"><h3 id="141-what-a-gate-means">14.1 What A Gate Means</h3>
+<p>A gate is a human decision point. It may pause a workflow until an authorized person reviews evidence and decides.</p>
+</section><section class="doc-section-page" data-section-index="60" data-section-title="14.2 Review A Gate" id="14-2-review-a-gate"><h3 id="142-review-a-gate">14.2 Review A Gate</h3>
+<ol>
+<li>Open <strong>Gates</strong> or click a pending gate from Overview.</li>
+<li>Read the title, workflow, age, and description.</li>
+<li>Review details and source records.</li>
+<li>Choose the appropriate decision:
+   - approve
+   - reject
+   - request changes, if available</li>
+<li>Add a note.</li>
+<li>Complete step-up if prompted.</li>
+<li>Submit.</li>
+</ol>
+<p>Expected result: the workflow advances, stops, or returns for changes.</p>
+</section><section class="doc-section-page" data-section-index="61" data-section-title="14.3 If You Are Denied" id="14-3-if-you-are-denied"><h3 id="143-if-you-are-denied">14.3 If You Are Denied</h3>
+<p>If you receive <code>403</code> or an access-denied message:</p>
+<ol>
+<li>Confirm you are signed in as the correct user.</li>
+<li>Confirm the action belongs to your role.</li>
+<li>Confirm the record is in your division, if applicable.</li>
+<li>Contact your manager or administrator if access appears wrong.</li>
+</ol>
+<p>Do not ask another user to perform actions under your name.</p>
+</section><section class="doc-section-page" data-section-index="62" data-section-title="15. Notifications, Errors, And Access Denied Messages" id="15-notifications-errors-and-access-denied-messages"><h2 id="15-notifications-errors-and-access-denied-messages">15. Notifications, Errors, And Access Denied Messages</h2>
+</section><section class="doc-section-page" data-section-index="63" data-section-title="15.1 Common Messages" id="15-1-common-messages"><h3 id="151-common-messages">15.1 Common Messages</h3>
+<table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Meaning</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Invalid credentials</td>
+<td>Username or password was wrong, or account is disabled</td>
+<td>Retry once, then contact admin.</td>
+</tr>
+<tr>
+<td>Session expired</td>
+<td>You were inactive too long</td>
+<td>Sign in again.</td>
+</tr>
+<tr>
+<td>Step-up required</td>
+<td>Sensitive action requires MFA</td>
+<td>Verify TOTP and retry.</td>
+</tr>
+<tr>
+<td>Step-up enrollment required</td>
+<td>You need MFA before this action</td>
+<td>Enroll authenticator.</td>
+</tr>
+<tr>
+<td>Access denied</td>
+<td>Role, division, or auditor posture does not allow action</td>
+<td>Contact manager/admin if unexpected.</td>
+</tr>
+<tr>
+<td>Conflict or version mismatch</td>
+<td>Another edit changed the record</td>
+<td>Refresh and review before retrying.</td>
+</tr>
+<tr>
+<td>Duplicate request</td>
+<td>Idempotency or replay protection detected a repeat</td>
+<td>Check whether the first submission succeeded.</td>
+</tr>
+</tbody>
+</table>
+</section><section class="doc-section-page" data-section-index="64" data-section-title="15.2 When To Escalate" id="15-2-when-to-escalate"><h3 id="152-when-to-escalate">15.2 When To Escalate</h3>
+<p>Escalate immediately if:</p>
+<ul>
+<li>you see data for the wrong division or person</li>
+<li>payroll or finance totals look wrong</li>
+<li>an incident severity is incorrect</li>
+<li>a gate is blocking urgent work</li>
+<li>AI output cites missing or inappropriate sources</li>
+<li>your device or credentials may be compromised</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="65" data-section-title="16. Safe Use Of AI Outputs" id="16-safe-use-of-ai-outputs"><h2 id="16-safe-use-of-ai-outputs">16. Safe Use Of AI Outputs</h2>
+<p>AI assists with search, drafting, summarization, workflow preparation, and operational support. You remain responsible for decisions you submit.</p>
+</section><section class="doc-section-page" data-section-index="66" data-section-title="16.1 Do" id="16-1-do"><h3 id="161-do">16.1 Do</h3>
+<ul>
+<li>Read citations.</li>
+<li>Verify amounts, dates, names, contract numbers, and compliance claims.</li>
+<li>Use action cards only after review.</li>
+<li>Keep sensitive data inside approved dashboard workflows.</li>
+<li>Ask a clearer follow-up if the answer is vague.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="67" data-section-title="16.2 Do Not" id="16-2-do-not"><h3 id="162-do-not">16.2 Do Not</h3>
+<ul>
+<li>Paste passwords, tokens, private keys, or MFA codes into chat.</li>
+<li>Treat AI output as final legal, payroll, safety, or contract approval.</li>
+<li>Submit an action card you do not understand.</li>
+<li>Use another user's account.</li>
+<li>Export sensitive data outside approved channels.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="68" data-section-title="17. Quick Start Checklists" id="17-quick-start-checklists"><h2 id="17-quick-start-checklists">17. Quick Start Checklists</h2>
+</section><section class="doc-section-page" data-section-index="69" data-section-title="17.1 New Field Crew User" id="17-1-new-field-crew-user"><h3 id="171-new-field-crew-user">17.1 New Field Crew User</h3>
+<ul>
+<li>[ ] Sign in.</li>
+<li>[ ] Change temporary password.</li>
+<li>[ ] Enroll MFA if prompted.</li>
+<li>[ ] Open schedule.</li>
+<li>[ ] Confirm assigned project.</li>
+<li>[ ] Submit daily log after work.</li>
+<li>[ ] Submit timecard for the pay period.</li>
+<li>[ ] Complete LMS/onboarding tasks.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="70" data-section-title="17.2 New Field Operations Manager" id="17-2-new-field-operations-manager"><h3 id="172-new-field-operations-manager">17.2 New Field Operations Manager</h3>
+<ul>
+<li>[ ] Sign in.</li>
+<li>[ ] Enroll MFA.</li>
+<li>[ ] Confirm division.</li>
+<li>[ ] Review schedule roster.</li>
+<li>[ ] Review pending timecards.</li>
+<li>[ ] Review incidents and daily logs.</li>
+<li>[ ] Open OPS assistant.</li>
+<li>[ ] Check gates and alerts.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="71" data-section-title="17.3 New Finance User" id="17-3-new-finance-user"><h3 id="173-new-finance-user">17.3 New Finance User</h3>
+<ul>
+<li>[ ] Sign in.</li>
+<li>[ ] Enroll MFA.</li>
+<li>[ ] Review contracts and invoices.</li>
+<li>[ ] Review labor postings.</li>
+<li>[ ] Review payroll access.</li>
+<li>[ ] Test a step-up prompt with a safe action if directed.</li>
+<li>[ ] Confirm audit export access if part of duties.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="72" data-section-title="17.4 New Business Development User" id="17-4-new-business-development-user"><h3 id="174-new-business-development-user">17.4 New Business Development User</h3>
+<ul>
+<li>[ ] Sign in.</li>
+<li>[ ] Review pipeline.</li>
+<li>[ ] Open opportunity details.</li>
+<li>[ ] Search Knowledge for a known document.</li>
+<li>[ ] Review assigned workflows.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="73" data-section-title="17.5 CEO / Executive" id="17-5-ceo-executive"><h3 id="175-ceo-executive">17.5 CEO / Executive</h3>
+<ul>
+<li>[ ] Sign in.</li>
+<li>[ ] Enroll MFA.</li>
+<li>[ ] Open Overview.</li>
+<li>[ ] Review gates.</li>
+<li>[ ] Open Ask-LYNNE.</li>
+<li>[ ] Review agent status.</li>
+<li>[ ] Confirm user administration access.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="74" data-section-title="18. Getting Help" id="18-getting-help"><h2 id="18-getting-help">18. Getting Help</h2>
+<p>Contact your manager or system administrator when:</p>
+<ul>
+<li>you cannot sign in</li>
+<li>MFA is lost</li>
+<li>your role or division is wrong</li>
+<li>a record is missing</li>
+<li>a workflow is stuck</li>
+<li>an approval is urgent</li>
+<li>you see data you should not see</li>
+<li>you suspect a security issue</li>
+</ul>
+<p>When reporting a problem, include:</p>
+<ul>
+<li>what you were trying to do</li>
+<li>page or workflow name</li>
+<li>approximate time</li>
+<li>error message</li>
+<li>record ID, if available</li>
+<li>screenshot without secrets or private key material</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="75" data-section-title="Appendix A - Common Task Paths" id="appendix-a-common-task-paths"><h2 id="appendix-a-common-task-paths">Appendix A - Common Task Paths</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Starting point</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Change password</td>
+<td>Account menu -&gt; Security</td>
+</tr>
+<tr>
+<td>Enroll MFA</td>
+<td>Account menu -&gt; Security / MFA</td>
+</tr>
+<tr>
+<td>Search documents</td>
+<td>Knowledge</td>
+</tr>
+<tr>
+<td>Ask executive assistant</td>
+<td>Ask-LYNNE</td>
+</tr>
+<tr>
+<td>Submit timecard</td>
+<td>Field Ops -&gt; Timecards</td>
+</tr>
+<tr>
+<td>Submit daily log</td>
+<td>Field Ops -&gt; Daily Logs</td>
+</tr>
+<tr>
+<td>Report incident</td>
+<td>Field Ops -&gt; Incidents</td>
+</tr>
+<tr>
+<td>Request travel</td>
+<td>Travel</td>
+</tr>
+<tr>
+<td>Review gates</td>
+<td>Overview -&gt; Gates</td>
+</tr>
+<tr>
+<td>Review invoices</td>
+<td>Finance -&gt; Invoices</td>
+</tr>
+<tr>
+<td>Review payroll</td>
+<td>Finance / Payroll</td>
+</tr>
+<tr>
+<td>Complete training</td>
+<td>LMS</td>
+</tr>
+<tr>
+<td>Complete onboarding</td>
+<td>Onboarding</td>
+</tr>
+</tbody>
+</table>
+<section class="footer">
+<p>Internal Use Only. Generated from TTIS_End_User_Guide.md.</p>
+</section>
+</section></main>
+
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>

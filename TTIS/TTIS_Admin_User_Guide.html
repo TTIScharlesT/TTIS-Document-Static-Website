@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS AI Virtual Business System - Admin User Guide</title>
+  <style>
+:root{--ink:#172033;--muted:#5b6475;--line:#d9dee8;--soft:#f6f8fb;--brand:#0f5f73;--brand-dark:#0a3d4b;--accent:#b98a18;--code:#0f172a}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:#fff;font:16px/1.55 "Segoe UI",Roboto,Helvetica,Arial,sans-serif}.page{max-width:1080px;margin:0 auto;padding:42px 28px 72px}.header{border-bottom:4px solid var(--brand);margin-bottom:28px;padding-bottom:18px}.eyebrow{color:var(--brand);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}h1,h2,h3,h4{color:var(--ink);line-height:1.18}h1{font-size:34px;margin:0 0 10px}h2{font-size:25px;margin-top:34px;padding-top:12px;border-top:1px solid var(--line)}h3{font-size:19px;margin-top:26px}h4{font-size:16px;margin-top:22px}p{margin:11px 0}a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}hr{border:0;border-top:1px solid var(--line);margin:28px 0}blockquote{border-left:4px solid var(--accent);background:#fff9e8;margin:18px 0;padding:12px 16px;color:#49380a}table{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:14px}th,td{border:1px solid var(--line);padding:9px 11px;vertical-align:top}th{background:var(--soft);color:var(--brand-dark);text-align:left}tr:nth-child(even) td{background:#fbfcfe}code{background:#eef2f7;color:var(--code);border-radius:4px;padding:1px 5px;font-family:Consolas,"Courier New",monospace;font-size:.92em}pre{background:#111827;color:#f8fafc;border-radius:6px;overflow-x:auto;padding:14px 16px;margin:16px 0 22px}pre code{background:transparent;color:inherit;padding:0}ul,ol{padding-left:26px}li{margin:5px 0}.toc ul{list-style:none;padding-left:18px}.toc>ul{padding-left:0}.toc a{color:var(--brand-dark)}.footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}@media print{body{font-size:11pt}.page{max-width:none;padding:.5in}a{color:inherit;text-decoration:none}pre{white-space:pre-wrap}h2{page-break-after:avoid}table,pre{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="header">
+      <p class="eyebrow">Thompson Telecom Infrastructure Solutions</p>
+      <h1>TTIS AI Virtual Business System - Admin User Guide</h1>
+    </section>
+    <p><strong>Audience:</strong> CEO, platform administrators, finance administrators, operations managers, security reviewers, deployment operators<br>
+<strong>Version:</strong> 1.0<br>
+<strong>Last updated:</strong> June 21, 2026<br>
+<strong>Classification:</strong> Internal Use Only<br>
+<strong>Primary systems:</strong> TTIS VBS backend, Dashboard API v3, server-rendered dashboard, webhook receiver, Redis queue worker, ChromaDB knowledge store, Caddy production ingress</p>
+<hr>
+<h2 id="table-of-contents">Table Of Contents</h2>
+<ol>
+<li><a href="#1-purpose-and-scope">Purpose And Scope</a></li>
+<li><a href="#2-admin-responsibilities">Admin Responsibilities</a></li>
+<li><a href="#3-system-access-model">System Access Model</a></li>
+<li><a href="#4-first-time-admin-setup">First-Time Admin Setup</a></li>
+<li><a href="#5-user-administration">User Administration</a></li>
+<li><a href="#6-mfa-and-step-up-administration">MFA And Step-Up Administration</a></li>
+<li><a href="#7-role-and-capability-management">Role And Capability Management</a></li>
+<li><a href="#8-dashboard-operations">Dashboard Operations</a></li>
+<li><a href="#9-workflow-and-gate-administration">Workflow And Gate Administration</a></li>
+<li><a href="#10-agent-and-eaa-administration">Agent And EAA Administration</a></li>
+<li><a href="#11-knowledge-base-administration">Knowledge Base Administration</a></li>
+<li><a href="#12-finance-payroll-and-sensitive-actions">Finance, Payroll, And Sensitive Actions</a></li>
+<li><a href="#13-webhook-administration">Webhook Administration</a></li>
+<li><a href="#14-deployment-and-runtime-operations">Deployment And Runtime Operations</a></li>
+<li><a href="#15-monitoring-audit-and-evidence">Monitoring, Audit, And Evidence</a></li>
+<li><a href="#16-backup-recovery-and-key-handling">Backup, Recovery, And Key Handling</a></li>
+<li><a href="#17-security-checklist">Security Checklist</a></li>
+<li><a href="#18-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr>
+<h2 id="1-purpose-and-scope">1. Purpose And Scope</h2>
+<p>This guide explains how to administer the TTIS AI Virtual Business System after Dashboard API v3. It covers day-to-day administration, security controls, user lifecycle, webhook trust, workflow gates, deployment operations, and audit evidence.</p>
+<p>The guide does not replace source-controlled implementation references. For API-level contracts, use <code>TTIS_AI_API_Reference_v3.md</code>. For deep production hosting details, use <code>docs/PRODUCTION_HOSTING.md</code>.</p>
+<h2 id="2-admin-responsibilities">2. Admin Responsibilities</h2>
+<p>Administrators are responsible for keeping the system usable, secure, auditable, and current.</p>
+<p>Core duties:</p>
+<ul>
+<li>Provision and deactivate users.</li>
+<li>Assign correct ABAC roles, divisions, auditor posture, and any explicit grants.</li>
+<li>Verify MFA enrollment and help users recover from lost devices.</li>
+<li>Maintain environment secrets and encryption keys.</li>
+<li>Monitor workflow gates, failed jobs, webhook drops, and service health.</li>
+<li>Maintain the Knowledge corpus and ensure sensitive data remains ABAC-scoped.</li>
+<li>Confirm that Redis, dashboard, webhook, worker, and ChromaDB are running in the expected deployment shape.</li>
+<li>Preserve the audit trail and never disable chain verification.</li>
+</ul>
+<h2 id="3-system-access-model">3. System Access Model</h2>
+<p>TTIS uses per-user identity and ABAC capability authorization. There is no shared dashboard bearer secret in the v3 model.</p>
+<h3 id="31-roles">3.1 Roles</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Typical user</th>
+<th>Administrative meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ceo</code></td>
+<td>Owner / executive administrator</td>
+<td>Superuser role; can administer users, agents, policy, gates, workflows, finance, payroll, Knowledge, and Ask-LYNNE.</td>
+</tr>
+<tr>
+<td><code>field_ops_mgr</code></td>
+<td>Field operations manager</td>
+<td>Division-scoped management of projects, schedule, safety, timecards, onboarding, documents, and OPS EAA.</td>
+</tr>
+<tr>
+<td><code>business_dev</code></td>
+<td>Business development user</td>
+<td>Pipeline, workflow, document, telemetry, and business-development operations.</td>
+</tr>
+<tr>
+<td><code>finance</code></td>
+<td>Finance/payroll authority</td>
+<td>Finance, payroll, invoice, audit export, travel booking/approval, and finance-level approvals.</td>
+</tr>
+<tr>
+<td><code>field_crew</code></td>
+<td>Technician / crew member</td>
+<td>Own timecards, daily logs, incidents, travel requests, schedule, LMS, onboarding, and field views.</td>
+</tr>
+</tbody>
+</table>
+<p>Auditor posture is an additional attribute. An auditor can read permitted resources but is denied mutating actions.</p>
+<h3 id="32-capabilities">3.2 Capabilities</h3>
+<p>Authorization is evaluated as:</p>
+<pre><code class="language-text">principal + resource + action + context -&gt; allow or deny
+</code></pre>
+<p>Examples:</p>
+<ul>
+<li><code>finance</code> can approve finance-level timecards.</li>
+<li><code>field_ops_mgr</code> can manage division-scoped schedules.</li>
+<li><code>field_crew</code> can submit their own timecards and daily logs.</li>
+<li><code>ceo</code> can access Ask-LYNNE and global administration.</li>
+</ul>
+<p>The server is the security boundary. Do not rely on UI hiding alone.</p>
+<h2 id="4-first-time-admin-setup">4. First-Time Admin Setup</h2>
+<h3 id="41-confirm-environment-configuration">4.1 Confirm Environment Configuration</h3>
+<ol>
+<li>Open <code>config/.env</code>.</li>
+<li>Confirm these minimum values are set:</li>
+</ol>
+<pre><code class="language-env">ANTHROPIC_API_KEY=
+DASHBOARD_JWT_SECRET=
+DASHBOARD_PWD_SALT=
+CORS_ALLOW_LIST=
+REDIS_URL=
+SQLITE_DIR=
+CHROMA_DIR=
+DOCUMENTS_DIR=
+PURSUITE_WEBHOOK_SECRET=
+TELEGRAM_WEBHOOK_SECRET=
+AUTH_KEY_FILE=/app/secrets/auth.key
+</code></pre>
+<ol start="3">
+<li>Confirm <code>DASHBOARD_JWT_SECRET</code> is at least 32 characters and not a placeholder.</li>
+<li>Confirm <code>DASHBOARD_PWD_SALT</code> is at least 16 characters.</li>
+<li>Confirm <code>CORS_ALLOW_LIST</code> contains the real dashboard origin.</li>
+<li>Confirm <code>AUTH_KEY_FILE</code> points to a protected secrets volume, or <code>AUTH_ENC_KEY</code> is set as an environment fallback.</li>
+</ol>
+<h3 id="42-install-dependencies">4.2 Install Dependencies</h3>
+<p>From the repository root:</p>
+<pre><code class="language-powershell">pip install -r requirements.txt
+</code></pre>
+<p>The password hashing stack requires <code>argon2-cffi</code>.</p>
+<h3 id="43-start-local-services">4.3 Start Local Services</h3>
+<p>Development mode:</p>
+<pre><code class="language-powershell">python main.py
+uvicorn dashboard.main:app --host 127.0.0.1 --port 8000
+uvicorn tools.pursuite_webhook:webhook_app --host 127.0.0.1 --port 8001
+</code></pre>
+<p>Production-shaped queue mode:</p>
+<pre><code class="language-powershell">docker compose up -d
+</code></pre>
+<p>Expected local services:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Local endpoint</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard API</td>
+<td><code>http://127.0.0.1:8000</code></td>
+<td>Caddy-routed in production.</td>
+</tr>
+<tr>
+<td>Webhook receiver</td>
+<td><code>http://127.0.0.1:8001</code></td>
+<td>Caddy-routed in production.</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td><code>127.0.0.1:6379</code></td>
+<td>Localhost only; never public.</td>
+</tr>
+<tr>
+<td>ChromaDB</td>
+<td><code>127.0.0.1:8002</code></td>
+<td>Localhost only.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-verify-health">4.4 Verify Health</h3>
+<ol>
+<li>Open <code>http://127.0.0.1:8000/health</code>.</li>
+<li>Open <code>http://127.0.0.1:8001/webhooks/health</code>.</li>
+<li>Confirm Redis responds:</li>
+</ol>
+<pre><code class="language-powershell">docker exec ttis-redis redis-cli ping
+</code></pre>
+<p>Expected response: <code>PONG</code>.</p>
+<h2 id="5-user-administration">5. User Administration</h2>
+<h3 id="51-user-lifecycle-overview">5.1 User Lifecycle Overview</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Admin action</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create</td>
+<td>Add user with role, division, password, and optional grants</td>
+<td>User can sign in and receives ABAC-scoped capabilities.</td>
+</tr>
+<tr>
+<td>Enroll MFA</td>
+<td>User enrolls TOTP</td>
+<td>Sensitive actions can be step-up authorized.</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>Change role/division/grants as duties change</td>
+<td>Effective capabilities update on future requests.</td>
+</tr>
+<tr>
+<td>Reset</td>
+<td>Admin resets password when required</td>
+<td>New password is stored as Argon2id.</td>
+</tr>
+<tr>
+<td>Disable</td>
+<td>Deactivate account</td>
+<td>User can no longer authenticate.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-create-a-user">5.2 Create A User</h3>
+<p>Who can perform: <code>ceo</code> or an explicitly authorized user-admin operator.</p>
+<p>Recommended steps:</p>
+<ol>
+<li>Open the dashboard administration area.</li>
+<li>Select <strong>Users</strong>.</li>
+<li>Choose <strong>Create User</strong>.</li>
+<li>Enter:
+   - user ID
+   - username
+   - temporary password
+   - ABAC role
+   - division, when applicable
+   - auditor flag, when applicable
+   - optional wizard grants, if the user needs wizard access</li>
+<li>Save.</li>
+<li>Provide the temporary password through an approved secure channel.</li>
+<li>Instruct the user to sign in, change the password, and enroll MFA.</li>
+</ol>
+<p>Expected result: the new user appears in the user list and can authenticate.</p>
+<h3 id="53-choose-the-correct-role">5.3 Choose The Correct Role</h3>
+<p>Use least privilege.</p>
+<table>
+<thead>
+<tr>
+<th>If the user needs to...</th>
+<th>Assign</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>administer the whole platform</td>
+<td><code>ceo</code></td>
+</tr>
+<tr>
+<td>manage crews, schedule, timecards, incidents, or onboarding for a division</td>
+<td><code>field_ops_mgr</code></td>
+</tr>
+<tr>
+<td>work pipeline, business development, documents, and opportunities</td>
+<td><code>business_dev</code></td>
+</tr>
+<tr>
+<td>approve finance, payroll, invoices, audit export, or travel booking</td>
+<td><code>finance</code></td>
+</tr>
+<tr>
+<td>submit field work, time, incidents, travel, LMS, and onboarding tasks</td>
+<td><code>field_crew</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="54-reset-a-password">5.4 Reset A Password</h3>
+<ol>
+<li>Open <strong>Admin &gt; Users</strong>.</li>
+<li>Select the user.</li>
+<li>Choose <strong>Reset Password</strong>.</li>
+<li>Enter a temporary password that satisfies the policy.</li>
+<li>Save.</li>
+<li>Tell the user to sign in and immediately change it.</li>
+</ol>
+<p>Expected result: the stored password is Argon2id. Legacy salted SHA-256 values remain accepted only for migration and are upgraded after successful login.</p>
+<h3 id="55-disable-a-user">5.5 Disable A User</h3>
+<p>Disable users immediately when employment ends, duties change, a device is lost, or credentials are suspected compromised.</p>
+<ol>
+<li>Open <strong>Admin &gt; Users</strong>.</li>
+<li>Select the user.</li>
+<li>Toggle active status to disabled.</li>
+<li>Save.</li>
+<li>Review audit logs for recent activity.</li>
+</ol>
+<p>Expected result: future login attempts fail.</p>
+<h2 id="6-mfa-and-step-up-administration">6. MFA And Step-Up Administration</h2>
+<h3 id="61-what-step-up-protects">6.1 What Step-Up Protects</h3>
+<p>Step-up MFA protects sensitive and high-impact actions such as:</p>
+<ul>
+<li>large financial approvals</li>
+<li>payroll-sensitive actions</li>
+<li>policy threshold increases</li>
+<li>sensitive key generation or rotation</li>
+<li>governed workflow decisions above threshold</li>
+</ul>
+<h3 id="62-user-enrollment">6.2 User Enrollment</h3>
+<ol>
+<li>User signs in.</li>
+<li>User opens security/MFA enrollment.</li>
+<li>User scans the TOTP secret with an authenticator app.</li>
+<li>User stores backup codes securely.</li>
+<li>User verifies a current code.</li>
+</ol>
+<p>Expected result: <code>GET /api/v1/auth/me</code> reports <code>totp_enrolled: true</code>.</p>
+<h3 id="63-admin-recovery">6.3 Admin Recovery</h3>
+<p>If a user loses MFA access:</p>
+<ol>
+<li>Confirm identity using company-approved verification.</li>
+<li>Disable the account temporarily if compromise is suspected.</li>
+<li>Reset password if needed.</li>
+<li>Clear or refresh MFA enrollment only through the approved admin path.</li>
+<li>Require the user to enroll a new authenticator.</li>
+<li>Review audit events.</li>
+</ol>
+<h3 id="64-encryption-key-requirements">6.4 Encryption Key Requirements</h3>
+<p>TOTP secrets are encrypted at rest. The app reads key material from:</p>
+<ol>
+<li><code>AUTH_KEY_FILE</code>, default <code>/app/secrets/auth.key</code></li>
+<li><code>AUTH_ENC_KEY</code>, environment fallback</li>
+</ol>
+<p>File precedence is intentional. Do not print, log, email, or paste key material into tickets.</p>
+<h2 id="7-role-and-capability-management">7. Role And Capability Management</h2>
+<h3 id="71-capability-review-procedure">7.1 Capability Review Procedure</h3>
+<p>Perform capability reviews:</p>
+<ul>
+<li>when a user is created</li>
+<li>when a user changes duties</li>
+<li>when an auditor posture is assigned</li>
+<li>before external audits</li>
+<li>after security incidents</li>
+</ul>
+<p>Steps:</p>
+<ol>
+<li>Export or inspect the user list.</li>
+<li>Confirm each role matches current job duties.</li>
+<li>Confirm division assignments are correct.</li>
+<li>Confirm auditor users cannot mutate records.</li>
+<li>Confirm any explicit grants are still justified.</li>
+<li>Remove stale grants.</li>
+<li>Record the review outcome.</li>
+</ol>
+<h3 id="72-division-scope">7.2 Division Scope</h3>
+<p>Division-scoped resources include projects, safety, incidents, timecards, travel, schedule, and onboarding. Do not assign a broad role to solve a division mismatch. Correct the division attribute instead.</p>
+<h2 id="8-dashboard-operations">8. Dashboard Operations</h2>
+<h3 id="81-daily-admin-start-of-day-check">8.1 Daily Admin Start-Of-Day Check</h3>
+<ol>
+<li>Confirm dashboard health.</li>
+<li>Confirm webhook health.</li>
+<li>Confirm Redis health.</li>
+<li>Open Overview.</li>
+<li>Review pending gates.</li>
+<li>Review failed or stalled workflows.</li>
+<li>Review alerts and incidents.</li>
+<li>Confirm recent audit entries are being written.</li>
+</ol>
+<h3 id="82-navigation-areas">8.2 Navigation Areas</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Admin use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overview</td>
+<td>Operational health, queue status, alerts, and high-level state.</td>
+</tr>
+<tr>
+<td>Ask-LYNNE</td>
+<td>CEO-only executive assistant workflow and research surface.</td>
+</tr>
+<tr>
+<td>Agents</td>
+<td>Agent status, activity, flags, and configurable EAA details.</td>
+</tr>
+<tr>
+<td>Knowledge</td>
+<td>RAG search, corpus inspection, document grounding.</td>
+</tr>
+<tr>
+<td>Admin / Users</td>
+<td>User lifecycle, role assignment, account state.</td>
+</tr>
+<tr>
+<td>Finance / Payroll</td>
+<td>Finance, invoices, payroll runs, tax forms, audit export.</td>
+</tr>
+<tr>
+<td>Field Ops</td>
+<td>Timecards, schedule, incidents, daily logs, projects.</td>
+</tr>
+<tr>
+<td>LMS / Onboarding</td>
+<td>Training, certification, onboarding records, task progress.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-workflow-and-gate-administration">9. Workflow And Gate Administration</h2>
+<h3 id="91-gate-review">9.1 Gate Review</h3>
+<ol>
+<li>Open <strong>Gates</strong> or <strong>Overview</strong>.</li>
+<li>Review gate type, workflow ID, presenter, age, confidence, and details.</li>
+<li>Confirm the underlying evidence.</li>
+<li>Approve, reject, or request changes where supported.</li>
+<li>Complete step-up if prompted.</li>
+<li>Confirm the result appears in workflow trace and audit.</li>
+</ol>
+<h3 id="92-stalled-workflow-handling">9.2 Stalled Workflow Handling</h3>
+<ol>
+<li>Open the workflow detail or trace.</li>
+<li>Identify the current step and last successful transition.</li>
+<li>Check whether a human gate is waiting.</li>
+<li>Check worker logs if queue mode is enabled.</li>
+<li>Confirm Redis queue depth if jobs are not draining.</li>
+<li>Use pause/override/terminate controls only when authorized.</li>
+<li>Record the decision reason.</li>
+</ol>
+<h3 id="93-override-safety">9.3 Override Safety</h3>
+<p>Overrides are sensitive. Use them only when the normal gate path cannot resolve the issue in time.</p>
+<p>Before override:</p>
+<ul>
+<li>verify workflow ID</li>
+<li>verify business justification</li>
+<li>verify authorization</li>
+<li>complete step-up if required</li>
+<li>capture the reason in the action comments</li>
+</ul>
+<h2 id="10-agent-and-eaa-administration">10. Agent And EAA Administration</h2>
+<h3 id="101-agent-status-review">10.1 Agent Status Review</h3>
+<ol>
+<li>Open <strong>Agents</strong>.</li>
+<li>Review health, status, model tier, recent actions, flags, and degraded state.</li>
+<li>Investigate repeated failures or tool errors.</li>
+<li>Confirm no disabled agent is required for an active workflow.</li>
+</ol>
+<h3 id="102-eaa-configuration">10.2 EAA Configuration</h3>
+<p>Editable EAAs include LYNNE and the OPS support/management assistants.</p>
+<p>Steps:</p>
+<ol>
+<li>Open agent detail.</li>
+<li>Choose <strong>Manage Config</strong>.</li>
+<li>Review persona, tools, knowledge sources, and limits.</li>
+<li>Make the minimum necessary change.</li>
+<li>Save.</li>
+<li>Complete step-up if prompted.</li>
+<li>Confirm the change applies on the next task.</li>
+</ol>
+<h3 id="103-disable-or-force-terminate">10.3 Disable Or Force-Terminate</h3>
+<ol>
+<li>Open the agent detail.</li>
+<li>Confirm the reason.</li>
+<li>Disable or force-terminate only when the agent is unsafe, looping, or blocking work.</li>
+<li>Confirm worker and dashboard both honor the change.</li>
+<li>Review audit events.</li>
+</ol>
+<h2 id="11-knowledge-base-administration">11. Knowledge Base Administration</h2>
+<h3 id="111-corpus-ownership">11.1 Corpus Ownership</h3>
+<p>The Knowledge corpus may include policy, regulations, project documents, proposal material, and other sensitive data. Treat it as controlled internal content.</p>
+<h3 id="112-add-or-refresh-documents">11.2 Add Or Refresh Documents</h3>
+<ol>
+<li>Place approved documents in the configured documents directory.</li>
+<li>Run the ingestion process or use the dashboard refresh action when available.</li>
+<li>Confirm the document appears in Knowledge search.</li>
+<li>Search for a known phrase from the document.</li>
+<li>Confirm citations and section views are correct.</li>
+</ol>
+<h3 id="113-quality-checks">11.3 Quality Checks</h3>
+<p>For each corpus update:</p>
+<ul>
+<li>confirm the source is approved</li>
+<li>confirm classification is appropriate</li>
+<li>confirm no prohibited PII is exposed</li>
+<li>confirm relevant roles can find it</li>
+<li>confirm unauthorized roles cannot see restricted content</li>
+</ul>
+<h2 id="12-finance-payroll-and-sensitive-actions">12. Finance, Payroll, And Sensitive Actions</h2>
+<h3 id="121-finance-administration">12.1 Finance Administration</h3>
+<p>Finance administrators manage contracts, cash flow, labor postings, invoices, audit export, and finance-level approvals.</p>
+<p>Before approving:</p>
+<ol>
+<li>Confirm amount, contract, source records, and attachments.</li>
+<li>Confirm provenance from timecard or invoice line.</li>
+<li>Confirm all required prior approvals exist.</li>
+<li>Complete step-up if prompted.</li>
+<li>Confirm audit hash is recorded.</li>
+</ol>
+<h3 id="122-payroll-administration">12.2 Payroll Administration</h3>
+<p>Payroll actions are sensitive and role-gated.</p>
+<ol>
+<li>Confirm employee records are current.</li>
+<li>Confirm approved timecards and labor postings.</li>
+<li>Generate or review the payroll run.</li>
+<li>Review deductions and tax settings.</li>
+<li>Generate ACH/NACHA only when authorized.</li>
+<li>Confirm encrypted bank detail handling and key status.</li>
+<li>Preserve generated artifacts as required by policy.</li>
+</ol>
+<h3 id="123-key-status">12.3 Key Status</h3>
+<p>Payroll encryption keys and auth-side TOTP encryption keys must live in protected secrets storage. Never return key material from an endpoint, log, screenshot, or ticket.</p>
+<h2 id="13-webhook-administration">13. Webhook Administration</h2>
+<h3 id="131-pursuite-webhook">13.1 Pursuite Webhook</h3>
+<p>Pursuite webhook requests require:</p>
+<ul>
+<li><code>X-Pursuite-Signature</code></li>
+<li><code>X-Pursuite-Timestamp</code>, required by default</li>
+<li>optional <code>X-Pursuite-Delivery</code>, used for replay detection</li>
+</ul>
+<p>Environment controls:</p>
+<pre><code class="language-env">PURSUITE_REQUIRE_TIMESTAMP=1
+PURSUITE_MAX_TIMESTAMP_SKEW_SECONDS=300
+PURSUITE_REPLAY_TTL_SECONDS=86400
+</code></pre>
+<p>Validation behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Invalid signature</td>
+<td><code>401</code></td>
+</tr>
+<tr>
+<td>Missing required timestamp</td>
+<td><code>401</code></td>
+</tr>
+<tr>
+<td>Stale timestamp</td>
+<td><code>401</code></td>
+</tr>
+<tr>
+<td>Duplicate delivery</td>
+<td><code>409</code></td>
+</tr>
+<tr>
+<td>Unknown event type</td>
+<td>Safe ignored response</td>
+</tr>
+</tbody>
+</table>
+<h3 id="132-telegram-webhook">13.2 Telegram Webhook</h3>
+<p>Telegram requires:</p>
+<ul>
+<li>URL token equal to <code>TELEGRAM_WEBHOOK_SECRET</code></li>
+<li><code>X-Telegram-Bot-Api-Secret-Token</code> header equal to the same secret</li>
+<li>sender chat ID in <code>TG_USER_WHITELIST</code></li>
+</ul>
+<p>Registration:</p>
+<pre><code class="language-powershell">python scripts/register_telegram_webhook.py --public-url https://webhook.example.com
+</code></pre>
+<p>Expected result: Telegram sends the secret header and the receiver accepts only whitelisted chats.</p>
+<h2 id="14-deployment-and-runtime-operations">14. Deployment And Runtime Operations</h2>
+<h3 id="141-production-shape">14.1 Production Shape</h3>
+<p>Production should expose only Caddy publicly. Dashboard, webhook, Redis, and ChromaDB should be private or localhost-bound.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Exposure rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Caddy</td>
+<td>Public <code>80/443</code></td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td>Caddy-routed, not directly public</td>
+</tr>
+<tr>
+<td>Webhook</td>
+<td>Caddy-routed, not directly public</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>Never public</td>
+</tr>
+<tr>
+<td>ChromaDB</td>
+<td>Never public</td>
+</tr>
+<tr>
+<td>Secrets volume</td>
+<td>Mounted, protected, app-user owned</td>
+</tr>
+</tbody>
+</table>
+<h3 id="142-docker-hardening-expectations">14.2 Docker Hardening Expectations</h3>
+<p>Dashboard and webhook images run as the non-root <code>ttis</code> user. Compose applies:</p>
+<pre><code class="language-yaml">cap_drop:
+  - ALL
+security_opt:
+  - no-new-privileges:true
+</code></pre>
+<p>Writable mounted volumes must be owned by the app user.</p>
+<h3 id="143-deployment-validation">14.3 Deployment Validation</h3>
+<p>Run:</p>
+<pre><code class="language-powershell">docker compose config
+docker build -f Dockerfile.dashboard -t ttis-dashboard:hardening-check .
+docker build -f Dockerfile.webhook -t ttis-webhook:hardening-check .
+</code></pre>
+<p>Expected result:</p>
+<ul>
+<li>compose config renders successfully</li>
+<li>dashboard image builds</li>
+<li>webhook image builds</li>
+<li>image user is <code>ttis</code></li>
+</ul>
+<h2 id="15-monitoring-audit-and-evidence">15. Monitoring, Audit, And Evidence</h2>
+<h3 id="151-audit-trail">15.1 Audit Trail</h3>
+<p>The audit trail is append-only and chain-verified. Never disable, truncate, or rewrite audit data.</p>
+<p>Admin actions that should produce audit evidence:</p>
+<ul>
+<li>user creation, disablement, password reset</li>
+<li>gate decision</li>
+<li>workflow override</li>
+<li>agent configuration change</li>
+<li>payroll key generation or rotation</li>
+<li>finance approval</li>
+<li>audit export</li>
+<li>webhook security drop</li>
+</ul>
+<h3 id="152-daily-evidence-review">15.2 Daily Evidence Review</h3>
+<ol>
+<li>Verify audit chain.</li>
+<li>Review failed login patterns.</li>
+<li>Review webhook security drops.</li>
+<li>Review high-value approvals.</li>
+<li>Review disabled or degraded agents.</li>
+<li>Review worker errors and queue backlog.</li>
+</ol>
+<h2 id="16-backup-recovery-and-key-handling">16. Backup, Recovery, And Key Handling</h2>
+<h3 id="161-backup-scope">16.1 Backup Scope</h3>
+<p>Back up:</p>
+<ul>
+<li>SQLite databases or PostgreSQL database</li>
+<li>ChromaDB persistence</li>
+<li>document corpus</li>
+<li>audit database</li>
+<li>secrets volumes</li>
+<li>environment configuration templates without secret values</li>
+</ul>
+<h3 id="162-recovery-order">16.2 Recovery Order</h3>
+<ol>
+<li>Restore database state.</li>
+<li>Restore secrets volume.</li>
+<li>Restore document and Chroma stores.</li>
+<li>Start Redis.</li>
+<li>Start dashboard, webhook, worker, and ChromaDB.</li>
+<li>Verify health endpoints.</li>
+<li>Verify audit chain.</li>
+<li>Run a login test.</li>
+<li>Run a Knowledge search test.</li>
+<li>Run a safe webhook health test.</li>
+</ol>
+<h3 id="163-key-handling-rules">16.3 Key Handling Rules</h3>
+<ul>
+<li>Store encryption keys in secrets volumes or managed secret stores.</li>
+<li>Prefer file-backed keys over environment fallback.</li>
+<li>Restrict filesystem ownership to the app user.</li>
+<li>Rotate keys only through approved procedures.</li>
+<li>Never include key material in screenshots, chat, tickets, or logs.</li>
+</ul>
+<h2 id="17-security-checklist">17. Security Checklist</h2>
+<p>Before production go-live or after major changes:</p>
+<ul>
+<li>[ ] <code>DASHBOARD_JWT_SECRET</code> is set, strong, and not shared.</li>
+<li>[ ] <code>DASHBOARD_PWD_SALT</code> is set and strong.</li>
+<li>[ ] <code>AUTH_KEY_FILE</code> or <code>AUTH_ENC_KEY</code> is configured.</li>
+<li>[ ] Users have individual accounts.</li>
+<li>[ ] MFA enrollment is enforced for sensitive users.</li>
+<li>[ ] Roles and divisions match job duties.</li>
+<li>[ ] Auditor users cannot mutate records.</li>
+<li>[ ] Redis is not public.</li>
+<li>[ ] Webhook is Caddy-routed, not directly public.</li>
+<li>[ ] Pursuite timestamp validation is required in production.</li>
+<li>[ ] Telegram header secret is enforced.</li>
+<li>[ ] Docker images run as non-root.</li>
+<li>[ ] Audit chain verification passes.</li>
+<li>[ ] Backups include databases, corpus, and secrets volumes.</li>
+<li>[ ] Full regression or curated security suite has been run.</li>
+</ul>
+<h2 id="18-troubleshooting">18. Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Admin action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login returns <code>503</code></td>
+<td>Auth config missing or weak</td>
+<td>Check <code>DASHBOARD_JWT_SECRET</code>, salt, user DB bootstrap.</td>
+</tr>
+<tr>
+<td>Login returns <code>401</code></td>
+<td>Wrong credentials or disabled user</td>
+<td>Reset password or reactivate only after verification.</td>
+</tr>
+<tr>
+<td>User cannot see a page</td>
+<td>ABAC role/division mismatch</td>
+<td>Check role, division, auditor flag, and grants.</td>
+</tr>
+<tr>
+<td>Sensitive action returns step-up error</td>
+<td>TOTP not enrolled or assertion expired</td>
+<td>Enroll/verify TOTP and retry.</td>
+</tr>
+<tr>
+<td>Pursuite returns <code>401</code></td>
+<td>Bad HMAC or timestamp</td>
+<td>Check secret, timestamp header, clock skew.</td>
+</tr>
+<tr>
+<td>Pursuite returns <code>409</code></td>
+<td>Replay detected</td>
+<td>Confirm whether provider retried the same delivery ID.</td>
+</tr>
+<tr>
+<td>Telegram silently drops update</td>
+<td>Header/path secret mismatch or chat not whitelisted</td>
+<td>Re-register webhook and verify <code>TG_USER_WHITELIST</code>.</td>
+</tr>
+<tr>
+<td>Workflow not progressing</td>
+<td>Gate pending, Redis unavailable, or worker down</td>
+<td>Review gate queue, Redis, worker logs.</td>
+</tr>
+<tr>
+<td>Knowledge search is empty</td>
+<td>Corpus not ingested or Chroma unavailable</td>
+<td>Re-ingest and verify Chroma health.</td>
+</tr>
+<tr>
+<td>Docker service cannot write</td>
+<td>Mounted volume ownership mismatch</td>
+<td>Fix ownership for the <code>ttis</code> app user.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="appendix-a-quick-commands">Appendix A - Quick Commands</h2>
+<pre><code class="language-powershell"># Install dependencies
+pip install -r requirements.txt
+
+# Full local verification
+pytest tests/ -v
+
+# Focused security checks
+pytest tests/test_password.py tests/test_stepup_policy.py tests/test_pursuite_integration.py tests/test_telegram_webhook.py -q
+
+# Mutative security harness
+python -m tools.mth --out data/mth
+
+# Compose validation
+docker compose config
+
+# Build hardened images
+docker build -f Dockerfile.dashboard -t ttis-dashboard:hardening-check .
+docker build -f Dockerfile.webhook -t ttis-webhook:hardening-check .
+</code></pre>
+    <section class="footer">
+      <p>Internal Use Only. Generated from TTIS_Admin_User_Guide.md.</p>
+    </section>
+  </main>
+</body>
+</html>

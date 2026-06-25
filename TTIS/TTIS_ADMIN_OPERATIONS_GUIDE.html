@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS Admin &amp; Operations Guide</title>
+</head>
+<body>
+<h1 id="ttis-admin-operations-guide">TTIS Admin &amp; Operations Guide</h1>
+<p><strong>Audience:</strong> TTIS administrators/operators (CEO + ops).
+<strong>Scope:</strong> setup, deploy, configuration, management, and troubleshooting for every TTIS system —
+the VBS backend, the Dashboard, the Field App, GCP/Caddy, the marketing site, the LMS, the RAG
+corpus, and Ask‑LYNNE.
+<strong>Last updated:</strong> 2026‑06‑16.</p>
+<blockquote>
+<p>Conventions used below
+- Commands are PowerShell-friendly on Windows dev boxes; the GCP host is Linux (bash).
+- <code>H:\Projects\…</code> are the local working copies; <code>~/ttis-ai</code> is the repo on the GCP VM.
+- "VBS" = the FastAPI backend (<code>ttis-ai</code>). "Dashboard" = the Next.js app (<code>TTI-S_Dashboard</code>).
+- Anything marked <strong>(verify)</strong> is an expected/observed value — confirm against the live system.</p>
+</blockquote>
+<hr/>
+<h2 id="0-overview-architecture">0. Overview &amp; Architecture</h2>
+<h3 id="01-the-systems-and-where-they-live">0.1 The systems and where they live</h3>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Repo / path</th>
+<th>Stack</th>
+<th>Prod surface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TTI‑VBS</strong> (backend)</td>
+<td><code>H:\Projects\TTI-S_VBS\ttis-ai</code></td>
+<td>Python 3.11, FastAPI</td>
+<td><code>app.tti-solutions.com/api/*</code>, <code>webhook.tti-solutions.com</code></td>
+</tr>
+<tr>
+<td><strong>TTI‑Dashboard</strong> (web UI)</td>
+<td><code>H:\Projects\TTI-S_Dashboard</code></td>
+<td>Next.js 15, TypeScript</td>
+<td><code>app.tti-solutions.com</code></td>
+</tr>
+<tr>
+<td><strong>TTIS Field App</strong></td>
+<td><code>H:\Projects\ttis-field-app</code></td>
+<td>Expo / React Native (native iOS+Android)</td>
+<td>App stores (EAS) — talks to <code>app.tti-solutions.com</code></td>
+</tr>
+<tr>
+<td><strong>Marketing site</strong></td>
+<td><code>ttis-ai\website</code></td>
+<td>Static (Markdown → HTML)</td>
+<td><code>tti-solutions.com</code>, <code>www.…</code></td>
+</tr>
+<tr>
+<td><strong>LMS</strong></td>
+<td>part of VBS (<code>dashboard/lms.py</code>)</td>
+<td>FastAPI module + Dashboard tabs</td>
+<td><code>app.tti-solutions.com</code> (LMS tabs)</td>
+</tr>
+<tr>
+<td><strong>RAG corpus</strong></td>
+<td><code>ttis-ai\data\documents</code> + ChromaDB</td>
+<td>ChromaDB + hybrid BM25</td>
+<td>internal (port 8002)</td>
+</tr>
+<tr>
+<td><strong>Ask‑LYNNE</strong></td>
+<td>part of VBS (<code>dashboard/lynne_*</code>)</td>
+<td>Claude Opus + SSE</td>
+<td><code>app.tti-solutions.com</code> (Ask‑LYNNE tab), Telegram</td>
+</tr>
+</tbody>
+</table>
+<h3 id="02-how-prod-fits-together-single-gcp-vm-caddy-host-routing">0.2 How prod fits together (single GCP VM, Caddy host-routing)</h3>
+<div class="codehilite"><pre><span></span><code>                         ┌──────────── GCP VM: ttis-prod (us-central1-a) ────────────┐
+   Internet  ──DNS──►    │  Caddy (TLS / Let's Encrypt, host-based routing)          │
+                         │    tti-solutions.com / www      → static file_server      │
+   app.tti-solutions.com │    app.tti-solutions.com        → /api/* → dashboard:8000 │
+   www.tti-solutions.com │                                   /*     → frontend:3000  │
+   webhook.tti-…         │    webhook.tti-solutions.com     → webhook:8001           │
+                         │                                                          │
+                         │  docker compose:  dashboard(8000) frontend(3000)          │
+                         │                   webhook(8001) worker  redis(6379)       │
+                         │                   chromadb(8002)  caddy                   │
+                         │  Cloud SQL (Postgres) via DATABASE_URL                    │
+                         └──────────────────────────────────────────────────────────┘
+</code></pre></div>
+<ul>
+<li><strong>COMMAND‑CORE</strong> (<code>orchestration/command_core.py</code>) is a deterministic event→workflow router (not an LLM).</li>
+<li><strong>Agents</strong> (~34, <code>config/agents.yaml</code>) are Claude-backed (Haiku/Sonnet/Opus tiers).</li>
+<li><strong>Execution mode:</strong> <code>inline</code> (dev, in-process) vs <code>queue</code> (prod, Redis + <code>python -m orchestration.worker</code>).</li>
+</ul>
+<h3 id="03-prerequisites-admin-workstation">0.3 Prerequisites (admin workstation)</h3>
+<ul>
+<li>Git, Python 3.11+, Node 20+, Docker Desktop (Compose v2).</li>
+<li>Access: GitHub org <code>TTIScharlesT</code>, the GCP project <code>tti-solutions-ai</code>, the Anthropic console.</li>
+<li>A populated <code>config/.env</code> for the VBS (never committed). See §1.2.</li>
+</ul>
+<hr/>
+<h2 id="1-ttivbs-backend">1. TTI‑VBS (Backend)</h2>
+<h3 id="11-setup">1.1 Setup</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_VBS</span><span class="p">\</span><span class="n">ttis-ai</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span>
+<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-upgrade</span> <span class="n">pip</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+<span class="nb">Copy-Item</span> <span class="n">config</span><span class="p">\.</span><span class="n">env</span><span class="p">.</span><span class="n">template</span> <span class="n">config</span><span class="p">\.</span><span class="n">env</span>   <span class="c"># then edit (see §1.2)</span>
+</code></pre></div>
+<p>Generate the two mandatory secrets:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">-c</span> <span class="s2">"import secrets; print(secrets.token_urlsafe(48))"</span>   <span class="c"># → DASHBOARD_JWT_SECRET (&gt;=32 chars)</span>
+<span class="n">python</span> <span class="n">-c</span> <span class="s2">"import secrets; print(secrets.token_urlsafe(24))"</span>   <span class="c"># → DASHBOARD_PWD_SALT  (&gt;=16 chars)</span>
+</code></pre></div>
+<h3 id="12-configuration-configenv">1.2 Configuration — <code>config/.env</code></h3>
+<p>The full template is <code>config/.env.template</code>. The variables that matter most:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Required</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ANTHROPIC_API_KEY</code></td>
+<td><strong>Yes</strong></td>
+<td>Claude API key (all agents + LYNNE).</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_JWT_SECRET</code></td>
+<td><strong>Yes</strong></td>
+<td>JWT signing key, <strong>≥32 chars</strong>, never a placeholder.</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_PWD_SALT</code></td>
+<td><strong>Yes</strong></td>
+<td>Password hash salt, <strong>≥16 chars</strong>.</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_USERS</code></td>
+<td>first boot</td>
+<td>JSON seed of users (after first boot the <code>auth.db</code> is source of truth).</td>
+</tr>
+<tr>
+<td><code>WORKFLOW_EXECUTION_MODE</code></td>
+<td>prod</td>
+<td><code>inline</code> (dev) or <code>queue</code> (prod).</td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>queue mode</td>
+<td>e.g. <code>redis://localhost:6379/0</code> (<code>redis://redis:6379/0</code> in Docker).</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>prod</td>
+<td>unset → SQLite; <code>postgresql://…</code> → Cloud SQL.</td>
+</tr>
+<tr>
+<td><code>CORS_ALLOW_LIST</code></td>
+<td>web UI</td>
+<td>Must include the Dashboard origin (e.g. <code>https://app.tti-solutions.com</code>).</td>
+</tr>
+<tr>
+<td><code>SCHEDULER_ENABLED</code></td>
+<td>opt‑in</td>
+<td><code>1</code> starts the recurring-job loop (reminders, daily updates). Default <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>SCHEDULER_TZ</code></td>
+<td>opt‑in</td>
+<td>e.g. <code>America/Chicago</code> — daily job times are local.</td>
+</tr>
+<tr>
+<td>Deploy/domains</td>
+<td>prod</td>
+<td><code>APP_DOMAIN</code>, <code>DASHBOARD_PUBLIC_URL</code>, <code>WEBSITE_DOMAIN</code>, <code>ACME_EMAIL</code>, <code>WEBHOOK_DOMAIN</code>, <code>FRONTEND_UPSTREAM</code>.</td>
+</tr>
+<tr>
+<td>Integrations</td>
+<td>optional</td>
+<td><code>PURSUITE_*</code>, <code>DUFFEL_API_TOKEN</code>, <code>GOOGLE_*</code>, <code>GOOGLE_MAPS_API_KEY</code>, <code>TICKETMASTER_API_KEY</code>, <code>SLACK_WEBHOOK_URL</code>, <code>OWNER_EMAIL</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional/unset integration keys <strong>degrade gracefully</strong> — the feature just isn't offered.</p>
+<h3 id="13-run-dev-inline-mode-3-terminals">1.3 Run — dev (inline mode), 3 terminals</h3>
+<div class="codehilite"><pre><span></span><code><span class="c"># 1) Bootstrap (loads .env, inits all SQLite DBs, builds tool + agent registries, COMMAND-CORE)</span>
+<span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span>
+
+<span class="c"># 2) Dashboard API (port 8000)</span>
+<span class="n">uvicorn</span> <span class="n">dashboard</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">127</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">1</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span>
+
+<span class="c"># 3) Webhook receiver (port 8001) — Pursuite CRM + Telegram inbound</span>
+<span class="n">uvicorn</span> <span class="n">tools</span><span class="p">.</span><span class="n">pursuite_webhook</span><span class="p">:</span><span class="n">webhook_app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8001</span>
+</code></pre></div>
+<p><code>python main.py</code> prints a startup banner ending with the service URLs and the two <code>uvicorn</code>
+commands. Health check: <code>curl http://127.0.0.1:8000/health</code> → <code>200</code>.</p>
+<p><strong>One-shot maintenance commands</strong> (don't start a server):</p>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-ingest-docs</span>      <span class="c"># ingest documents into ChromaDB (see §7)</span>
+<span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-verify-chain</span>     <span class="c"># verify the append-only audit hash chain</span>
+<span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-list-gates</span>       <span class="c"># list workflows awaiting a human gate</span>
+<span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-test-pursuite</span>     <span class="c"># test Pursuite CRM connectivity</span>
+</code></pre></div>
+<h3 id="14-run-docker-queue-mode-production-shape">1.4 Run — Docker (queue mode, production shape)</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">docker-compose</span> <span class="n">up</span> <span class="n">-d</span>           <span class="c"># chromadb:8002, redis:6379, dashboard:8000, webhook:8001, worker</span>
+<span class="n">docker-compose</span> <span class="n">logs</span> <span class="o">-f</span>         <span class="c"># tail</span>
+<span class="n">docker-compose</span> <span class="n">up</span> <span class="n">-d</span> <span class="p">-</span><span class="n">-scale</span> <span class="n">worker</span><span class="p">=</span><span class="n">3</span>   <span class="c"># more queue throughput</span>
+<span class="n">docker-compose</span> <span class="n">down</span>            <span class="c"># stop (add -v to wipe volumes)</span>
+</code></pre></div>
+<p>In queue mode the API/webhook enqueue to Redis (<code>queue:workflow_jobs</code>) and the <strong>worker</strong> consumes
+them: <code>python -m orchestration.worker</code>. Inline mode runs the workflow in a background thread (dev
+only — not durable across restarts).</p>
+<blockquote>
+<p><strong>Docker Desktop / WSL2 gotcha — single‑file <code>.env</code> bind mounts.</strong> On Windows, bind‑mounting a
+single file (e.g. <code>./.env:/app/.env</code>) is unreliable: Docker Desktop can create the destination as a
+<strong>directory</strong>, and then <code>runc</code> rejects the mount with
+<code>not a directory: Are you trying to mount a directory onto a file (or vice‑versa)?</code> — typically
+<strong>on restart</strong> of a container that was first created when the mount existed. Fixes:
+- <strong>Prefer <code>env_file:</code></strong> over a single‑file bind mount — it injects the vars with no filesystem mount.
+- If you hit it, <strong>recreate</strong> (don't restart) the container so it picks up the current config:
+  <code>docker compose down --remove-orphans &amp;&amp; docker compose … up -d --force-recreate</code>. Never
+  <code>docker start</code>/<code>restart</code> the stale container — that replays the dead mount.
+- If Docker auto‑created a bogus <strong>directory</strong> at the host <code>.env</code> path, delete it and ensure a real
+  file exists (copy from <code>.env.template</code>) before bringing the stack back up.</p>
+</blockquote>
+<h3 id="15-data-layer">1.5 Data layer</h3>
+<ul>
+<li><strong>SQLite</strong> (dev/Railway) in <code>data/sqlite/</code>: <code>audit.db</code> (append-only, chain-verified — <strong>never disable</strong>),
+  <code>auth.db</code>, <code>state.db</code>, <code>finance*.db</code>, <code>hr.db</code> (PII-guarded), <code>contracts.db</code>, <code>schedule.db</code>,
+  plus domain + safety DBs. Tables are created idempotently on boot.</li>
+<li><strong>PostgreSQL</strong> (prod GCP Cloud SQL) when <code>DATABASE_URL=postgresql://…</code>. <code>db.py</code> adapts placeholders
+  and DDL automatically; no app code changes.</li>
+<li><strong>ChromaDB</strong> (RAG vector store) — <code>data/chroma_db/</code>, container port 8002.</li>
+<li><strong>Redis</strong> — task queue + workflow context + telemetry.</li>
+</ul>
+<h3 id="16-manage">1.6 Manage</h3>
+<ul>
+<li><strong>Scheduler</strong> (<code>orchestration/scheduler_runner.py</code>): set <code>SCHEDULER_ENABLED=1</code> to start the
+  in‑process tick loop. Seeds the CEO daily‑update job (if <code>DAILY_UPDATE_RECIPIENTS</code> is set) and the
+  timecard reminder/supervisor‑digest jobs. Knobs: <code>SCHEDULER_TZ</code>, <code>SCHEDULER_TICK_SECONDS</code>,
+  <code>TIMECARD_REMINDER_INTERVAL_SECONDS</code>, <code>TIMECARD_SUPERVISOR_DIGEST_TIME</code>.</li>
+<li><strong>Agent kill‑switch</strong> (<code>orchestration/agent_flags.py</code>): durable disable/enable per agent, broadcast
+  over Redis; consulted before each agent run.</li>
+<li><strong>Useful scripts</strong> (<code>scripts/</code>): <code>migrate_db_files.py</code>, <code>setup_google_workspace.py</code>,
+  <code>setup_staging_env.py</code>, <code>register_telegram_webhook.py</code>, <code>seed_wizards.py</code>, <code>seed_lms_catalog.py</code>,
+  <code>seed_policy_ack.py</code>, <code>ingest_rag_corpus.py</code>, <code>scaffold_corpus.py</code>, <code>build_agent_guide.py</code>,
+  <code>build_workflow_guide.py</code>, <code>deploy_prod.sh</code>.</li>
+</ul>
+<h3 id="17-test">1.7 Test</h3>
+<div class="codehilite"><pre><span></span><code><span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span> <span class="n">-q</span>          <span class="c"># full suite</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span><span class="n">test_abac_pdp</span><span class="p">.</span><span class="n">py</span> <span class="n">-q</span>   <span class="c"># subset</span>
+</code></pre></div>
+<p>Integration/realtime tests need Redis:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">docker-compose</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">yml</span> <span class="n">up</span> <span class="n">-d</span>         <span class="c"># ephemeral Redis on 6399</span>
+<span class="nv">$env:REDIS_URL</span> <span class="p">=</span> <span class="s2">"redis://localhost:6399/0"</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span><span class="n">test_realtime_integration</span><span class="p">.</span><span class="n">py</span> <span class="n">-q</span>
+<span class="n">docker-compose</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">yml</span> <span class="n">down</span> <span class="n">-v</span>
+</code></pre></div>
+<p>CI (<code>.github/workflows/ci.yml</code>) runs the full guardrail + integration suite on every push/PR with an
+ephemeral Redis, Python 3.11.</p>
+<h3 id="18-user-password-management-localdev">1.8 User &amp; password management (local/dev)</h3>
+<p>Identities live in <code>auth.db</code>. The password hash is <code>sha256(DASHBOARD_PWD_SALT + plaintext)</code> — use the
+<code>users</code> helpers so the salt is applied for you. To reset the tester's password <strong>and</strong> create/refresh
+a <code>charles</code> CEO login:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_VBS</span><span class="p">\</span><span class="n">ttis-ai</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-c</span> <span class="s2">"</span>
+<span class="s2">from dotenv import load_dotenv</span>
+<span class="s2">load_dotenv('config/.env')</span>
+<span class="s2">from dashboard.users import init_users_db, set_password, upsert_user, hash_password, get_user</span>
+<span class="s2">from dashboard.abac import Role</span>
+<span class="s2">init_users_db()</span>
+<span class="s2">PW = 'TTIS-CEO-2026!'</span>
+<span class="s2">print('reset tester (U-TEST):', set_password('U-TEST', PW))</span>
+<span class="s2">upsert_user(user_id='U-001', username='charles', password_sha256=hash_password(PW),</span>
+<span class="s2">            role=Role.parse('ceo'), domain='tti-solutions.com')</span>
+<span class="s2">u = get_user('charles')</span>
+<span class="s2">print('charles present:', bool(u), '| role:', u['role'] if u else None)</span>
+<span class="s2">"</span>
+</code></pre></div>
+<p>(On the prod VM the equivalent runs inside the container with <code>docker exec</code> — see §4.6.)</p>
+<h3 id="19-local-dev-against-the-seeded-db">1.9 Local dev against the seeded DB</h3>
+<p>To exercise the real seeded data end‑to‑end on your workstation:</p>
+<div class="codehilite"><pre><span></span><code><span class="c"># Backend on :8000, loading config/.env explicitly</span>
+<span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_VBS</span><span class="p">\</span><span class="n">ttis-ai</span>
+<span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span>
+<span class="n">uvicorn</span> <span class="n">dashboard</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">127</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">1</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="n">config</span><span class="p">\.</span><span class="n">env</span>
+
+<span class="c"># Frontend on :3000 (separate terminal), then HARD-refresh the browser (Ctrl+F5)</span>
+<span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_Dashboard</span>
+<span class="n">git</span> <span class="n">pull</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">dev</span>          <span class="c"># or: npm run build; npm start</span>
+</code></pre></div>
+<blockquote>
+<p>The <code>--env-file config\.env</code> flag is what loads your keys when starting uvicorn directly (without it
+the backend boots with no secrets and fails closed). After a fresh frontend build, <strong>hard‑refresh</strong>
+to drop the cached bundle or you'll see stale UI.</p>
+</blockquote>
+<h3 id="110-troubleshoot">1.10 Troubleshoot</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Diagnose</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Startup aborts: JWT secret missing/short/placeholder</td>
+<td>the error names the var</td>
+<td>Set a ≥32‑char <code>DASHBOARD_JWT_SECRET</code> (§1.1).</td>
+</tr>
+<tr>
+<td>Backend boots with no auth / 401 everything</td>
+<td>started uvicorn without env</td>
+<td>Add <code>--env-file config\.env</code> (§1.9).</td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError</code></td>
+<td>wrong/own venv not active</td>
+<td><code>.\.venv\Scripts\activate</code>; <code>pip install -r requirements.txt</code>.</td>
+</tr>
+<tr>
+<td>Redis connection refused</td>
+<td><code>redis-cli ping</code> fails</td>
+<td><code>docker-compose up -d redis</code>; check <code>REDIS_URL</code>.</td>
+</tr>
+<tr>
+<td>Workflows enqueue but never run</td>
+<td><code>redis-cli llen queue:workflow_jobs</code> grows</td>
+<td>Start <code>python -m orchestration.worker</code> (or <code>--scale worker</code>).</td>
+</tr>
+<tr>
+<td>Audit chain "tampered"</td>
+<td><code>python main.py --verify-chain</code> reports a break</td>
+<td><strong>Do not disable</strong> — investigate; the chain is inviolable by design.</td>
+</tr>
+<tr>
+<td>403 on all routes</td>
+<td>user/role not provisioned</td>
+<td>Create a user (§1.8); verify ABAC role in <code>auth.db</code>.</td>
+</tr>
+<tr>
+<td>Login fails after salt change</td>
+<td>old hashes no longer match</td>
+<td>Re‑set passwords with the helper (§1.8) — it re‑hashes with the current salt.</td>
+</tr>
+<tr>
+<td>CORS errors from the web UI</td>
+<td>browser console shows blocked origin</td>
+<td>Add the origin to <code>CORS_ALLOW_LIST</code>, restart VBS.</td>
+</tr>
+<tr>
+<td>Port already in use (<code>:8000</code>/<code>:3000</code>/<code>:8081</code>)</td>
+<td>another process holds it</td>
+<td>Kill it — Windows one‑liner in the Appendix.</td>
+</tr>
+<tr>
+<td>LYNNE/agents 429</td>
+<td>Anthropic rate limit</td>
+<td>Auto‑retries with back‑off; raise the org token/min if persistent.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="111-security-regression-testing-mth-pipeline">1.11 Security &amp; regression testing (MTH + pipeline)</h3>
+<p><strong>Mutative Test Harness (MTH, R‑MTH‑01)</strong> — adversarial, in‑process RBAC/auth/injection fuzzing
+(<code>tools/mth/</code>). It mints a JWT per role, fires mutated requests at the app via <code>TestClient</code>, and an
+oracle <strong>grounded in <code>dashboard/abac.py::can()</code></strong> flags any divergence — so it's self‑checking against
+the live policy.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">tools</span><span class="p">.</span><span class="n">mth</span>                  <span class="c"># full run → data/mth/latest.{json,html}</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">tools</span><span class="p">.</span><span class="n">mth</span> <span class="p">-</span><span class="n">-dry-run</span>        <span class="c"># build the plan, send nothing</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">tools</span><span class="p">.</span><span class="n">mth</span> <span class="p">-</span><span class="n">-out</span> <span class="nb">DIR </span>       <span class="c"># write the report elsewhere</span>
+</code></pre></div>
+<p>Strategy groups: Protocol (missing‑auth / forged <code>alg=none</code> / malformed), RBAC (wrong‑role), Structural
+(overpost / remove‑field / empty‑object), Type (coercion / binary), Value (SQLi / XSS / path‑traversal /
+long‑string), Semantic (cross‑entity TTIS↔ROSS_LV), Chaos (1 MB / duplicate), Injection (login SQLi).
+<strong>CRITICAL</strong> findings (<code>AUTH_BYPASS</code>, <code>RBAC_BYPASS</code>, <code>INJECTION_ACCEPTED</code>, <code>OVERPOST_ESCALATION</code>,
+<code>CROSS_ENTITY_LEAK</code>) → exit 1; <code>UNEXPECTED_CRASH</code>/<code>IDEMPOTENCY_VIOLATION</code> (HIGH) and <code>MISSING_VALIDATION</code>
+(LOW) are reported, not blocking. It seeds a real charge code + a timecard advanced through the approval
+chain so write/approval routes hit valid targets. <strong>Add an endpoint = add a <code>Baseline</code> in
+<code>tools/mth/baselines.py</code></strong> (the engine auto‑generates every variant). CI gates on it
+(<code>tests/test_mth_oracle.py</code> + a step that fails on CRITICAL and uploads the report artifact).</p>
+<p><strong>Regression pipeline (R‑REG‑01)</strong> — one command runs the whole suite as ordered phases + the MTH gate
++ a summary report:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">run_regression</span><span class="p">.</span><span class="n">py</span>                 <span class="c"># or:  .\scripts\run-regression.ps1</span>
+<span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">run_regression</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-list</span>          <span class="c"># phases + file assignment</span>
+<span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">run_regression</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-phase</span> <span class="n">auth_identity</span>
+<span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">run_regression</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-skip-realtime</span> <span class="p">-</span><span class="n">-skip-mth</span> <span class="p">-</span><span class="n">-filter</span> <span class="n">timecard</span>
+</code></pre></div>
+<p>14 phases (guardrails, auth_identity, timecards, finance_payroll, field_ops, projects_pm,
+lms_onboarding, lynne_eaa, agents_workflows, wizards, travel, integrations, security, realtime) + the
+MTH harness; the realtime phase auto‑skips when Redis is unreachable. Report → <code>test-results/
+regression-&lt;ts&gt;.txt</code>; exit 0/1. (Plain <code>pytest tests/ -q</code> still works for ad‑hoc runs.)</p>
+<hr/>
+<h2 id="2-ttidashboard-apptti-solutionscom">2. TTI‑Dashboard (<code>app.tti-solutions.com</code>)</h2>
+<h3 id="21-setup">2.1 Setup</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_Dashboard</span>
+<span class="n">npm</span> <span class="n">ci</span>                       <span class="c"># clean install from package-lock (Node 20+)</span>
+<span class="nb">Copy-Item</span> <span class="p">.</span><span class="n">env</span><span class="p">.</span><span class="n">example</span> <span class="p">.</span><span class="n">env</span><span class="p">.</span><span class="n">local</span>   <span class="c"># then edit (see §2.3)</span>
+</code></pre></div>
+<h3 id="22-run-dev">2.2 Run — dev</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">npm</span> <span class="n">run</span> <span class="n">dev</span>                  <span class="c"># http://127.0.0.1:3000  (use 127.0.0.1, not localhost — cookie SameSite)</span>
+</code></pre></div>
+<p>The Dashboard talks to the VBS API at <code>NEXT_PUBLIC_VBS_BASE_URL</code> (dev: <code>http://127.0.0.1:8000</code>).
+The VBS backend's <code>CORS_ALLOW_LIST</code> <strong>must</strong> include the Dashboard origin.</p>
+<h3 id="23-configuration">2.3 Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Dev value</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NEXT_PUBLIC_VBS_BASE_URL</code></td>
+<td><code>http://127.0.0.1:8000</code></td>
+<td>VBS API base (prod: <code>https://app.tti-solutions.com</code>).</td>
+</tr>
+<tr>
+<td><code>NEXT_PUBLIC_APP_URL</code></td>
+<td><code>http://localhost:3000</code></td>
+<td>The app's own public origin.</td>
+</tr>
+<tr>
+<td><code>NEXT_PUBLIC_STEPUP_THRESHOLD_USD</code></td>
+<td><code>100000</code></td>
+<td>Step‑up MFA threshold for high‑value actions.</td>
+</tr>
+<tr>
+<td><code>GOOGLE_CLIENT_ID</code> / <code>GOOGLE_CLIENT_SECRET</code></td>
+<td>optional</td>
+<td>Google OAuth (restricted to <code>tti-solutions.com</code>).</td>
+</tr>
+<tr>
+<td><code>ROLE_MAP</code></td>
+<td>dev/staging</td>
+<td>JSON email→role override until backend supplies role claims.</td>
+</tr>
+<tr>
+<td><code>*_DEMO</code> flags</td>
+<td>dev</td>
+<td>Seed sample data (agents/workflows/finance/etc.) with no backend.</td>
+</tr>
+</tbody>
+</table>
+<p><code>NEXT_PUBLIC_*</code> values are <strong>build‑time</strong> for the prod image (baked by CI); runtime secrets
+(OAuth, OTEL) are injected at container start.</p>
+<h3 id="24-build-test">2.4 Build &amp; test</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">npm</span> <span class="n">run</span> <span class="n">typecheck</span>            <span class="c"># tsc --noEmit</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">lint</span>                 <span class="c"># eslint --max-warnings 0</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">test</span><span class="p">:</span><span class="n">cov</span>             <span class="c"># vitest + coverage (gate: 80% global; 100% on abac/ + finance/)</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">build</span>                <span class="c"># .next/standalone</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">e2e</span>                  <span class="c"># Playwright (desktop / Pixel 7 / tablet)</span>
+</code></pre></div>
+<p>CI (<code>.github/workflows/ci.yml</code>) runs lint → typecheck → test:cov → build → e2e. Do <strong>not</strong> run
+<code>npm audit fix --force</code> (it can downgrade Next.js and break the App Router).</p>
+<p><strong>Smoke‑test against a running VBS backend</strong> (<code>scripts/vbs-smoke*.mjs</code> — pure Node, hits the API over
+HTTP; the backend must be up and reachable at <code>NEXT_PUBLIC_VBS_BASE_URL</code>):</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_Dashboard</span>
+<span class="nv">$env:VBS_SMOKE_USER</span><span class="p">=</span><span class="s2">"charles"</span>
+<span class="nv">$env:VBS_SMOKE_PASS</span><span class="p">=</span><span class="s2">"&lt;your VBS password&gt;"</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">vbs</span><span class="p">:</span><span class="n">smoke</span>                 <span class="c"># full smoke; or a slice: npm run vbs:smoke:timecard / :payroll / :lynne / …</span>
+<span class="nb">Remove-Item</span> <span class="n">Env</span><span class="p">:</span><span class="n">VBS_SMOKE_PASS</span>    <span class="c"># clear the password from the shell when done</span>
+</code></pre></div>
+<p>Slices available: <code>vbs:smoke:v3 / :timecard / :daily-log / :incident / :session / :phase3 / :uam /
+:phase5-obs / :phase4 / :rag / :lynne / :rag-resolver / :agent-mgmt / :history / :payroll</code>.</p>
+<h3 id="25-deploy">2.5 Deploy</h3>
+<ul>
+<li>On every push to <code>main</code>, <code>.github/workflows/ghcr.yml</code> builds and pushes a Docker image to GHCR
+  (<code>ghcr.io/ttischarlest/tti-s_dashboard:latest</code>) with the prod <code>NEXT_PUBLIC_*</code> baked in.</li>
+<li>The VBS deploy script pulls that image onto the GCP VM (<code>docker compose pull frontend</code>) — see §4.</li>
+<li>Local Windows redeploy helper: <code>./scripts/run-redeploy.ps1 [-Ref main] [-Port 3000]</code>.</li>
+</ul>
+<h3 id="26-debugging-a-failing-api-call-in-the-browser-devtools">2.6 Debugging a failing API call in the browser (DevTools)</h3>
+<p>When the UI misbehaves, the fastest diagnosis is to watch the actual request the browser made.</p>
+<p><strong>Open DevTools</strong> (Windows — Chrome/Edge/Firefox):
+- <code>F12</code> (or <code>Ctrl+Shift+I</code>) — DevTools.
+- <code>Ctrl+Shift+J</code> — straight to the <strong>Console</strong>.
+- Firefox <code>Ctrl+Shift+E</code> — straight to <strong>Network</strong>. (Mac: <code>Cmd+Option+I</code>.)</p>
+<p><strong>Capture the failing call:</strong>
+1. <code>F12</code> → <strong>Network</strong> tab.
+2. Click the <strong>Fetch/XHR</strong> filter (hides images/CSS, shows just API calls); optionally type <code>api/v1</code> in the filter box.
+3. Leave DevTools open, then click the panel in the app (or <code>Ctrl+R</code> to reload).
+4. Look for rows in <strong>red</strong> or with a <strong>4xx/5xx</strong> Status — those are the failures.
+5. Click a red row → the <strong>Status</strong> (top of <em>Headers</em>), the <strong>Request URL</strong>, and the <strong>Response</strong> tab tell the story.</p>
+<p>Common reads: a <code>4xx</code>/<code>5xx</code> with no <code>Access-Control-Allow-Origin</code> header → CORS (fix the VBS
+<code>CORS_ALLOW_LIST</code>); <code>401</code> → auth/token; <code>404</code> on a new endpoint → backend not redeployed;
+<code>net::ERR_CONNECTION_REFUSED</code> → wrong <code>NEXT_PUBLIC_VBS_BASE_URL</code> or VBS not running.</p>
+<h3 id="27-troubleshoot">2.7 Troubleshoot</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Diagnose</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API calls fail / blocked (CORS)</td>
+<td>DevTools Network: missing <code>Access-Control-Allow-Origin</code></td>
+<td>Add the Dashboard origin to VBS <code>CORS_ALLOW_LIST</code>, restart VBS.</td>
+</tr>
+<tr>
+<td>Login 401</td>
+<td>DevTools Network: <code>/api/v1/auth/login</code> → 401</td>
+<td>Verify creds; check VBS health.</td>
+</tr>
+<tr>
+<td>New endpoint 404 from the UI</td>
+<td>DevTools Network: <code>404</code> on <code>/api/v1/…</code></td>
+<td>Redeploy backend (GCP §4.4); confirm <code>main</code> is current.</td>
+</tr>
+<tr>
+<td><code>ERR_CONNECTION_REFUSED</code></td>
+<td>wrong base URL / VBS down</td>
+<td>Fix <code>NEXT_PUBLIC_VBS_BASE_URL</code>; start VBS on <code>:8000</code>.</td>
+</tr>
+<tr>
+<td>Coverage gate fails</td>
+<td>vitest report; <code>abac/</code>+<code>finance/</code> &lt;100%</td>
+<td>Add tests; those paths require 100%.</td>
+</tr>
+<tr>
+<td>Old UI after deploy</td>
+<td>browser bundle cache</td>
+<td>Hard refresh (Ctrl/Cmd‑Shift‑R); confirm <code>frontend</code> image was pulled.</td>
+</tr>
+<tr>
+<td>Next downgraded to 9.x</td>
+<td><code>npm audit fix --force</code> was run</td>
+<td>Revert <code>package.json</code>/lock, <code>npm ci</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="3-ttis-field-app">3. TTIS Field App</h2>
+<p>A <strong>standalone native app</strong> (<code>H:\Projects\ttis-field-app</code>, Expo <code>~54</code> / React Native, iOS+Android) —
+<strong>not</strong> a browser page. Per ADR‑0001 a native app was chosen over PWA for reliable push (P1 safety
+alerts) and durable on‑device storage of unsynced DCAA timecards. Crews use the installed app; it is
+a thin client over the <strong>same VBS API</strong> (<code>https://app.tti-solutions.com</code>, set in <code>app.json</code> →
+<code>extra.apiBaseUrl</code>). Scope doc: <code>ttis-ai/docs/MOBILE_FIELD_APP_SCOPE.md</code>.</p>
+<h3 id="31-setup-run-dev">3.1 Setup &amp; run (dev)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">ttis-field-app</span>
+<span class="n">npm</span> <span class="n">install</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">start </span>               <span class="c"># Expo dev server + QR (open in Expo Go)</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">ios</span>                  <span class="c"># iOS simulator</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">android</span>              <span class="c"># Android emulator</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">web</span>                  <span class="c"># react-native-web preview</span>
+</code></pre></div>
+<h3 id="32-what-a-field-user-gets">3.2 What a field user gets</h3>
+<ul>
+<li><strong>Login</strong> with VBS credentials (<code>field_crew</code> role); JWT stored in <code>expo-secure-store</code> (Keychain/Keystore).</li>
+<li><strong>Tabs:</strong> Home, Time, Schedule, Pay, Assistant (FIELDAIDE — a read‑only field agent).</li>
+<li><strong>Submit forms:</strong> timecard, daily log, incident (with tappable body‑map), travel — all exactly‑once
+  (Idempotency‑Key). All reads are server‑scoped to the caller's <code>user_id</code> (a tech only sees their own).</li>
+<li><strong>Backend endpoints:</strong> <code>/api/v1/timecards/summary</code>, <code>/api/v1/payroll/next-payday</code>,
+  <code>/api/v1/schedule/me</code>, <code>/api/v1/field/assistant</code>, <code>/api/v1/projects/assigned</code>, plus the standard
+  <code>/timecards</code>, <code>/daily-logs</code>, <code>/incidents</code>, <code>/travel/requests</code> submits.</li>
+</ul>
+<h3 id="33-build-distribute-eas">3.3 Build &amp; distribute (EAS)</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">npm</span> <span class="n">install</span> <span class="n">-g</span> <span class="n">eas-cli</span>
+<span class="n">eas</span> <span class="n">login</span>
+<span class="n">eas</span> <span class="n">build</span> <span class="p">-</span><span class="n">-platform</span> <span class="n">ios</span>       <span class="c"># → TestFlight</span>
+<span class="n">eas</span> <span class="n">build</span> <span class="p">-</span><span class="n">-platform</span> <span class="n">android</span>   <span class="c"># → Play Internal Testing</span>
+<span class="n">eas</span> <span class="n">update</span>                     <span class="c"># OTA JS update (expo-updates)</span>
+</code></pre></div>
+<blockquote>
+<p>Status: P0 (auth + tab shell + live data) and P1 (submit forms) shipped. Pending: P3 push
+(device registry + mission‑critical inbox) and P4 hardening (offline queue, biometric unlock, EAS pilot).</p>
+</blockquote>
+<h3 id="34-troubleshoot">3.4 Troubleshoot</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Can't reach API in dev</td>
+<td>pointing at prod by default</td>
+<td>App uses <code>app.tti-solutions.com</code>; for local VBS, override <code>extra.apiBaseUrl</code> / <code>lib/config.ts</code>.</td>
+</tr>
+<tr>
+<td>Login fails</td>
+<td>VBS down or wrong role</td>
+<td>Verify VBS health; user must have <code>field_crew</code> role.</td>
+</tr>
+<tr>
+<td>Expo Go won't connect</td>
+<td>phone/PC not same LAN</td>
+<td>Same network, or use a tunnel (<code>expo start --tunnel</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="4-gcp-deploy-domains">4. GCP, Deploy &amp; Domains</h2>
+<h3 id="41-production-host">4.1 Production host</h3>
+<ul>
+<li>GCP project <code>tti-solutions-ai</code>, VM <code>ttis-prod</code> (zone <code>us-central1-a</code>, Ubuntu). Repo at <code>~/ttis-ai</code>.</li>
+<li><strong>Live IP: <code>34.27.180.8</code></strong> (static). <code>dig +short tti-solutions.com @8.8.8.8</code> → <code>34.27.180.8</code>.</li>
+<li>Cloud SQL (Postgres) via <code>DATABASE_URL</code>. Payroll field‑encryption key lives on a <strong>separate</strong>
+<code>/app/secrets</code> volume (never in DB backups), GUI‑rotated.</li>
+<li>Compose for prod is always the <strong>two‑file overlay</strong>: <code>-f docker-compose.yml -f docker-compose.prod.yml</code>.</li>
+<li>Infra/cutover notes: <code>ttis-ai/docs/PRODUCTION_HOSTING.md</code>, <code>ttis-ai/docs/LMS_DEPLOY_AND_SEED_RUNBOOK.md</code>.</li>
+</ul>
+<blockquote>
+<p><strong>⏰ Action by 2026‑08‑01 — Cloud SQL export IAM change.</strong> Google is removing the
+<code>cloudsql.instances.export</code> permission from the <strong>Viewer</strong> (<code>roles/cloudsql.viewer</code>) and legacy
+<strong>Reader</strong> roles. After that date, anyone (or any service account) holding only those roles can no
+longer export the database — via console, <code>gcloud sql export</code>, or the API. If a person or job exports
+the prod DB to Cloud Storage, grant them <strong><code>roles/cloudsql.editor</code></strong> (or a custom role that includes
+<code>cloudsql.instances.export</code>) <strong>before the date</strong>. Automated Cloud SQL <strong>backups are unaffected</strong> —
+this only touches the export‑to‑GCS path, so if you rely solely on managed backups, no action is needed.
+```bash</p>
+<h1 id="who-currently-has-only-viewer-legacy-reader">Who currently has only Viewer / legacy Reader?</h1>
+<p>gcloud projects get-iam-policy tti-solutions-ai --flatten="bindings[].members" \
+  --filter="bindings.role=roles/cloudsql.viewer OR bindings.role=roles/cloudsql.legacyReader" \
+  --format="table(bindings.role, bindings.members)"</p>
+<h1 id="grant-export-capability-to-whoever-needs-it">Grant export capability to whoever needs it:</h1>
+<p>gcloud projects add-iam-policy-binding tti-solutions-ai \
+  --member="user:charles@tti-solutions.com" --role="roles/cloudsql.editor"
+```</p>
+</blockquote>
+<h3 id="42-connect-to-the-prod-vm">4.2 Connect to the prod VM</h3>
+<div class="codehilite"><pre><span></span><code>gcloud<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>project<span class="w"> </span>tti-solutions-ai
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>ttis-prod<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+<span class="nb">cd</span><span class="w"> </span>~/ttis-ai
+</code></pre></div>
+<h3 id="43-deploy-orchestrated-the-safe-default">4.3 Deploy — orchestrated (the safe default)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/ttis-ai
+./scripts/deploy_prod.sh
+</code></pre></div>
+<p>Stages (aborts safely before any cutover if a check fails): <strong>preflight</strong> (docker + required <code>.env</code>
+keys) → <strong>repo sync</strong> (<code>git pull --ff-only</code> — ⚠️ watch the <strong><code>it pull</code> typo</strong>, it silently no‑ops and
+leaves the backend stale) → <strong>Caddyfile validation</strong> (throwaway <code>caddy validate</code> with the domain env,
+incl. <code>WEBHOOK_DOMAIN</code>; a missing one fails validation — fixed in #196) → <strong>build+start</strong> app services
+(website stays live) → <strong>pull frontend</strong> from GHCR (bare <code>up -d</code> reuses cached <code>:latest</code>) →
+<strong>health‑gate</strong> <code>/health</code> → <strong>seed</strong> LMS catalog + policy‑ack (idempotent) → <strong>cutover</strong> Caddy (first
+run provisions Let's Encrypt; port 80 reachable).</p>
+<h3 id="44-deploy-manual-perservice-the-everyday-path">4.4 Deploy — manual per‑service (the everyday path)</h3>
+<p>When you just need to ship the latest <code>main</code> for one service:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Backend (dashboard) — pull + rebuild the image, recreate the container</span>
+git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>main
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build<span class="w"> </span>dashboard
+
+<span class="c1"># Verify the new backend is serving (any 2xx/3xx is "up"; this endpoint is a quick probe)</span>
+curl<span class="w"> </span>-s<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>-w<span class="w"> </span><span class="s2">"%{http_code}\n"</span><span class="w"> </span>localhost:8000/api/v1/projects/timeline
+
+<span class="c1"># Frontend — pull the CI-built GHCR image, recreate the container</span>
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>pull<span class="w"> </span>frontend
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>frontend
+
+<span class="c1"># Force-recreate a service if a config/env change isn't picked up</span>
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--force-recreate<span class="w"> </span>dashboard
+</code></pre></div>
+<blockquote>
+<p>⚠️ <strong>After every RAG ingest you must rebuild the dashboard</strong> (the ingest writes to ChromaDB, but the
+running container won't reflect it until rebuilt) — see §7.5.</p>
+</blockquote>
+<p><strong>Rollback:</strong> <code>docker compose stop caddy &amp;&amp; docker start ttis-web</code>.</p>
+<h3 id="45-postdeploy-verification-precheck">4.5 Post‑deploy verification &amp; precheck</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># DNS resolves to the prod IP</span>
+dig<span class="w"> </span>+short<span class="w"> </span>tti-solutions.com<span class="w"> </span>@8.8.8.8<span class="w">                 </span><span class="c1"># → 34.27.180.8</span>
+
+<span class="c1"># Edge / TLS (run from anywhere)</span>
+curl<span class="w"> </span>-sI<span class="w"> </span>https://tti-solutions.com/<span class="w">                   </span><span class="c1"># 200, Server: Caddy</span>
+curl<span class="w"> </span>-sI<span class="w"> </span>https://www.tti-solutions.com/<span class="w">               </span><span class="c1"># 301 → https://tti-solutions.com</span>
+curl<span class="w"> </span>-sI<span class="w"> </span>https://app.tti-solutions.com/<span class="w">               </span><span class="c1"># 307 → /vbs   (dashboard root redirects)</span>
+curl<span class="w"> </span>-sI<span class="w"> </span>https://app.tti-solutions.com/api/v1/health<span class="w">  </span><span class="c1"># API health</span>
+
+<span class="c1"># On the VM — container health (ttis-dashboard should read "(healthy)")</span>
+docker<span class="w"> </span>ps<span class="w"> </span>--format<span class="w"> </span><span class="s1">'table {{.Names}}\t{{.Status}}'</span>
+
+<span class="c1"># On the VM — certificate provisioning / renewal</span>
+docker<span class="w"> </span>logs<span class="w"> </span>ttis-caddy<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-iE<span class="w"> </span><span class="s1">'certificate obtained|obtaining|error'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
+
+<span class="c1"># On the VM — are any users provisioned? 0 ⇒ seed/create one (see §4.6), then restart dashboard</span>
+grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">'^DASHBOARD_USERS='</span><span class="w"> </span>config/.env
+<span class="c1"># if 0:</span>
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>dashboard
+</code></pre></div>
+<h3 id="46-create-a-login-on-prod-on-the-vm">4.6 Create a login on prod (on the VM)</h3>
+<p>User identities live in <code>auth.db</code> (not <code>.env</code> after first boot). Create/upsert a CEO login in place —
+the password hash is <code>sha256(DASHBOARD_PWD_SALT + plaintext)</code>:</p>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">NU</span><span class="o">=</span><span class="s1">'charles'</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">NP</span><span class="o">=</span><span class="s1">'ChangeThisPassword'</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span>
+<span class="s2">import os, hashlib</span>
+<span class="s2">from dashboard import users</span>
+<span class="s2">from dashboard.abac import Role</span>
+<span class="s2">users.init_users_db()</span>
+<span class="s2">pw = hashlib.sha256((os.environ['DASHBOARD_PWD_SALT'] + os.environ['NP']).encode()).hexdigest()</span>
+<span class="s2">users.upsert_user(user_id='U-001', username=os.environ['NU'], password_sha256=pw,</span>
+<span class="s2">                  role=Role.CEO, domain='tti-solutions.com')</span>
+<span class="s2">print('created user:', os.environ['NU'], '(role ceo)')</span>
+<span class="s2">"</span>
+<span class="c1"># → created user: charles (role ceo)</span>
+</code></pre></div>
+<p>Pass the password via the <code>-e NP=</code> env (don't bake it into the command history where avoidable), and
+change it on first login.</p>
+<h3 id="47-caddy-domain-routing-configcaddyfile">4.7 Caddy &amp; domain routing (<code>config/Caddyfile</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Routes to</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tti-solutions.com</code></td>
+<td>static <code>file_server</code> (the built <code>website/www</code>)</td>
+<td>marketing apex</td>
+</tr>
+<tr>
+<td><code>www.tti-solutions.com</code></td>
+<td><code>301</code> → apex</td>
+<td>canonical redirect</td>
+</tr>
+<tr>
+<td><code>app.tti-solutions.com</code></td>
+<td><code>/api/*,/health,/workflows/*,…</code> → <code>dashboard:8000</code>; else → <code>frontend:3000</code></td>
+<td><code>flush_interval -1</code> keeps SSE/WS (Ask‑LYNNE) unbuffered</td>
+</tr>
+<tr>
+<td><code>webhook.tti-solutions.com</code></td>
+<td><code>webhook:8001</code></td>
+<td>Pursuite + Telegram inbound; DNS must point here</td>
+</tr>
+</tbody>
+</table>
+<p>Validate after any edit:</p>
+<div class="codehilite"><pre><span></span><code>caddy<span class="w"> </span>validate<span class="w"> </span>--config<span class="w"> </span>config/Caddyfile<span class="w"> </span>--adapter<span class="w"> </span>caddyfile<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">APP_DOMAIN</span><span class="o">=</span>app.tti-solutions.com<span class="w"> </span>-e<span class="w"> </span><span class="nv">WEBSITE_DOMAIN</span><span class="o">=</span>tti-solutions.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">ACME_EMAIL</span><span class="o">=</span>admin@tti-solutions.com<span class="w"> </span>-e<span class="w"> </span><span class="nv">FRONTEND_UPSTREAM</span><span class="o">=</span>frontend:3000<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">WEBHOOK_DOMAIN</span><span class="o">=</span>webhook.tti-solutions.com
+</code></pre></div>
+<h3 id="48-staging">4.8 Staging</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">setup_staging_env</span><span class="p">.</span><span class="n">py</span>        <span class="c"># writes config/.env.staging + 5 test logins (--force to regen)</span>
+<span class="c"># set ANTHROPIC_API_KEY in config/.env.staging, then:</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">-p</span> <span class="n">ttis-staging</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">yml</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">staging</span><span class="p">.</span><span class="n">yml</span> <span class="n">up</span> <span class="n">-d</span>
+</code></pre></div>
+<p>Staging runs on shifted host ports (dashboard <code>8100</code>, webhook <code>8101</code>, redis <code>6380</code>, chromadb <code>8102</code>)
+with isolated volumes — it never touches dev <code>:8000</code>. Logins e.g. <code>staging_admin</code> / <code>Staging!CEO#2026</code>.</p>
+<h3 id="49-troubleshoot-prod">4.9 Troubleshoot (prod)</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Diagnose</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deploy aborts at Caddy validation</td>
+<td>re‑read the validate error; usually a domain var</td>
+<td>Set <code>WEBHOOK_DOMAIN</code>/<code>APP_DOMAIN</code>/… in <code>config/.env</code>; re‑run.</td>
+</tr>
+<tr>
+<td>New UI not visible after deploy</td>
+<td><code>docker inspect ttis-frontend --format '{{.Image}}'</code> vs GHCR digest; browser cache</td>
+<td><code>docker compose -f … -f docker-compose.prod.yml pull frontend &amp;&amp; … up -d frontend</code>; hard‑refresh (Ctrl/Cmd‑Shift‑R).</td>
+</tr>
+<tr>
+<td>New backend endpoints 404</td>
+<td><code>git -C ~/ttis-ai log -1 --oneline</code> (is <code>main</code> current?)</td>
+<td><code>git pull --ff-only origin main</code> (beware <code>it pull</code>), then <code>… up -d --build dashboard</code>.</td>
+</tr>
+<tr>
+<td>RAG results stale after ingest</td>
+<td>ingest ran but dashboard not rebuilt</td>
+<td>Rebuild: <code>… up -d --build dashboard</code> (see §7.5).</td>
+</tr>
+<tr>
+<td><code>app.tti-solutions.com</code> not 307→/vbs</td>
+<td>dashboard down / unhealthy</td>
+<td><code>docker ps</code> → check <code>ttis-dashboard (healthy)</code>; <code>docker logs ttis-dashboard --tail 80</code>.</td>
+</tr>
+<tr>
+<td>Login fails for everyone / 0 users</td>
+<td><code>grep -c '^DASHBOARD_USERS=' config/.env</code> = 0 and <code>auth.db</code> empty</td>
+<td>Create a user (§4.6); restart dashboard.</td>
+</tr>
+<tr>
+<td>TLS cert errors on first cutover</td>
+<td><code>docker logs ttis-caddy 2&gt;&amp;1 \| grep -iE 'obtain\|error'</code></td>
+<td>Open ports 80/443 to the VM; wait for ACME challenge; re‑try.</td>
+</tr>
+<tr>
+<td>Site serves old Squarespace / wrong IP</td>
+<td><code>dig +short tti-solutions.com @8.8.8.8</code> ≠ <code>34.27.180.8</code></td>
+<td>Repoint DNS A records to <code>34.27.180.8</code>; lower TTL ahead of changes.</td>
+</tr>
+<tr>
+<td>Container unhealthy after deploy</td>
+<td><code>docker logs &lt;name&gt; --tail 120</code>; check <code>.env</code> keys, Redis/Cloud SQL reachability</td>
+<td>Fix the missing env/dependency; <code>… up -d --force-recreate &lt;svc&gt;</code>.</td>
+</tr>
+<tr>
+<td>Worker not draining jobs</td>
+<td><code>docker logs ttis-worker --tail 80</code>; <code>redis-cli llen queue:workflow_jobs</code></td>
+<td>Restart worker; ensure <code>WORKFLOW_EXECUTION_MODE=queue</code> + <code>REDIS_URL</code> correct.</td>
+</tr>
+<tr>
+<td>Need to roll back the edge</td>
+<td>—</td>
+<td><code>docker compose stop caddy &amp;&amp; docker start ttis-web</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="410-publish-a-confidential-corpus-doc-to-prod-eg-the-foundercompany-fact-sheet">4.10 Publish a confidential corpus doc to prod (e.g. the founder/company fact sheet)</h3>
+<p><code>corp_confidential</code> corpus docs (the founder/company <strong>fact sheet</strong>, sensitive org docs) are <strong>gitignored
+by design</strong> — they never go to GitHub or the name‑scrubbed public corpus. So they ride to prod
+<strong>separately</strong> from the code, then get ingested + the dashboard rebuilt so LYNNE / the RESEARCHER agent
+ground on them. (The ingest handles <code>.md</code>, <code>.docx</code>, and <code>.pdf</code> in <code>corp_confidential</code>.)</p>
+<p><strong>Environment facts that bite (verified 2026‑06‑17):</strong>
+- GCP project is <strong><code>tti-solutions-ai</code></strong> (not <code>ttis-ai</code> — that's a different, empty project). VM <code>ttis-prod</code>, zone <code>us-central1-a</code>.
+- You SSH in as <strong><code>echar</code></strong>, but the app is deployed under user <strong><code>charles</code></strong> at <strong><code>/home/charles/ttis-ai</code></strong> (your <code>~</code> is <code>/home/echar</code>, which has <em>no</em> repo). So git/docker run as <code>charles</code>, and file ops into the repo need <code>sudo</code>.
+- The confidential dir is <strong><code>data/documents/corp_confidential/</code></strong> — <strong>not</strong> <code>…/library/corp_confidential/</code>. The ingest globs <code>…/corp_confidential/**/*.md</code> and the container mounts <code>./data/documents:/app/data/documents:ro</code>, so a file under a <code>library/</code> subdir is silently skipped.
+- The ingest script is <strong>baked into the dashboard image</strong> (only <code>data/documents</code> is mounted, not <code>scripts/</code>). So you <strong>must <code>build dashboard</code> <em>before</em> ingesting</strong> or an older image runs the old script (e.g. one with no <code>.md</code> support).
+- On Windows, <code>gcloud compute scp</code> shells out to PuTTY's <code>pscp</code>, which reads a <code>H:\…</code> source as a <em>remote</em> host (the drive‑letter colon). <strong><code>cd</code> into the file's folder and pass the bare filename.</strong> Close the file in any editor first (an Office <code>~$…</code> lock → "Cannot open file").</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 0) (on the VM, as echar) make the real target dir, owned by charles</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>ttis-prod<span class="w"> </span>--project<span class="o">=</span>tti-solutions-ai<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+sudo<span class="w"> </span>install<span class="w"> </span>-d<span class="w"> </span>-o<span class="w"> </span>charles<span class="w"> </span>-g<span class="w"> </span>charles<span class="w"> </span>/home/charles/ttis-ai/data/documents/corp_confidential
+
+<span class="c1"># 1) (LOCAL, new PowerShell window — the SSH session holds the other) copy the gitignored doc to /tmp.</span>
+<span class="c1">#    cd into the folder so pscp doesn't treat the H: drive letter as a remote host.</span>
+<span class="c1">#    &gt;&gt;&gt; run on your workstation, not the VM &lt;&lt;&lt;</span>
+<span class="c1">#    cd H:\Projects\TTI-S_VBS\ttis-ai\data\documents\corp_confidential</span>
+<span class="c1">#    gcloud compute scp FOUNDER_COMPANY_FACT_SHEET.md ttis-prod:/tmp/ \</span>
+<span class="c1">#        --project=tti-solutions-ai --zone=us-central1-a</span>
+
+<span class="c1"># 2) (on the VM, as echar) move it into the repo with charles ownership</span>
+sudo<span class="w"> </span>install<span class="w"> </span>-o<span class="w"> </span>charles<span class="w"> </span>-g<span class="w"> </span>charles<span class="w"> </span>-m<span class="w"> </span><span class="m">644</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/tmp/FOUNDER_COMPANY_FACT_SHEET.md<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>/home/charles/ttis-ai/data/documents/corp_confidential/
+
+<span class="c1"># 3) (on the VM) switch to the charles user — owns the repo + can run docker/git</span>
+sudo<span class="w"> </span>-u<span class="w"> </span>charles<span class="w"> </span>-H<span class="w"> </span>bash<span class="w"> </span>-l
+<span class="nb">cd</span><span class="w"> </span>~/ttis-ai
+git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>main<span class="w">                                  </span><span class="c1"># get the .md‑capable ingest script</span>
+<span class="nv">C</span><span class="o">=</span><span class="s2">"docker compose -f docker-compose.yml -f docker-compose.prod.yml"</span>
+<span class="nv">$C</span><span class="w"> </span>build<span class="w"> </span>dashboard<span class="w">                                              </span><span class="c1"># re‑bake the new ingest script INTO the image</span>
+<span class="nv">$C</span><span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--no-deps<span class="w"> </span>dashboard<span class="w"> </span>python<span class="w"> </span>scripts/ingest_rag_corpus.py<span class="w">   </span><span class="c1"># ingest → live chromadb</span>
+<span class="c1">#   look for:  corp_confidential   FOUNDER_COMPANY_FACT_SHEET.md → N chunks (md)</span>
+<span class="nv">$C</span><span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>dashboard<span class="w">                                              </span><span class="c1"># restart on the rebuilt image</span>
+</code></pre></div>
+<blockquote>
+<p>Verify: ask LYNNE a question only the sheet answers (e.g. <em>"what year was TTIS founded?"</em> → 2026, or
+<em>"TTIS's initial commercial area of emphasis?"</em> → data center infrastructure). LYNNE cites it as a
+<code>REF‑n</code> source. <code>corp_confidential</code> is CEO‑only and <strong>not</strong> name‑scrubbed, so personal facts are
+preserved. See the <strong>Corpus &amp; RAG</strong> tab for the full ingest reference.</p>
+<p>Notes: if <code>git pull</code> reports a dirty tree (an older root‑owned <code>ingest_rag_corpus.py</code>), <code>git stash</code>
+first. If <code>docker</code> says <code>permission denied … docker.sock</code> even as <code>charles</code>, prefix the <code>$C</code> commands
+with <code>sudo</code>. Chroma is a separate persisted service and the dashboard queries it live, so the ingest
+alone makes the doc searchable — the <code>up -d dashboard</code> just rolls onto the rebuilt image.</p>
+</blockquote>
+<hr/>
+<h2 id="5-marketing-site-wwwtti-solutionscom">5. Marketing Site (<code>www.tti-solutions.com</code>)</h2>
+<p>Pure static site built from Markdown — no server, no framework. Source in <code>ttis-ai/website/</code>.</p>
+<h3 id="51-build-produce-the-committed-www">5.1 Build (produce the committed <code>www/</code>)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_VBS</span><span class="p">\</span><span class="n">ttis-ai</span><span class="p">\</span><span class="n">website</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">python</span> <span class="n">build</span><span class="p">.</span><span class="n">py</span>              <span class="c"># content/*.md (+ templates/base.html) → www/*.html, copies static/</span>
+</code></pre></div>
+<h3 id="52-preview-locally">5.2 Preview locally</h3>
+<p>Run the dev server <strong>from the repo root</strong> (not from <code>website/</code>):</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">TTI-S_VBS</span><span class="p">\</span><span class="n">ttis-ai</span>
+<span class="n">py</span> <span class="n">website</span><span class="p">\</span><span class="n">serve</span><span class="p">.</span><span class="n">py</span> <span class="n">8745</span>
+</code></pre></div>
+<p>Open <a href="http://localhost:8745/">http://localhost:8745/</a>. It <strong>rebuilds on each page navigation</strong>, so after editing
+<code>content/*.md</code>, <code>templates/</code>, or <code>static/</code> just <strong>refresh</strong> the browser. <code>Ctrl+C</code> stops it.</p>
+<p><strong>Restart cleanly</strong> (free the port first, then start):</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">Get-NetTCPConnection</span> <span class="n">-LocalPort</span> <span class="n">8745</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span> <span class="p">|</span>
+  <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">OwningProcess</span> <span class="n">-Unique</span> <span class="p">|</span>
+  <span class="k">ForEach</span><span class="n">-Object</span> <span class="p">{</span> <span class="nb">Stop-Process</span> <span class="n">-Id</span> <span class="nv">$_</span> <span class="n">-Force</span> <span class="p">}</span>
+<span class="n">py</span> <span class="n">website</span><span class="p">\</span><span class="n">serve</span><span class="p">.</span><span class="n">py</span> <span class="n">8745</span>
+</code></pre></div>
+<h3 id="53-edit-content">5.3 Edit content</h3>
+<ul>
+<li>Pages are <code>website/content/*.md</code> with YAML front matter (<code>title</code>, <code>slug</code>, <code>nav_order</code>,
+  <code>description</code>, <code>hero_*</code>, …). Layout helpers: <code>::: grid cols-3 …</code>, <code>::: card</code>, <code>::: cta-panel</code>.</li>
+<li>Add a page = add a <code>content/&lt;slug&gt;.md</code> with <code>nav_order</code>, run <code>build.py</code>, commit the rebuilt <code>www/</code>.</li>
+<li><strong>Before publishing</strong>, fill placeholders — see <code>website/PLACEHOLDERS.md</code> (CAGE, UEI, phone, email,
+  capability‑statement PDF, Formspree endpoint). Check none remain:
+  <code>grep -rn "\[\[" website/content website/templates</code>.</li>
+</ul>
+<h3 id="54-production">5.4 Production</h3>
+<p>Caddy serves the pre‑built <code>www/</code> via <code>file_server</code> on the apex; <code>www.</code> 301‑redirects to it. The
+site migrated off Squarespace — deploy is just rebuilding <code>www/</code> and shipping it with the stack (§4).</p>
+<h3 id="55-troubleshoot">5.5 Troubleshoot</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Diagnose</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>serve.py</code> errors / no pages</td>
+<td>run from <code>website/</code> instead of repo root</td>
+<td>Run <code>py website\serve.py 8745</code> from the <strong>repo root</strong>.</td>
+</tr>
+<tr>
+<td>Port 8745 already in use</td>
+<td>another <code>serve.py</code> still running</td>
+<td>Free the port (the restart recipe in §5.2), then start again.</td>
+</tr>
+<tr>
+<td>Edits not showing</td>
+<td>browser cached the page</td>
+<td>It rebuilds per navigation — <strong>refresh</strong>; hard‑refresh (Ctrl+F5) if needed.</td>
+</tr>
+<tr>
+<td>Build fails: <code>No module named markdown</code></td>
+<td>deps not installed</td>
+<td><code>pip install -r website/requirements.txt</code>.</td>
+</tr>
+<tr>
+<td>Placeholders visible on the live site</td>
+<td><code>[[…]]</code> tokens not filled</td>
+<td><code>grep -rn "\[\[" website/content website/templates</code>; fill per <code>website/PLACEHOLDERS.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="6-lms">6. LMS</h2>
+<p>The LMS is a VBS module (<code>dashboard/lms.py</code>, <code>dashboard/lms_db.py</code>) surfaced through the Dashboard's
+LMS tabs (Courses, Review, Enrollments, Credentials, Escalations). Architecture/schema:
+<code>docs/LMS_QMS_ARCHITECTURE.md</code>; scope/decisions: <code>docs/LMS_SCOPE.md</code>.</p>
+<h3 id="61-seed-the-catalog-idempotent">6.1 Seed the catalog (idempotent)</h3>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>scripts/seed_lms_catalog.py<span class="w">            </span><span class="c1"># seed if empty</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>scripts/seed_lms_catalog.py<span class="w"> </span>--force<span class="w">    </span><span class="c1"># re-apply (conflict-tolerant)</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>scripts/seed_lms_catalog.py<span class="w"> </span>--print<span class="w">    </span><span class="c1"># emit dialect SQL (pipe to psql)</span>
+</code></pre></div>
+<p>Seeds courses, rubrics, certifications, curricula, the role→cert matrix, and registered competencies.
+Dialect‑portable (SQLite <code>INSERT OR IGNORE</code> / Postgres <code>ON CONFLICT DO NOTHING</code>). <code>deploy_prod.sh</code>
+runs this automatically.</p>
+<h3 id="62-policyacknowledgment-course-rack0102">6.2 Policy‑acknowledgment course (R‑ACK‑01/02)</h3>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>scripts/seed_policy_ack.py
+</code></pre></div>
+<p>Creates the <code>POL-ACK</code> course: a module + attestation quiz per company policy letter, plus a
+<strong>comprehension read‑gate</strong> for policies that have a question bank
+(<code>scripts/policy_lessons/comprehension_banks.json</code>): <strong>5 random questions, 80% to pass</strong>; on fail the
+learner re‑reads and gets a different 5; <strong>3 failures lock the quiz and escalate to a supervisor</strong>.
+Earns <code>CERT-POLACK</code> (365‑day). Idempotent (skips if <code>POL-ACK</code> exists).</p>
+<p><strong>Supervisor escalation / reset:</strong>
+- List open escalations: <code>GET /api/v1/lms/quiz-escalations?status=open</code> (also the <strong>Escalations</strong> tab).
+- Reset a locked learner: <code>POST /api/v1/lms/enrollments/{enrollment_id}/quizzes/{quiz_id}/reset-lock</code>.</p>
+<h3 id="63-verify-the-lms-is-live">6.3 Verify the LMS is live</h3>
+<ul>
+<li>After deploy/seed: the Dashboard <strong>Courses</strong> tab lists courses; the <strong>Review</strong> tab is present; a
+  learner can open <code>POL-ACK</code>. If Courses is empty → run the catalog seed (§6.1). If the UI looks old →
+  confirm the frontend image was pulled and hard‑refresh.</li>
+</ul>
+<h3 id="64-corpus-for-the-lms">6.4 Corpus for the LMS</h3>
+<p>LMS authoring content is grounded in the same RAG corpus (the <code>policies</code> + <code>corp_confidential</code>
+collections) — see <strong>§7</strong>. The LMS authoring agent (P4b) drafts lessons grounded in the <strong>approved</strong>
+corpus and stages them through a three‑stage gate (competent reviewer → CEO release); it is unblocked
+once the policy <code>.docx</code> set is signed and ingested. Authoring guidance:
+<code>docs/templates/CORPUS_AUTHORING_GUIDE.md</code>; coverage: <code>docs/LMS_CORPUS_COVERAGE_CHECKLIST.md</code>.</p>
+<hr/>
+<h2 id="7-corpus-rag-ingestion-vbs-lms">7. Corpus &amp; RAG Ingestion (VBS + LMS)</h2>
+<p>The RAG corpus grounds agent answers, LYNNE, and LMS authoring. Storage is <strong>ChromaDB</strong> (port 8002,
+<code>data/chroma_db/</code>) with <strong>hybrid retrieval</strong> (vector embeddings <code>all-MiniLM-L6-v2</code> + BM25, fused by
+reciprocal‑rank). Query layer: <code>dashboard/rag.py</code> (access is enforced server‑side by ABAC capability).</p>
+<h3 id="71-collections">7.1 Collections</h3>
+<table>
+<thead>
+<tr>
+<th>Collection</th>
+<th>Source</th>
+<th>Visibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>far_dfars</code></td>
+<td>FAR/DFARS DITA‑HTML (<code>H:/Projects/Library/FARHTML</code>, <code>DFARSHTML</code>)</td>
+<td>all (name‑scrubbed)</td>
+</tr>
+<tr>
+<td><code>sdvosb_regs</code></td>
+<td>13 CFR Part 128 PDF (<code>H:/Projects/Library/…</code>)</td>
+<td>all (name‑scrubbed)</td>
+</tr>
+<tr>
+<td><code>policies</code></td>
+<td><code>data/documents/policies/**/*.docx</code> (+ allow‑listed <code>.xlsx</code>)</td>
+<td>all (name‑scrubbed)</td>
+</tr>
+<tr>
+<td><code>corp_confidential</code></td>
+<td><code>data/documents/corp_confidential/**</code></td>
+<td>CEO‑only (not scrubbed)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-where-corpus-files-go">7.2 Where corpus files go</h3>
+<div class="codehilite"><pre><span></span><code>ttis-ai/data/documents/
+  policies/                 → policies collection (TTIS policy .docx, curriculum subfolders)
+    Compliance/ Quality/ Safety/ Technical/ Travel/ curriculum/…
+  corp_confidential/        → corp_confidential collection (CEO-only, not scrubbed)
+</code></pre></div>
+<p>Authoring a TTIS interpretive <code>.docx</code>: structure per <code>docs/templates/CORPUS_AUTHORING_GUIDE.md</code>
+(Policy Number header, numbered Heading‑1 sections). <strong>Do not</strong> paste verbatim OSHA/TIA/NEC/BICSI
+text (copyright wall) — those are external/attested credentials.</p>
+<h3 id="73-ingest-idempotent">7.3 Ingest (idempotent)</h3>
+<p>The canonical run (throwaway container writing to the shared <code>ttis-chromadb</code>):</p>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--no-deps<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">CHROMA_HOST</span><span class="o">=</span>ttis-chromadb<span class="w"> </span>-e<span class="w"> </span><span class="nv">CHROMA_PORT</span><span class="o">=</span><span class="m">8000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">"H:/Projects/Library:/library:ro"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">"H:/Projects/TTI-S_VBS/ttis-ai/data/documents:/app/data/documents:ro"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">"H:/Projects/TTI-S_VBS/ttis-ai/tools:/app/tools:ro"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">"H:/Projects/TTI-S_VBS/ttis-ai/dashboard:/app/dashboard:ro"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="s2">"H:/Projects/TTI-S_VBS/ttis-ai/scripts:/app/scripts:ro"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>dashboard<span class="w"> </span>python<span class="w"> </span>scripts/ingest_rag_corpus.py
+</code></pre></div>
+<p>(Local non‑Docker equivalent: <code>python main.py --ingest-docs</code>.) Output logs per collection, e.g.
+<code>policies  120 sections → 980 chunks ingested</code> and a final total across collections.</p>
+<p><strong>Idempotent / re‑ingest:</strong> chunk IDs are deterministic (<code>source_ref#chunk</code>), so re‑running upserts
+in place — changed text gets new embeddings, unchanged chunks are silent overwrites. To update: edit
+the source doc, re‑run the same command. (Deleted docs leave orphan chunks until cleaned via the
+ChromaDB API.) FAR and DFARS share <code>far_dfars</code>, so always ingest in one pass.</p>
+<p>Custom paths via env: <code>RAG_LIBRARY_DIR</code> (default <code>/library</code>), <code>RAG_DOCS_DIR</code> (default
+<code>/app/data/documents</code>), <code>CHROMA_HOST</code>/<code>CHROMA_PORT</code>.</p>
+<h3 id="74-ingest-on-prod-background-the-mandatory-rebuild">7.4 Ingest on prod (background) + the mandatory rebuild</h3>
+<p>On the VM the corpus library is <strong>inside the container</strong> at <code>/app/data/documents/library</code>. Run the
+ingest detached (it's long‑running) and watch the log:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Start the full ingest in the background</span>
+nohup<span class="w"> </span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">RAG_LIBRARY_DIR</span><span class="o">=</span>/app/data/documents/library<span class="w"> </span>ttis-dashboard<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>python<span class="w"> </span>scripts/ingest_rag_corpus.py<span class="w"> </span>&gt;<span class="w"> </span>~/ingest.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
+
+tail<span class="w"> </span>-f<span class="w"> </span>~/ingest.log<span class="w">                     </span><span class="c1"># watch progress (Ctrl-C to stop watching)</span>
+tail<span class="w"> </span>-n<span class="w"> </span><span class="m">15</span><span class="w"> </span>~/ingest.log<span class="w">                  </span><span class="c1"># last lines</span>
+pgrep<span class="w"> </span>-af<span class="w"> </span>ingest_rag_corpus<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span>grep<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"ingest finished"</span>
+</code></pre></div>
+<p>Ingest a <strong>single collection</strong> (e.g. re‑load the SDVOSB CFR PDF) without a full run:</p>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"from tools.rag_ingest import load_cfr_pdf; from dashboard.rag import chunk_sections, ingest_chunks; s=list(load_cfr_pdf('/app/data/documents/library/13 CFR Part 125.pdf','13 CFR Part 125')); print('sdvosb_regs:', ingest_chunks('sdvosb_regs', chunk_sections(s,'sdvosb_regs')), 'chunks')"</span>
+</code></pre></div>
+<h3 id="75-rebuild-the-dashboard-after-every-ingest">7.5 Rebuild the dashboard after EVERY ingest</h3>
+<p>Ingest writes to ChromaDB, but the running dashboard caches its retrievers and won't serve the new
+corpus until rebuilt:</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/ttis-ai<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>pull<span class="w"> </span>--ff-only<span class="w"> </span>origin<span class="w"> </span>main
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.prod.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build<span class="w"> </span>dashboard
+</code></pre></div>
+<h3 id="76-verify">7.6 Verify</h3>
+<p>After ingest <strong>and</strong> the rebuild, run a RAG search from the Dashboard <strong>Knowledge</strong> tab (or the
+LYNNE/agent path) and confirm citations resolve to the new sections.</p>
+<hr/>
+<h2 id="8-asklynne">8. Ask‑LYNNE</h2>
+<p>LYNNE is the CEO‑facing conversational EAA (Claude Opus), with grounded RAG citations, tool use, and
+propose→confirm workflow initiation. Code: <code>dashboard/lynne_stream.py</code> (orchestrator),
+<code>dashboard/lynne_tools.py</code>, <code>dashboard/lynne_actions.py</code>, <code>dashboard/lynne_projects.py</code>.</p>
+<h3 id="81-access">8.1 Access</h3>
+<ul>
+<li><strong>Dashboard:</strong> the <strong>Ask‑LYNNE</strong> tab (streaming chat + citations).</li>
+<li><strong>SSE endpoint:</strong> <code>POST /api/v1/lynne/stream</code> (events: <code>start</code>, <code>citations</code>, <code>token…</code>, <code>done</code>).</li>
+<li><strong>Telegram:</strong> the LYNNE bot (same backend via the webhook receiver).</li>
+</ul>
+<h3 id="82-configuration-env">8.2 Configuration (env)</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LYNNE_ALLOWED_PRINCIPALS</code></td>
+<td>unset</td>
+<td>Allow‑list of principals (opt‑in restriction).</td>
+</tr>
+<tr>
+<td><code>LYNNE_WEB_SEARCH</code></td>
+<td><code>1</code></td>
+<td>Live web search tool.</td>
+</tr>
+<tr>
+<td><code>LYNNE_PROJECTS</code></td>
+<td><code>1</code></td>
+<td>GRID executive‑project tools.</td>
+</tr>
+<tr>
+<td><code>LYNNE_MEMORY</code></td>
+<td><code>1</code></td>
+<td>Rich cross‑turn memory (recall earlier research/docs).</td>
+</tr>
+<tr>
+<td><code>LYNNE_OUTPUT_FORMAT</code> / <code>LYNNE_OUTPUT_EMAIL</code></td>
+<td><code>gdoc</code> / unset</td>
+<td>Save‑to‑Drive format / email recipient.</td>
+</tr>
+<tr>
+<td><code>GOOGLE_DRIVE_LYNNE_FOLDER</code> / <code>GOOGLE_DRIVE_SHARED_ID</code></td>
+<td>unset</td>
+<td>Drive target for saved runs.</td>
+</tr>
+<tr>
+<td>Durable runs</td>
+<td>—</td>
+<td><code>LYNNE_STEP_GATES</code>, <code>LYNNE_STEP_GATE_TIMEOUT</code>, <code>LYNNE_RUN_TTL_SECONDS</code>, <code>LYNNE_SEQ_COMPACTION</code>, <code>LYNNE_SEQ_COMPACT_TOKENS</code>, <code>LYNNE_DIGEST_MODEL</code>.</td>
+</tr>
+<tr>
+<td>Tool keys</td>
+<td>unset</td>
+<td><code>GOOGLE_MAPS_API_KEY</code> (maps/places), <code>TICKETMASTER_API_KEY</code> (events), <code>DUFFEL_API_TOKEN</code> (travel). Tool appears only if its key is set; weather (Weather.gov) needs none.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-google-workspace-gmailcalendardrive-for-lynne">8.3 Google Workspace (Gmail/Calendar/Drive) for LYNNE</h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>scripts/setup_google_workspace.py<span class="w">     </span><span class="c1"># interactive: GCP project, enable APIs, service account,</span>
+<span class="w">                                             </span><span class="c1"># domain-wide delegation, env vars, Docker mount</span>
+</code></pre></div>
+<p>It configures a service account + domain‑wide delegation and prints the env vars to add
+(<code>GOOGLE_SERVICE_ACCOUNT_JSON</code>, <code>GOOGLE_IMPERSONATED_USER</code>, Drive folder IDs). Mount <code>./secrets</code>
+read‑only into the container. Verify:</p>
+<div class="codehilite"><pre><span></span><code>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ttis-dashboard<span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"from tools.google_gmail import GoogleGmail; print(len(GoogleGmail().list_emails(max_results=3)))"</span>
+</code></pre></div>
+<h3 id="84-capabilities">8.4 Capabilities</h3>
+<ul>
+<li><strong>Read tools (inline):</strong> weather, directions/places (Maps), travel search (Duffel), Drive/Gmail/Calendar read, web search.</li>
+<li><strong>Propose→confirm:</strong> initiate workflow, sync deadlines to calendar, delegate research.</li>
+<li><strong>Direct (audit‑logged):</strong> GRID project create/update/delete, calendar event cleanup.</li>
+<li><strong>Playbooks:</strong> savable templated multi‑step tasks (Ask‑LYNNE + Telegram).</li>
+<li><strong>Durable runs:</strong> Redis‑buffered, survive disconnect, optional save‑to‑Drive; mid‑run confirm gates.</li>
+<li><strong>Integrity guardrails</strong> (<code>agents/integrity_policy.py</code>): anti‑assumption (no unsourced identity/authority
+  claims), confidence scoring, <code>needs_review</code> flag below threshold.</li>
+</ul>
+<h3 id="85-troubleshoot">8.5 Troubleshoot</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Save to Drive" fails</td>
+<td>Workspace not configured</td>
+<td>Re‑run <code>setup_google_workspace.py</code>; check <code>GOOGLE_*</code> env + Drive folder ID.</td>
+</tr>
+<tr>
+<td>A tool isn't offered</td>
+<td>its API key is unset</td>
+<td>Set <code>GOOGLE_MAPS_API_KEY</code> / <code>DUFFEL_API_TOKEN</code> / etc.; restart.</td>
+</tr>
+<tr>
+<td>Web search missing</td>
+<td><code>LYNNE_WEB_SEARCH=0</code></td>
+<td>Set <code>=1</code>, restart.</td>
+</tr>
+<tr>
+<td>Streaming arrives in bursts</td>
+<td>Caddy buffering</td>
+<td>Ensure <code>flush_interval -1</code> on the dashboard proxy in <code>config/Caddyfile</code>.</td>
+</tr>
+<tr>
+<td>429 rate‑limit</td>
+<td>Anthropic tier/limit</td>
+<td>LYNNE auto‑retries with back‑off; raise the org token‑per‑minute limit if persistent.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="9-pursuite-govcon-captureproposal-platform">9. Pursuite (GovCon capture/proposal platform)</h2>
+<p>Separate product at <code>H:\Projects\Pursuite\app</code> — an npm‑workspaces monorepo (<code>apps/api</code>, <code>apps/web</code>;
+internally codenamed <strong>BidCommandPro</strong>). It feeds the TTIS VBS through the <strong>Pursuite webhook</strong> (CRM
+events → port 8001). Local dev runs in Docker; config is injected via <code>env_file: .env</code> (see the
+<strong>Docker Desktop / WSL2 <code>.env</code> gotcha</strong> in §1.4). Prod images are tagged <code>pursuite/api:YYYYMMDD</code>. The
+admin/troubleshooting CLI lives in <code>apps/api/src/db/scripts/</code> and <strong>all helper scripts run from
+<code>apps/api/</code></strong> (they read the monorepo‑root <code>.env</code> automatically). <strong>When in doubt, run
+<code>npm run check-health</code> first</strong> (§9.7).</p>
+<blockquote>
+<p>Two sibling dirs, easy to confuse: <code>src/db/seeds/</code> = <strong>seeding</strong> scripts (run once to populate a
+demo/dev env); <code>src/db/scripts/</code> = <strong>admin CLI</strong> tools (run on‑demand to inspect/modify existing data).</p>
+</blockquote>
+<h3 id="91-local-run-container-control-docker">9.1 Local run &amp; container control (Docker)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">yml</span> <span class="o">-f</span> <span class="n">docker-compose</span><span class="p">.</span><span class="n">localtest</span><span class="p">.</span><span class="n">yml</span> <span class="n">up</span> <span class="n">-d</span> <span class="p">-</span><span class="n">-force-recreate</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="nb">ps</span>
+
+<span class="c"># Per-container control</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">up</span> <span class="n">-d</span> <span class="p">-</span><span class="n">-force-recreate</span> <span class="n">web</span>    <span class="c"># recreate the web container</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">restart</span> <span class="n">api</span>                    <span class="c"># restart the API</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">logs</span> <span class="n">api</span> <span class="o">-f</span>                     <span class="c"># follow API logs</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">logs</span> <span class="n">api</span> <span class="p">-</span><span class="n">-tail</span><span class="p">=</span><span class="n">5</span>               <span class="c"># confirm API status</span>
+</code></pre></div>
+<blockquote>
+<p>Always <strong>recreate</strong> rather than restart (<code>… up -d --force-recreate</code>, or <code>down --remove-orphans</code> then
+<code>up</code>). Restarting a stale container replays the old single‑file <code>.env</code> mount and fails — see §1.4.</p>
+</blockquote>
+<p><strong>Log in via the web UI (local-auth):</strong> there is no separate username field. Set <strong>Organization</strong>
+to <code>default</code>, click <strong>"Admin only? Use local login"</strong>, then enter the admin <strong>email</strong> and local-admin
+password. On a clean standalone install Pursuite Manager auto-creates <code>admin@pursuite.local</code> in org
+<code>default</code> and writes the first-run password to <code>%APPDATA%\Pursuite\first-run-admin.txt</code>. Use that
+first-run password once, then create a named admin account and rotate/clear the temporary local password
+(see section 9.9).</p>
+<p><strong>Running CLI scripts against local infra</strong> needs the DB + Redis env present in the shell:</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">$env:DATABASE_URL</span> <span class="p">=</span> <span class="s1">'postgresql://bidcommand:devpassword@localhost:5432/bidcommand'</span>   <span class="c"># local dev only</span>
+<span class="nv">$env:REDIS_URL</span>    <span class="p">=</span> <span class="s1">'redis://localhost:6379'</span>
+</code></pre></div>
+<h3 id="92-seed-ttisolutions-own-tenant-telecom-bootstrap-market-intel">9.2 Seed TTI‑Solutions' own tenant (telecom bootstrap + market intel)</h3>
+<p>The seed scripts live in the <code>apps/api</code> workspace, so run them from there (or add <code>-w apps/api</code> from
+the monorepo root):</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+
+<span class="c"># 1) Bootstrap company data — NAICS 238210 (wiring), 517919 (telecom), 561621 (security systems)</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">tti</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">tti-solutions</span> <span class="p">-</span><span class="n">-email</span> <span class="n">charles</span><span class="nv">@tti</span><span class="n">-solutions</span><span class="p">.</span><span class="n">com</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"YourPW"</span> <span class="p">`</span>
+  <span class="p">-</span><span class="n">-naics</span> <span class="n">238210</span><span class="p">,</span><span class="n">517919</span><span class="p">,</span><span class="n">561621</span> <span class="p">-</span><span class="n">-opportunities</span> <span class="n">6</span>
+
+<span class="c"># 2) Pull real market intelligence from USASpending.gov for that org</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">enrich</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">tti-solutions</span>
+
+<span class="c"># 3) Refresh market data periodically</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">enrich</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">tti-solutions</span> <span class="p">-</span><span class="n">-reset</span>
+</code></pre></div>
+<p>Direct equivalent: <code>npx tsx src/db/seeds/telecom-bootstrap.ts --org tti-solutions …</code>.</p>
+<h3 id="93-demo-seeds-sales-aipositioning-demos">9.3 Demo seeds (sales / AI‑positioning demos)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+
+<span class="c"># Simplest — named org with a local-auth login</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">ai-demo</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">demo-ai</span> <span class="p">-</span><span class="n">-email</span> <span class="n">admin</span><span class="nv">@example</span><span class="p">.</span><span class="n">com</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"Demo@2026!"</span> <span class="p">-</span><span class="n">-naics</span> <span class="n">541512</span>
+
+<span class="c"># Reset an existing named org (purge + re-seed)</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">ai-demo</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">demo-ai</span> <span class="p">-</span><span class="n">-reset</span> <span class="p">-</span><span class="n">-email</span> <span class="n">admin</span><span class="nv">@example</span><span class="p">.</span><span class="n">com</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"Demo@2026!"</span>
+
+<span class="c"># No flags = auto-generated unique slug, default email, no local-auth password</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">seed</span><span class="p">:</span><span class="n">ai-demo</span>
+</code></pre></div>
+<p>Flags: <code>--org &lt;slug&gt;</code> (named; omit → auto unique slug), <code>--email</code>/<code>--password</code> (local‑auth login; omit
+→ none), <code>--reset</code> (purge the named <code>--org</code> then re‑seed; omitting <code>--org</code> always creates fresh),
+<code>--naics &lt;csv&gt;</code>. Direct: <code>npx tsx src/db/seeds/ai-positioning-demo.ts …</code>.</p>
+<p><strong>What the AI demo builds</strong> — a 3‑bid / 2‑agency story arc that exercises the three AI initiatives:
+CISA CDM Phase 4 (<strong>LOSS</strong> to Booz Allen, with a written debrief) → Army DEVCOM MCADE (<strong>WIN</strong> $12.8M,
+banked win themes) → CISA ZTA Advisory (<strong>ACTIVE</strong>, due in 28 days, the test bed) → NIH IT
+Modernization (<strong>QUALIFYING</strong>). It demonstrates (1) <strong>Capture‑Context Injection</strong> (win themes,
+debriefs, CRM hot buttons, bid/no‑bid rationale, compliance scan, content library), (2) <strong>Agentic
+Content Research</strong> (real agency DHS CISA + real NAICS 541512 → live USASpending.gov awarded‑contract
+queries), and (3) <strong>Section‑Type Intelligent Pipelines</strong> (six section types, each with type‑specific
+context; Price/Cost links to the CPQ quote). Using a real agency + NAICS is what makes USASpending
+return actual awards in the demo.</p>
+<p><strong>Generic CRM test data</strong> (separate from the tenant/demo seeds — bulk accounts + contacts for load/UX
+testing). Two scripts in <code>G:\BidCommandPro\seed\</code>: run <code>generate.js</code> first (→ <code>accounts.csv</code> 100 rows
++ <code>contacts.csv</code> ~1,615 rows; 10 "anchor" accounts get a 5‑level org chart), then <code>seed.js</code> to POST
+them to a running API:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">node</span> <span class="n">generate</span><span class="p">.</span><span class="n">js</span>
+<span class="n">node</span> <span class="n">seed</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-url</span> <span class="n">http</span><span class="p">://</span><span class="n">localhost</span><span class="p">:</span><span class="n">3001</span> <span class="p">-</span><span class="n">-token</span> <span class="p">&lt;</span><span class="n">jwt</span><span class="p">&gt;</span>   <span class="c"># --dry to preview, --delay 50 to throttle</span>
+</code></pre></div>
+<p><code>--token</code> is a JWT from <code>POST /api/v1/auth/login</code>. <code>seed.js</code> imports in dependency order (accounts →
+contacts → wire <code>reportsTo</code> hierarchy) with a live progress bar.</p>
+<h3 id="94-reset-a-localauth-password">9.4 Reset a local‑auth password</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">npm</span> <span class="n">run</span> <span class="nb">reset-local</span><span class="n">-pw</span> <span class="p">--</span> <span class="p">-</span><span class="n">-email</span> <span class="n">david</span><span class="p">.</span><span class="n">chen</span><span class="nv">@meridianfed</span><span class="p">.</span><span class="n">example</span> <span class="p">`</span>
+  <span class="p">-</span><span class="n">-org</span> <span class="n">meridian-federal-solutions</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"Demo@Pursuite2026!"</span>
+</code></pre></div>
+<h3 id="95-demo-playbooks-sales-enablement">9.5 Demo playbooks (sales enablement)</h3>
+<table>
+<thead>
+<tr>
+<th>Playbook</th>
+<th>Location</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sales Demo</strong></td>
+<td><code>G:\Pursuite\marketing\Pursuite_Sales_Demo_Playbook.docx</code> / <code>.pdf</code></td>
+<td>10 modules, ~64 min — talking points, discovery questions, objection handling, pricing‑tier table, demo setup checklist.</td>
+</tr>
+<tr>
+<td><strong>AI Demo</strong></td>
+<td><code>G:\Pursuite\marketing\Pursuite_AI_Demo_Playbook.docx</code> / <code>.pdf</code></td>
+<td>3 initiative deep‑dives (color‑coded banners), live proof‑point boxes, competitive positioning table, pre‑seeded checklist tied to the seed script.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="96-build-deliver-customer-packaging">9.6 Build &amp; deliver (customer packaging)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span>
+<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">build</span><span class="o">-and</span><span class="n">-deliver</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p><strong>Interactive menu</strong> (before build): APP URL (required), Admin email (required), Org slug (default
+<code>default</code>), Temp password (<strong>auto‑generated</strong>, 16 random chars). <strong>Five stages:</strong></p>
+<ol>
+<li>Write <code>APP_URL</code> + <code>APP_VERSION</code> to <code>.env.production</code>.</li>
+<li><code>docker compose build</code> — prod images tagged <code>pursuite/api:YYYYMMDD</code>.</li>
+<li><strong>Delivery gate</strong> — <code>bootstrap-admin</code> + the vitest regression suite. <em>If this fails, no package is produced.</em></li>
+<li>Package assembly → <code>delivery/pursuite-YYYYMMDD-HHMMSS.zip</code>: <code>docker-compose.production.yml</code>,
+   pre‑configured <code>.env.production</code>, <code>migrations/</code> (26 SQL files), <code>images/</code> (docker‑save tarballs of
+   both images), <code>MANIFEST.txt</code>.</li>
+<li>Verdict banner — App URL, admin username, org slug, <strong>temp password (shown once — capture it)</strong>,
+   "pw expires 3 days after first login", package path, size (~842 MB), SHA‑256.</li>
+</ol>
+<h3 id="97-health-check-run-this-first">9.7 Health check (run this first)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">check-health</span>
+</code></pre></div>
+<p>One command checks DB connectivity, the critical schema columns, Redis ping, and BullMQ queue depths.
+Exit <code>0</code> = all clear, <code>1</code> = one or more failures (safe for CI/monitoring). A red
+<code>❌ Schema: &lt;table&gt;.&lt;column&gt;</code> line means a migration didn't run — go to §9.10.</p>
+<h3 id="98-helper-admin-scripts-appsapisrcdbscripts">9.8 Helper / admin scripts (<code>apps/api/src/db/scripts/</code>)</h3>
+<p>Run from <code>apps/api/</code>. Full option reference is in each script's JSDoc header.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run check-health</code></td>
+<td>DB + schema + Redis + BullMQ health (exit 0/1).</td>
+</tr>
+<tr>
+<td><code>npm run list-orgs</code></td>
+<td>Table of every org: slug, plan, Stripe status, trial expiry, user count.</td>
+</tr>
+<tr>
+<td><code>npm run inspect-org -- --org &lt;slug&gt;</code></td>
+<td>Deep‑inspect one org — billing, full user table (roles/active/SSO), anomaly warnings.</td>
+</tr>
+<tr>
+<td><code>npm run create-user -- --email &lt;e&gt; --org &lt;slug&gt; --role &lt;role&gt; [--name "…"]</code></td>
+<td>Create a user.</td>
+</tr>
+<tr>
+<td><code>npm run set-user-role -- --email &lt;e&gt; --org &lt;slug&gt; --role &lt;role&gt;</code></td>
+<td>Change a user's role.</td>
+</tr>
+<tr>
+<td><code>npm run reset-local-pw -- --email &lt;e&gt; --org &lt;slug&gt; --password &lt;pw&gt;</code></td>
+<td>Set/reset the bcrypt local‑auth password (admin only).</td>
+</tr>
+<tr>
+<td><code>npm run clear-session -- --email &lt;e&gt; --org &lt;slug&gt;</code></td>
+<td>Force‑logout (writes Redis blocklist).</td>
+</tr>
+<tr>
+<td><code>npm run set-plan -- --org &lt;slug&gt; --plan &lt;plan&gt; [opts]</code></td>
+<td>Override an org's plan/billing for testing.</td>
+</tr>
+<tr>
+<td><code>npm run purge:org -- [--pattern &lt;pre&gt;\|--org &lt;slug&gt;\|--keep &lt;csv&gt;] [--dry-run]</code></td>
+<td>Targeted org purge.</td>
+</tr>
+<tr>
+<td><code>npm run purge:test</code></td>
+<td>Purge <code>test-*</code> orgs + clear business data from the bootstrap org.</td>
+</tr>
+<tr>
+<td><code>npm run db:generate</code> / <code>npm run db:migrate</code></td>
+<td>Generate / apply Drizzle migrations.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="99-users-roles-sessions">9.9 Users, roles &amp; sessions</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">create-user</span> <span class="p">--</span> <span class="p">-</span><span class="n">-email</span> <span class="n">admin</span><span class="nv">@pursuite</span><span class="p">.</span><span class="n">local</span> <span class="p">-</span><span class="n">-org</span> <span class="n">pursuite</span> <span class="p">-</span><span class="n">-role</span> <span class="n">admin</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">create-user</span> <span class="p">--</span> <span class="p">-</span><span class="n">-email</span> <span class="n">writer</span><span class="nv">@example</span><span class="p">.</span><span class="n">com</span> <span class="p">-</span><span class="n">-org</span> <span class="n">pursuite</span> <span class="p">-</span><span class="n">-role</span> <span class="n">writer</span> <span class="p">-</span><span class="n">-name</span> <span class="s2">"Jane Doe"</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-user</span><span class="n">-role</span> <span class="p">--</span> <span class="p">-</span><span class="n">-email</span> <span class="n">charles</span><span class="nv">@pursuite</span><span class="p">.</span><span class="n">io</span> <span class="p">-</span><span class="n">-org</span> <span class="n">pursuite</span> <span class="p">-</span><span class="n">-role</span> <span class="n">admin</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">reset-local</span><span class="n">-pw</span> <span class="p">--</span> <span class="p">-</span><span class="n">-email</span> <span class="n">admin</span><span class="nv">@pursuite</span><span class="p">.</span><span class="n">local</span> <span class="p">-</span><span class="n">-org</span> <span class="n">pursuite</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"&lt;password&gt;"</span>
+</code></pre></div>
+<p>Valid roles: <code>admin · proposal_manager · writer · executive_approver · read_only</code>. Only <code>admin</code> can
+use local‑auth login. First‑time <strong>SSO</strong> users are auto‑provisioned <code>read_only</code> — upgrade via Admin → Users.</p>
+<p><strong>Bootstrap an admin from env</strong> (fresh org, dev/source via <code>tsx</code>):</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">$env:ADMIN_EMAIL</span><span class="p">=</span><span class="s1">'admin@pursuite.local'</span><span class="p">;</span> <span class="nv">$env:ADMIN_PASSWORD</span><span class="p">=</span><span class="s1">'&lt;password&gt;'</span>
+<span class="nv">$env:ORG_SLUG</span><span class="p">=</span><span class="s1">'pursuite'</span><span class="p">;</span> <span class="nv">$env:ORG_NAME</span><span class="p">=</span><span class="s1">'Pursuite'</span>
+<span class="n">npx</span> <span class="n">tsx</span> <span class="n">apps</span><span class="p">/</span><span class="n">api</span><span class="p">/</span><span class="n">src</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">seeds</span><span class="p">/</span><span class="n">bootstrap-admin</span><span class="p">.</span><span class="n">ts</span>
+</code></pre></div>
+<p><strong>Standalone delivered app login and named-admin handoff.</strong> The standalone login form has no separate
+<code>username</code> field. Use:</p>
+<ul>
+<li><strong>Org:</strong> <code>default</code></li>
+<li><strong>Email:</strong> admin email</li>
+<li><strong>Password:</strong> local admin password</li>
+</ul>
+<p>On a clean standalone install, Pursuite Manager auto-creates:</p>
+<div class="codehilite"><pre><span></span><code>Email: admin@pursuite.local
+Org: default
+Password file: %APPDATA%\Pursuite\first-run-admin.txt
+</code></pre></div>
+<p>Use that first-run password to sign in, then create your named admin account.</p>
+<p>To create/set a named admin from PowerShell against the standalone container:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">docker</span> <span class="n">exec</span> <span class="n">pursuite-api</span> <span class="n">node</span> <span class="n">dist</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="n">create-user</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-email</span> <span class="s2">"you@company.com"</span> <span class="p">-</span><span class="n">-org</span> <span class="k">default</span> <span class="p">-</span><span class="n">-role</span> <span class="n">admin</span> <span class="p">-</span><span class="n">-name</span> <span class="s2">"Your Name"</span>
+
+<span class="n">docker</span> <span class="n">exec</span> <span class="n">pursuite-api</span> <span class="n">node</span> <span class="n">dist</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-local</span><span class="n">-pw</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-email</span> <span class="s2">"you@company.com"</span> <span class="p">-</span><span class="n">-org</span> <span class="k">default</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"Use-A-Strong-Password-Here"</span>
+</code></pre></div>
+<p>If the user already exists, promote them and set/reset the password:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">docker</span> <span class="n">exec</span> <span class="n">pursuite-api</span> <span class="n">node</span> <span class="n">dist</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">set-user</span><span class="n">-role</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-email</span> <span class="s2">"you@company.com"</span> <span class="p">-</span><span class="n">-org</span> <span class="k">default</span> <span class="p">-</span><span class="n">-role</span> <span class="n">admin</span>
+
+<span class="n">docker</span> <span class="n">exec</span> <span class="n">pursuite-api</span> <span class="n">node</span> <span class="n">dist</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-local</span><span class="n">-pw</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-email</span> <span class="s2">"you@company.com"</span> <span class="p">-</span><span class="n">-org</span> <span class="k">default</span> <span class="p">-</span><span class="n">-password</span> <span class="s2">"Use-A-Strong-Password-Here"</span>
+</code></pre></div>
+<p>After confirming the named admin can log in, disable the temporary/default local password:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">docker</span> <span class="n">exec</span> <span class="n">pursuite-api</span> <span class="n">node</span> <span class="n">dist</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-local</span><span class="n">-pw</span><span class="p">.</span><span class="n">js</span> <span class="p">-</span><span class="n">-email</span> <span class="n">admin</span><span class="nv">@pursuite</span><span class="p">.</span><span class="n">local</span> <span class="p">-</span><span class="n">-org</span> <span class="k">default</span> <span class="p">-</span><span class="n">-clear</span>
+</code></pre></div>
+<p><strong>Gotcha:</strong> <code>standalone-admin.js</code> only creates the first admin if the org has no existing admin. Once
+<code>admin@pursuite.local</code> exists, use <code>create-user</code>, <code>set-user-role</code>, and <code>reset-local-pw</code>; rerunning
+<code>standalone-admin.js</code> will not reset the password.</p>
+<p><strong><code>reset-local-pw</code> specifics:</strong> local‑auth is admin‑only (<code>systemRole = "admin"</code>); the password is a
+bcrypt hash (12 rounds) stored in Redis at <code>local_pw:&lt;userId&gt;</code>. <code>--clear</code> deletes it (disables local
+auth for that user); does not affect SSO.</p>
+<p><strong>Force‑logout / "Token revoked":</strong> <code>clear-session</code> writes blocklist entries for the access token
+(<code>blocklist:&lt;userId&gt;</code>, 8 h) <strong>and</strong> refresh token (<code>blocklist:&lt;userId&gt;:refresh</code>, 30 d); the next request
+returns <code>401 Token revoked</code>. A normal login clears them automatically. It accepts <code>--email &lt;e&gt; --org
+&lt;slug&gt;</code> <strong>or</strong> <code>--user-id &lt;uuid&gt;</code>. Stale entries after re‑login:
+<code>redis-cli DEL blocklist:&lt;userId&gt; blocklist:&lt;userId&gt;:refresh</code>.</p>
+<h3 id="910-schema-drift-migrations-the-1-login500-cause">9.10 Schema drift &amp; migrations (the #1 login‑500 cause)</h3>
+<p><strong>Symptom:</strong> <code>500</code> on <code>POST /api/v1/auth/local</code> with <code>column "X" does not exist</code> (e.g.
+<code>onboarding_completed_at</code>, <code>settings</code>, <code>system_roles</code>, <code>notification_prefs</code>). A migration added columns
+but didn't run against this DB.</p>
+<div class="codehilite"><pre><span></span><code><span class="c"># Apply pending migrations</span>
+<span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">db</span><span class="p">:</span><span class="n">migrate</span>                       <span class="c"># or: npm run db:migrate --workspace=@bidcommand/api</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">check-health</span>                     <span class="c"># all Schema rows should be green</span>
+</code></pre></div>
+<p>Emergency manual fix (CI down / first deploy) via <code>psql</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">organizations</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">onboarding_completed_at</span><span class="w"> </span><span class="k">timestamp</span><span class="p">;</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">organizations</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">settings</span><span class="w"> </span><span class="n">jsonb</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'{}'</span><span class="p">;</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">organizations</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">plan</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'free'</span><span class="p">;</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">system_roles</span><span class="w"> </span><span class="nb">text</span><span class="p">[];</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">sso_subject</span><span class="w"> </span><span class="nb">text</span><span class="p">;</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">notification_prefs</span><span class="w"> </span><span class="n">jsonb</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">'{}'</span><span class="p">;</span>
+</code></pre></div>
+<p><strong>Prevent:</strong> run <code>db:migrate</code> in the deploy pipeline <strong>before</strong> the API process starts.</p>
+<h3 id="911-onboarding-wizard-org-cleanup">9.11 Onboarding wizard &amp; org cleanup</h3>
+<div class="codehilite"><pre><span></span><code><span class="c"># Onboarding wizard (clears/sets onboardingCompletedAt) — run from monorepo root</span>
+<span class="n">node</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span><span class="p">=.</span><span class="n">env</span> <span class="n">node_modules</span><span class="p">/.</span><span class="n">bin</span><span class="p">/</span><span class="n">tsx</span> <span class="n">apps</span><span class="p">/</span><span class="n">api</span><span class="p">/</span><span class="n">src</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-onboarding</span><span class="p">.</span><span class="n">ts</span>            <span class="c"># force reappear</span>
+<span class="n">node</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span><span class="p">=.</span><span class="n">env</span> <span class="n">node_modules</span><span class="p">/.</span><span class="n">bin</span><span class="p">/</span><span class="n">tsx</span> <span class="n">apps</span><span class="p">/</span><span class="n">api</span><span class="p">/</span><span class="n">src</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-onboarding</span><span class="p">.</span><span class="n">ts</span> <span class="p">-</span><span class="n">-org</span> <span class="n">acme</span>  <span class="c"># specific org</span>
+<span class="n">node</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span><span class="p">=.</span><span class="n">env</span> <span class="n">node_modules</span><span class="p">/.</span><span class="n">bin</span><span class="p">/</span><span class="n">tsx</span> <span class="n">apps</span><span class="p">/</span><span class="n">api</span><span class="p">/</span><span class="n">src</span><span class="p">/</span><span class="n">db</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-onboarding</span><span class="p">.</span><span class="n">ts</span> <span class="p">-</span><span class="n">-complete</span>  <span class="c"># suppress wizard</span>
+
+<span class="c"># Purge orgs (from apps/api) — ALWAYS --dry-run first</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">org</span> <span class="p">--</span> <span class="p">-</span><span class="n">-pattern</span> <span class="n">test</span><span class="p">-</span> <span class="p">-</span><span class="n">-dry-run</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">org</span> <span class="p">--</span> <span class="p">-</span><span class="n">-pattern</span> <span class="n">test</span><span class="p">-</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">org</span> <span class="p">--</span> <span class="p">-</span><span class="n">-pattern</span> <span class="n">tti-solutions</span><span class="p">-</span><span class="n">17</span>            <span class="c"># all timestamp-suffixed TTI seeds</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">org</span> <span class="p">--</span> <span class="p">-</span><span class="n">-keep</span> <span class="k">default</span><span class="p">,</span><span class="n">meridian-federal-solutions</span> <span class="p">-</span><span class="n">-dry-run</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">org</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="n">tti-solutions</span><span class="p">-</span><span class="n">1716300000000</span>     <span class="c"># one exact slug</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">purge</span><span class="p">:</span><span class="n">test</span>                                          <span class="c"># test-* + clear bootstrap-org business data</span>
+</code></pre></div>
+<h3 id="912-billing-plan-overrides-testing">9.12 Billing / plan overrides (testing)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">app</span><span class="p">\</span><span class="n">apps</span><span class="p">\</span><span class="n">api</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">enterprise</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">pro</span> <span class="p">-</span><span class="n">-status</span> <span class="n">active</span> <span class="p">-</span><span class="n">-period-end</span> <span class="p">+</span><span class="n">30d</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">starter</span> <span class="p">-</span><span class="n">-status</span> <span class="n">trialing</span> <span class="p">-</span><span class="n">-trial-ends</span> <span class="p">+</span><span class="n">3d</span>   <span class="c"># trial banner</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">free</span> <span class="p">-</span><span class="n">-status</span> <span class="n">canceled</span> <span class="p">-</span><span class="n">-trial-ends</span> <span class="p">-</span><span class="n">1d</span>      <span class="c"># red "upgrade required"</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">free</span> <span class="p">-</span><span class="n">-clear-stripe</span>                          <span class="c"># reset / unsubscribe</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="nb">set-plan</span> <span class="p">--</span> <span class="p">-</span><span class="n">-org</span> <span class="p">&lt;</span><span class="n">slug</span><span class="p">&gt;</span> <span class="p">-</span><span class="n">-plan</span> <span class="n">pro</span>                             <span class="c"># target a specific org</span>
+</code></pre></div>
+<p><strong>Plan not updating after Stripe checkout?</strong> Check: webhook delivered (<code>checkout.session.completed</code>)?
+<code>STRIPE_WEBHOOK_SECRET</code> correct (a wrong secret fails signature verify silently)? <code>STRIPE_STARTER_PRICE_ID</code>
++ <code>STRIPE_PRO_PRICE_ID</code> both set and matching the dashboard? Inspect with <code>npm run inspect-org -- --org &lt;slug&gt;</code>.</p>
+<h3 id="913-redis-background-jobs">9.13 Redis &amp; background jobs</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">redis-cli</span> <span class="n">ping</span>                                   <span class="c"># → PONG (else Redis down / wrong REDIS_URL)</span>
+<span class="n">redis-cli</span> <span class="n">KEYS</span> <span class="s2">"bull:*:wait"</span>                      <span class="c"># waiting BullMQ jobs</span>
+<span class="n">redis-cli</span> <span class="n">ZCARD</span> <span class="s2">"bull:sam-monitor:delayed"</span>         <span class="c"># scheduled SAM.gov monitors</span>
+<span class="n">redis-cli</span> <span class="n">LMOVE</span> <span class="s2">"bull:&lt;q&gt;:failed"</span> <span class="s2">"bull:&lt;q&gt;:wait"</span> <span class="n">LEFT</span> <span class="n">RIGHT</span>   <span class="c"># retry a failed job</span>
+</code></pre></div>
+<p>SAM.gov monitors run as BullMQ scheduled jobs; each org supplies its <strong>own</strong> SAM.gov API key
+(Admin → Integrations, expires annually). For managed Redis use <code>rediss://</code> (TLS) and check VPC rules.</p>
+<h3 id="914-environment-variables-reference">9.14 Environment variables (reference)</h3>
+<p>All belong in the monorepo‑root <code>.env</code> (or your secrets manager).</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>APP_URL</code></td>
+<td>✅</td>
+<td>Public base URL users type to reach the app, <strong>no trailing slash</strong>. See the callout below.</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>✅</td>
+<td><code>postgres://user:pass@host/db</code>.</td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>✅</td>
+<td><code>redis://…</code> or <code>rediss://…</code> (TLS).</td>
+</tr>
+<tr>
+<td><code>JWT_SECRET</code></td>
+<td>✅</td>
+<td>≥32 random chars.</td>
+</tr>
+<tr>
+<td><code>TOKEN_ENCRYPTION_KEY</code></td>
+<td>✅</td>
+<td><strong>Distinct</strong> 64‑char hex (<code>openssl rand -hex 32</code>), ≠ <code>JWT_SECRET</code>; server fails closed if missing/dup.</td>
+</tr>
+<tr>
+<td><code>STRIPE_SECRET_KEY</code> / <code>STRIPE_WEBHOOK_SECRET</code></td>
+<td>✅</td>
+<td><code>sk_…</code> / <code>whsec_…</code>.</td>
+</tr>
+<tr>
+<td><code>STRIPE_STARTER_PRICE_ID</code> / <code>STRIPE_PRO_PRICE_ID</code></td>
+<td>✅</td>
+<td>Must match the Stripe dashboard exactly.</td>
+</tr>
+<tr>
+<td><code>EMAIL_PROVIDER</code> (+ provider keys)</td>
+<td>✅</td>
+<td><code>ses</code> (<code>SES_FROM_ADDRESS</code>, <code>AWS_*</code>) or <code>sendgrid</code> (<code>SENDGRID_*</code>).</td>
+</tr>
+<tr>
+<td><code>VAPID_PUBLIC_KEY</code> / <code>VAPID_PRIVATE_KEY</code> / <code>VAPID_SUBJECT</code></td>
+<td>push</td>
+<td><code>npx web-push generate-vapid-keys</code> (changing them forces re‑subscribe).</td>
+</tr>
+<tr>
+<td><code>AWS_S3_BUCKET</code> / <code>AWS_S3_REGION</code> / <code>AWS_*</code></td>
+<td>uploads</td>
+<td>S3 file storage.</td>
+</tr>
+<tr>
+<td><code>OIDC_ISSUER</code> / <code>OIDC_CLIENT_ID</code> / <code>OIDC_CLIENT_SECRET</code> / <code>OIDC_REDIRECT_URI</code></td>
+<td>SSO</td>
+<td><code>SSO_PROVIDER=auth0</code> or generic.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong><code>APP_URL</code> — the most delivery‑critical setting.</strong> It's the public base URL the API uses to build
+absolute links/redirects in <strong>five</strong> places: user‑invitation accept links, Stripe checkout
+<code>success_url</code>/<code>cancel_url</code>, the Stripe billing‑portal <code>return_url</code>, Nylas calendar/email OAuth
+callbacks, and "View Report" links in scheduled‑report emails (plus the desktop tray's open‑in‑browser).
+Set it to exactly what users type to reach the app — <strong>no trailing slash</strong>. If it's wrong, invite
+emails contain broken links, Stripe redirects fail after checkout, and OAuth redirects go to the wrong
+host. Examples: <code>http://localhost</code> (local), <code>http://192.168.1.100</code> (LAN/office — most common
+self‑hosted), <code>http://bidcommandpro.local</code> (custom DNS/hosts), <code>https://bids.yourcompany.com</code> (Internet + TLS).</p>
+</blockquote>
+<h3 id="915-errorcode-quick-reference">9.15 Error‑code quick reference</h3>
+<table>
+<thead>
+<tr>
+<th>HTTP</th>
+<th>Message</th>
+<th>Likely cause</th>
+<th>See</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>401</td>
+<td><code>Token revoked</code></td>
+<td>force‑logout / stale blocklist</td>
+<td>§9.9</td>
+</tr>
+<tr>
+<td>401</td>
+<td><code>Invalid credentials</code></td>
+<td>wrong pw, user inactive, or not admin</td>
+<td>§9.9</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>Invalid or expired state</code></td>
+<td>SSO state TTL (60 s) expired</td>
+<td>§9.13</td>
+</tr>
+<tr>
+<td>400</td>
+<td><code>Organization 'X' not found</code></td>
+<td>bad <code>?org=</code> slug on <code>/auth/login</code></td>
+<td><code>list-orgs</code></td>
+</tr>
+<tr>
+<td>403</td>
+<td><code>Plan limit exceeded</code></td>
+<td>free/starter hitting a gated feature</td>
+<td>§9.12</td>
+</tr>
+<tr>
+<td>500</td>
+<td><code>column "X" does not exist</code></td>
+<td>migration not applied</td>
+<td>§9.10</td>
+</tr>
+<tr>
+<td>500</td>
+<td><code>TOKEN_ENCRYPTION_KEY</code> error</td>
+<td>missing/duplicate key</td>
+<td>§9.14</td>
+</tr>
+<tr>
+<td>500</td>
+<td><code>connect ECONNREFUSED</code></td>
+<td>Redis/Postgres not reachable</td>
+<td>§9.13</td>
+</tr>
+</tbody>
+</table>
+<h3 id="916-troubleshoot-operations-product">9.16 Troubleshoot (operations + product)</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Diagnose</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OCI <code>not a directory</code> on <code>.env</code> mount</td>
+<td>stale container replaying old single‑file mount</td>
+<td><code>down --remove-orphans</code> then <code>up -d --force-recreate</code> (§1.4).</td>
+</tr>
+<tr>
+<td>Login <code>500</code></td>
+<td>read the API log stack trace (<code>docker compose logs api --tail=50</code>)</td>
+<td>Almost always schema drift (§9.10) or a missing env key (§9.14).</td>
+</tr>
+<tr>
+<td>Login <code>401</code> despite correct password</td>
+<td><code>inspect-org</code> — user inactive / not admin?</td>
+<td>Reactivate (<code>UPDATE users SET active=true …</code>); only <code>admin</code> does local‑auth (§9.9).</td>
+</tr>
+<tr>
+<td>Seed says org already exists</td>
+<td>named <code>--org</code> already seeded</td>
+<td>Add <code>--reset</code> (or omit <code>--org</code> for a fresh slug).</td>
+</tr>
+<tr>
+<td>USASpending returns nothing</td>
+<td>unreal agency/NAICS, or org not seeded</td>
+<td>Seed first; use real agency + NAICS (demo uses DHS CISA + 541512).</td>
+</tr>
+<tr>
+<td>Delivery gate fails in <code>build-and-deliver.ps1</code></td>
+<td><code>bootstrap-admin</code>/vitest failed</td>
+<td>Fix the failing test before packaging — the gate is intentional.</td>
+</tr>
+<tr>
+<td>Can't log in after delivery</td>
+<td>temp password expired (3 days) / not captured</td>
+<td>Shown once in the verdict banner; re‑issue via <code>reset-local-pw</code>.</td>
+</tr>
+<tr>
+<td>"MFA code required" but never enrolled</td>
+<td>account is TOTP‑enrolled</td>
+<td>Enter the authenticator code; Admin can reset MFA (Admin → Users), then re‑enroll.</td>
+</tr>
+<tr>
+<td>MFA code rejected repeatedly</td>
+<td>device clock drift</td>
+<td>Wait for the next 30‑s code; set phone time to automatic.</td>
+</tr>
+<tr>
+<td>Document blocked — "clearance required" (403)</td>
+<td>clearance below the item minimum</td>
+<td>Set under Profile → Security (Admin‑assigned); the denial is audited.</td>
+</tr>
+<tr>
+<td>RFP Shredder finds no requirements</td>
+<td>scanned/image‑only PDF, OCR layer absent</td>
+<td>OCR runs automatically; re‑upload a clearer scan or add requirements manually (air‑gap bundles the OCR layer).</td>
+</tr>
+<tr>
+<td>Compliance Matrix export stuck "Generating"</td>
+<td>DOCX/PDF renders in the background</td>
+<td>Wait for <strong>Complete</strong> (CSV is instant); ensure <code>soffice</code> (LibreOffice) is on the worker for PDF.</td>
+</tr>
+<tr>
+<td>No emails sent / going to spam</td>
+<td>check <code>EMAIL_PROVIDER</code> + keys; SPF/DKIM/DMARC</td>
+<td>SES sandbox only sends to verified addresses — request production access.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="917-mutative-test-harness-regression">9.17 Mutative Test Harness &amp; regression</h3>
+<p><strong>MTH</strong> (<code>testing/mutative-harness/</code>; ref <code>MTH_User_Guide_v4</code>) — adversarial input mutation against the
+Pursuite API. <strong>Never run against prod</strong> — it creates/deletes users and edits org config; use a
+dedicated test/staging instance.</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">H</span><span class="p">:\</span><span class="n">Projects</span><span class="p">\</span><span class="n">Pursuite</span><span class="p">\</span><span class="n">testing</span><span class="p">\</span><span class="n">mutative-harness</span>
+<span class="n">npm</span> <span class="n">install</span> <span class="p">;</span> <span class="nb">copy </span><span class="p">.</span><span class="n">env</span><span class="p">.</span><span class="n">example</span> <span class="p">.</span><span class="n">env</span>     <span class="c"># add tokens + API URL (DRY_RUN=true by default)</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">run</span><span class="p">:</span><span class="n">dry</span>                          <span class="c"># plan + results/latest.html, no requests sent</span>
+<span class="c"># set DRY_RUN=false in .env, then a scope:</span>
+<span class="n">npm</span> <span class="n">run</span> <span class="n">run</span><span class="p">:</span><span class="n">all</span>                          <span class="c"># or run:auth / run:rbac / run:compliance / run:admin</span>
+</code></pre></div>
+<p>Mutation types: Structural (remove_field / empty_object / extra_fields / nesting), Type (invalid_enum
+SQLi / binary), Value (sql / xss / path‑traversal / long‑string), Semantic (cross_org_id), Protocol
+(missing_auth / wrong_role_token / <code>alg=none</code> / malformed), Chaos (duplicate / concurrent /
+large_payload), Fuzz. Findings → <code>results/latest.{json,html}</code>; severities CRITICAL/HIGH/MEDIUM/LOW;
+exit <strong>0</strong> clean / <strong>1</strong> CRITICAL (block) / <strong>2</strong> fatal. <strong>Add an endpoint = append a baseline in
+<code>src/input-generator/baseline-payloads.ts</code></strong> (the engine auto‑generates all groups).</p>
+<p><strong>17‑step regression pipeline</strong> — <code>scripts/run-regression.ps1</code> (ref <code>TestPlan_Regression_v6.docx</code>;
+301 documented TCs, 258 active):</p>
+<div class="codehilite"><pre><span></span><code><span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">run-regression</span><span class="p">.</span><span class="n">ps1</span>                  <span class="c"># full 17-step run</span>
+<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">run-regression</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-Filter</span> <span class="s2">"BUG-"</span>   <span class="c"># bug-fix regression only</span>
+<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">run-regression</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-Filter</span> <span class="s2">"NEG-"</span> <span class="n">-ApiOnly</span>
+<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">run-regression</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-AirGap</span> <span class="n">-AirGapApiUrl</span> <span class="n">http</span><span class="p">://</span><span class="n">airgap-host</span><span class="p">:</span><span class="n">3000</span> <span class="n">-AirGapEmail</span> <span class="n">admin</span><span class="nv">@company</span><span class="p">.</span><span class="n">gov</span>
+</code></pre></div>
+<p>Steps: prereqs → container health → credentials → <code>tsc</code> → API vitest → web vitest → BUG‑/NEG‑
+regression → CPQ → debrief/WLA → RFP shredder → A‑series stubs → phase 1–4 suites → air‑gap smoke
+(25 checks) → summary (<code>test-results/regression-*.txt</code>). Flags: <code>-ApiOnly</code> / <code>-WebOnly</code> / <code>-Filter</code> /
+<code>-AirGap</code>. Filter aliases: <code>BUG-</code>, <code>NEG-</code>, <code>TC-CPQ-</code>, <code>TC-DB-</code>, <code>TC-RFP-</code>, <code>TC-WLA-</code>, …</p>
+<blockquote>
+<p>The TTIS VBS port of this methodology lives on the <strong>TTI‑VBS</strong> tab §1.11 (<code>tools/mth/</code>,
+<code>scripts/run_regression.py</code>) — same oracle/strategy model, adapted to FastAPI + the ABAC PDP.</p>
+</blockquote>
+<hr/>
+<h2 id="appendix">Appendix</h2>
+<h3 id="a-kill-a-stuck-listening-port-windows-powershell">A · Kill a stuck listening port (Windows / PowerShell)</h3>
+<div class="codehilite"><pre><span></span><code><span class="nb">Get-NetTCPConnection</span> <span class="n">-LocalPort</span> <span class="n">8081</span> <span class="n">-State</span> <span class="n">Listen</span> <span class="p">|</span>
+  <span class="nb">Select-Object</span> <span class="n">-ExpandProperty</span> <span class="n">OwningProcess</span> <span class="n">-Unique</span> <span class="p">|</span>
+  <span class="k">ForEach</span><span class="n">-Object</span> <span class="p">{</span> <span class="nb">Stop-Process</span> <span class="n">-Id</span> <span class="nv">$_</span> <span class="n">-Force</span> <span class="p">}</span>
+</code></pre></div>
+<p>(Swap <code>8081</code> for <code>8000</code>/<code>3000</code>/etc. as needed.)</p>
+<h3 id="b-quick-command-index">B · Quick command index</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connect to prod</td>
+<td><code>gcloud config set project tti-solutions-ai</code> → <code>gcloud compute ssh ttis-prod --zone=us-central1-a</code></td>
+</tr>
+<tr>
+<td>Prod deploy backend</td>
+<td><code>git pull --ff-only origin main</code> → <code>docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build dashboard</code></td>
+</tr>
+<tr>
+<td>Prod deploy frontend</td>
+<td><code>docker compose -f … -f docker-compose.prod.yml pull frontend</code> → <code>… up -d frontend</code></td>
+</tr>
+<tr>
+<td>Prod verify edge</td>
+<td><code>curl -sI https://app.tti-solutions.com/</code> (307→/vbs) · <code>dig +short tti-solutions.com @8.8.8.8</code> (34.27.180.8)</td>
+</tr>
+<tr>
+<td>Prod health</td>
+<td><code>docker ps --format 'table {{.Names}}\t{{.Status}}'</code></td>
+</tr>
+<tr>
+<td>Create prod user</td>
+<td><code>docker exec -e NU=… -e NP=… ttis-dashboard python -c "…upsert_user…"</code> (§4.6)</td>
+</tr>
+<tr>
+<td>VBS dev up</td>
+<td><code>python main.py</code> + <code>uvicorn dashboard.main:app --port 8000 --env-file config\.env</code> + <code>uvicorn tools.pursuite_webhook:webhook_app --port 8001</code></td>
+</tr>
+<tr>
+<td>Reset CEO password (local)</td>
+<td><code>…python.exe -c "…set_password/upsert_user…"</code> (§1.8)</td>
+</tr>
+<tr>
+<td>VBS docker up</td>
+<td><code>docker-compose up -d</code></td>
+</tr>
+<tr>
+<td>VBS tests</td>
+<td><code>pytest tests/ -q</code></td>
+</tr>
+<tr>
+<td>Verify audit chain</td>
+<td><code>python main.py --verify-chain</code></td>
+</tr>
+<tr>
+<td>Dashboard dev</td>
+<td><code>npm run dev</code> (<code>:3000</code>)</td>
+</tr>
+<tr>
+<td>Dashboard checks</td>
+<td><code>npm run typecheck &amp;&amp; npm run lint &amp;&amp; npm run test:cov &amp;&amp; npm run build</code></td>
+</tr>
+<tr>
+<td>Field app dev</td>
+<td><code>npm run start</code> (Expo)</td>
+</tr>
+<tr>
+<td>Field app build</td>
+<td><code>eas build --platform ios|android</code></td>
+</tr>
+<tr>
+<td>Deploy prod</td>
+<td><code>./scripts/deploy_prod.sh</code> (on the VM)</td>
+</tr>
+<tr>
+<td>Validate Caddy</td>
+<td><code>caddy validate --config config/Caddyfile --adapter caddyfile -e …</code></td>
+</tr>
+<tr>
+<td>Staging up</td>
+<td><code>docker compose -p ttis-staging -f docker-compose.yml -f docker-compose.staging.yml up -d</code></td>
+</tr>
+<tr>
+<td>Build website</td>
+<td><code>python website/build.py</code> → preview <code>python website/serve.py</code></td>
+</tr>
+<tr>
+<td>Seed LMS</td>
+<td><code>docker exec ttis-dashboard python scripts/seed_lms_catalog.py</code></td>
+</tr>
+<tr>
+<td>Seed policy‑ack</td>
+<td><code>docker exec ttis-dashboard python scripts/seed_policy_ack.py</code></td>
+</tr>
+<tr>
+<td>Ingest corpus</td>
+<td><code>docker compose run --rm … dashboard python scripts/ingest_rag_corpus.py</code></td>
+</tr>
+<tr>
+<td>LYNNE Workspace setup</td>
+<td><code>python scripts/setup_google_workspace.py</code></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

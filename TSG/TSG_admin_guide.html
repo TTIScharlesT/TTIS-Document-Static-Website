@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TSG License Manager Administrator Guide</title>
+  <style>
+    body{font-family:Arial,sans-serif;line-height:1.6;margin:32px;color:#172033;background:#fff}
+    h1,h2,h3{color:#0f2f57} h1{border-bottom:3px solid #0f2f57;padding-bottom:10px}
+    .meta,.note{background:#f5f7fb;border-left:4px solid #356aa0;padding:12px 16px;margin:16px 0}
+    .warn{background:#fff8e6;border-left-color:#d89a00}
+    table{border-collapse:collapse;width:100%;margin:14px 0} th,td{border:1px solid #d8deea;padding:8px 10px;text-align:left;vertical-align:top} th{background:#edf2f8}
+    code,pre{font-family:Consolas,"Courier New",monospace} pre{background:#f5f7fb;border:1px solid #d8deea;border-radius:8px;padding:12px;overflow:auto}
+    li{margin:4px 0}.checklist li{list-style:"☐  "}
+  </style>
+</head>
+<body>
+  <h1>TSG License Manager Administrator Guide</h1>
+  <div class="meta"><p><strong>Version:</strong> RC1<br><strong>Audience:</strong> administrators, support leads, operations owners, release managers, and product owners<br><strong>Environment focus:</strong> GCP staging and production-style operations</p></div>
+
+  <h2>1. Purpose</h2>
+  <p>TSG License Manager is the shared licensing, entitlement, activation, customer portal, billing, Stripe webhook, email, and product-integration service for TTI Solutions products.</p>
+  <p>The administrator role is responsible for keeping the license service accurate, secure, auditable, and ready for product teams to integrate with.</p>
+
+  <h2>2. Core responsibilities</h2>
+  <ul>
+    <li>Maintain products, tenants, plans, modules, and entitlements.</li>
+    <li>Manage license lifecycle state and device activation records.</li>
+    <li>Verify customer access and product portal boundaries.</li>
+    <li>Review Stripe price mappings and webhook outcomes.</li>
+    <li>Manage password setup/reset workflows and email delivery evidence.</li>
+    <li>Record release, rollback, backup, and acceptance evidence.</li>
+  </ul>
+
+  <h2>3. Access model</h2>
+  <table><tr><th>Role</th><th>Typical responsibility</th></tr>
+    <tr><td>Superadmin</td><td>Full platform configuration and emergency operations.</td></tr>
+    <tr><td>Admin</td><td>Product, customer, license, billing, and integration management.</td></tr>
+    <tr><td>Support</td><td>Customer support, password reset assistance, device/license review.</td></tr>
+    <tr><td>Operations</td><td>Deployment, monitoring, backup/restore, rollback, and evidence capture.</td></tr>
+    <tr><td>Product owner</td><td>Product identity, portal behavior, acceptance signoff.</td></tr>
+  </table>
+  <div class="note warn"><p>Use named user accounts, store secrets outside source control, use HTTPS, and avoid exposing development credentials in staging or production.</p></div>
+
+  <h2>4. Key URLs and product identities</h2>
+  <table><tr><th>Item</th><th>Value</th></tr>
+    <tr><td>Shared service URL</td><td><code>https://license-staging.tti-solutions.com</code></td></tr>
+    <tr><td>GCP project</td><td><code>ttis-ai</code></td></tr>
+    <tr><td>Region</td><td><code>us-central1</code></td></tr>
+    <tr><td>Cloud Run service</td><td><code>tsg-license-manager-staging</code></td></tr>
+    <tr><td>Cloud SQL instance</td><td><code>tsg-license-manager-staging</code></td></tr>
+    <tr><td>Database</td><td><code>tsg_license_manager</code></td></tr>
+  </table>
+  <table><tr><th>Product</th><th>Product ID</th><th>Tenant ID</th><th>Key prefix</th><th>Staging portal</th></tr>
+    <tr><td>DocGuard AI</td><td><code>docguard_ai</code></td><td><code>docguard</code></td><td><code>DGA</code></td><td><code>https://docguard-ai-staging.tti-solutions.com</code></td></tr>
+    <tr><td>Pursuite</td><td><code>pursuite_crm</code></td><td><code>pursuite</code></td><td><code>PURSUITE</code></td><td><code>https://pursuite-staging.tti-solutions.com</code></td></tr>
+  </table>
+
+  <h2>5. Admin console map</h2>
+  <table><tr><th>Section</th><th>Use it to</th></tr>
+    <tr><td>Dashboard</td><td>Review overall product/customer/license status.</td></tr>
+    <tr><td>Products</td><td>Confirm product IDs, names, tenants, key prefixes, and status.</td></tr>
+    <tr><td>Customers</td><td>Review customer records and account/license relationships.</td></tr>
+    <tr><td>Licenses</td><td>View product keys, plans, status, and device limits.</td></tr>
+    <tr><td>Activations</td><td>Review device activations and deactivation history.</td></tr>
+    <tr><td>Stripe Mapping</td><td>Map Stripe prices to product plans.</td></tr>
+    <tr><td>Email</td><td>Review settings, templates, outbox, and delivery events.</td></tr>
+    <tr><td>Product Integration Settings</td><td>Retrieve product API credentials and endpoint references.</td></tr>
+    <tr><td>Monitoring</td><td>Review logs, runtime errors, metrics, and operational health.</td></tr>
+  </table>
+
+  <h2>6. Daily operating checklist</h2>
+  <ol>
+    <li>Sign in with an approved admin account.</li>
+    <li>Confirm the expected staging or production environment.</li>
+    <li>Check readiness/database connectivity.</li>
+    <li>Review recent runtime errors.</li>
+    <li>Review auth, billing, Stripe, email, and client events.</li>
+    <li>Confirm no unexpected product or tenant records were created.</li>
+    <li>Record unusual findings in the release or operations log.</li>
+  </ol>
+
+  <h2>7. Product setup workflow</h2>
+  <h3>Step 1: Verify tenant</h3>
+  <p>Confirm tenant ID, display name, domain/portal hostname, theme, visibility group, and support email.</p>
+  <h3>Step 2: Verify product record</h3>
+  <p>Confirm product ID, product name, tenant ID, key prefix, category group, visibility group, and status.</p>
+  <pre>Product: DocGuard AI
+Product ID: docguard_ai
+Tenant: docguard
+Key prefix: DGA</pre>
+  <h3>Step 3: Verify plans, modules, and marketplace extensions</h3>
+  <p>Confirm plan IDs, billing type, device limits, module entitlement mapping, extension IDs, required plans, and download/docs URLs.</p>
+
+  <h2>8. Customer and license management</h2>
+  <p>A valid license record includes customer, product ID, plan ID, product key, status, device limit, and timestamps.</p>
+  <ol>
+    <li>Customer purchases or receives a license.</li>
+    <li>License is created with the correct product and plan.</li>
+    <li>Entitlements are attached.</li>
+    <li>Customer receives setup/license email when configured.</li>
+    <li>Customer activates the product.</li>
+    <li>Product refreshes license state periodically.</li>
+  </ol>
+
+  <h2>9. Customer password setup and reset</h2>
+  <ol>
+    <li>Verify customer identity through approved support procedure.</li>
+    <li>Confirm customer email is tied to the expected record.</li>
+    <li>Send or regenerate a setup/reset token.</li>
+    <li>Confirm token expiration and single-use behavior.</li>
+    <li>Ask the customer to sign in through the correct product portal.</li>
+  </ol>
+
+  <h2>10. Product integration credentials</h2>
+  <pre>X-TSG-Product-ID: &lt;product_id&gt;
+X-TSG-API-Key: &lt;product API key&gt;</pre>
+  <p>Retrieve credentials from Product Integration Settings and share only through approved secure channels.</p>
+
+  <h2>11. Stripe, billing, and email operations</h2>
+  <pre>stripe_price_id -&gt; product_id -&gt; plan_id</pre>
+  <p>Before acceptance, send a signed Stripe test-mode event, verify signature success, confirm license/customer updates, prove duplicate replay is idempotent, and prove tampered payloads are rejected.</p>
+  <p>For email, confirm password setup, password reset, license-created, and delivery-event records using secrets from the environment or secret store.</p>
+
+  <h2>12. Monitoring, backup, restore, and rollback</h2>
+  <pre>/admin/monitoring
+/admin/logs
+/admin/errors
+/admin/email-events
+/admin/auth-events
+/admin/billing-events
+/admin/client-events</pre>
+  <p>Before deployment, record image digest, Cloud Run revision, Cloud SQL backup identifier, migration version, readiness response, operator, and timestamp.</p>
+
+  <h2>13. Release acceptance checklist</h2>
+  <ul class="checklist">
+    <li>Hosted CI passes on the release commit.</li>
+    <li>GCP staging deploy is healthy.</li>
+    <li>Readiness returns database OK.</li>
+    <li>Product portal routing is validated.</li>
+    <li>Product identities are correct.</li>
+    <li>Secrets are stored outside source control.</li>
+    <li>Customer tenant/product isolation is verified.</li>
+    <li>Client API credentials reject missing/invalid headers.</li>
+    <li>Activation, refresh, deactivation, and device-limit tests pass.</li>
+    <li>Stripe signed payload, tamper rejection, and replay idempotency pass.</li>
+    <li>SMTP staging delivery passes.</li>
+    <li>Backup/restore and rollback evidence are recorded.</li>
+  </ul>
+
+  <h2>14. Security rules</h2>
+  <ul>
+    <li>Never commit secrets.</li>
+    <li>Never share product API keys in unapproved channels.</li>
+    <li>Use HTTPS-only staging and production URLs.</li>
+    <li>Use explicit allowed hosts and secure cookies.</li>
+    <li>Disable development seed credentials in production.</li>
+    <li>Restrict GCP permissions by least privilege.</li>
+  </ul>
+</body>
+</html>

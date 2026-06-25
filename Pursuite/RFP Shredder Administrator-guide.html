@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pursuite RFP Shredder Administrator Guide</title>
+<style>
+:root{
+  --brand:#003087; --brand-light:#0057b8; --ink:#1f2733; --muted:#5b6675;
+  --line:#e5e8ee; --bg:#ffffff; --soft:#f6f8fb; --accent:#b88a00;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--soft); color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:920px; margin:0 auto; padding:0 24px 96px;}
+.masthead{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-light) 100%);
+  color:#fff; margin:0 0 32px; padding:48px 24px;
+}
+.masthead-inner{max-width:920px; margin:0 auto;}
+.masthead h1{margin:0; font-size:2rem; font-weight:700; letter-spacing:-.01em; border:0; color:#fff;}
+.masthead p{margin:.5rem 0 0; color:rgba(255,255,255,.85); font-style:italic; max-width:60ch;}
+.doc-nav{max-width:920px; margin:-18px auto 24px; padding:0 24px;}
+.doc-nav-inner{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 16px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+.doc-nav a{display:inline-block; margin:.15rem .8rem .15rem 0; font-size:.92rem; font-weight:600;}
+main{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:40px 48px; box-shadow:0 1px 3px rgba(16,24,40,.04);}
+h1,h2,h3,h4{line-height:1.25; color:var(--ink); scroll-margin-top:20px;}
+main>h1:first-child{margin-top:0}
+h1{font-size:1.7rem; font-weight:700; margin:2.4rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--line);}
+h2{font-size:1.35rem; font-weight:700; margin:2.2rem 0 .8rem; padding-bottom:.3rem; border-bottom:1px solid var(--line); color:var(--brand);}
+h3{font-size:1.12rem; font-weight:650; margin:1.8rem 0 .6rem;}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--brand-light);}
+p{margin:.7rem 0}
+a{color:var(--brand-light); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:#10243f}
+ul,ol{margin:.6rem 0 .9rem; padding-left:1.4rem}
+li{margin:.25rem 0}
+li>ul,li>ol{margin:.2rem 0}
+hr{border:0; border-top:1px solid var(--line); margin:2.5rem 0}
+code{background:var(--soft); border:1px solid var(--line); border-radius:4px; padding:.08em .4em; font-size:.88em; font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+blockquote{margin:1rem 0; padding:.4rem 1rem; border-left:3px solid var(--accent); background:#fffdf5; color:var(--muted); font-style:italic;}
+table{border-collapse:collapse; width:100%; margin:1.1rem 0; font-size:.93rem;}
+th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+thead th{background:var(--brand); color:#fff; font-weight:600; border-color:var(--brand);}
+tbody tr:nth-child(even){background:var(--soft)}
+/* Table of contents block (first list after the TOC heading) */
+.toc-callout{background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 20px; margin:1rem 0 2rem;}
+@media print{
+  body{background:#fff} main{border:0; box-shadow:none; padding:0}
+  .doc-nav{display:none}
+  .masthead{background:var(--brand) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  thead th{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  a{color:var(--ink)}
+}
+@media (max-width:640px){
+  main{padding:24px 18px} .wrap{padding:0 12px 64px} .masthead{padding:32px 18px}
+  .doc-nav{padding:0 12px}
+}
+.doc-footer{max-width:920px; margin:24px auto 0; padding:0 24px 48px; color:var(--muted); font-size:.9rem;}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Pursuite RFP Shredder Administrator Guide</h1>
+    <p>Administrator guide for verified RFP Shredder controls and operations.</p>
+  </div>
+</header>
+<nav class="doc-nav" aria-label="Document navigation">
+  <div class="doc-nav-inner">
+    <a href="#administration-overview">Overview</a><a href="#installation">Installation</a><a href="#configuration">Configuration</a><a href="#security-administration">Security</a><a href="#audit-and-compliance">Audit</a><a href="#troubleshooting">Troubleshooting</a>
+  </div>
+</nav>
+<div class="wrap">
+  <main>
+    <section aria-label="Document content">
+      <article>
+<h1 id="pursuite-rfp-shredder-administrator-guide">Pursuite RFP Shredder Administrator Guide</h1>
+<p>Document type: Administrator guide<br>
+Product area: Pursuite RFP Shredder, Compliance Matrix, AI Provider, CUI processing, Proposal Kickoff wizard<br>
+Version: 1.0<br>
+Last updated: June 23, 2026<br>
+Status: Publication-ready draft with screenshot placeholders and SME review markers</p>
+<hr>
+<h2 id="source-and-verification-standard">Source And Verification Standard</h2>
+<p>This guide uses only verified product information from the provided source materials. UI labels, roles, permissions, file limits, status values, API routes, security gates, and operational behavior are drawn from existing Pursuite documentation, frontend source, backend routes, permissions, migrations, and API reference material.</p>
+<p>Where the requested documentation outline asks for behavior that is not verified in the source materials, this guide uses <code>[SME Review Required: ...]</code> instead of inventing product behavior.</p>
+<p>Source priority used:</p>
+<ol>
+<li>Product screenshots and UI labels.</li>
+<li>Existing repository code and API routes.</li>
+<li>Existing documentation.</li>
+<li>SME notes.</li>
+<li>Clearly marked assumptions.</li>
+</ol>
+<p>No product screenshots were provided in the source materials. Screenshot placeholders are included for replacement.</p>
+<hr>
+<h2 id="table-of-contents">Table Of Contents</h2>
+<ol>
+<li><a href="#administration-overview">Administration Overview</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#user-management">User Management</a></li>
+<li><a href="#security-administration">Security Administration</a></li>
+<li><a href="#wizard-configuration">Wizard Configuration</a></li>
+<li><a href="#shred-template-administration">Shred Template Administration</a></li>
+<li><a href="#ai-configuration">AI Configuration</a></li>
+<li><a href="#reporting-administration">Reporting Administration</a></li>
+<li><a href="#audit-and-compliance">Audit And Compliance</a></li>
+<li><a href="#backup-and-recovery">Backup And Recovery</a></li>
+<li><a href="#monitoring-and-maintenance">Monitoring And Maintenance</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#appendix">Appendix</a></li>
+</ol>
+<hr>
+<h2 id="revision-history">Revision History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>June 23, 2026</td>
+<td>Codex</td>
+<td>Initial RFP Shredder administrator guide created from verified source materials.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="administration-overview">Administration Overview</h2>
+<h3 id="purpose">Purpose</h3>
+<p>This guide explains how administrators govern the Pursuite RFP Shredder and related downstream controls. It focuses on verified administration tasks: access control, AI provider readiness, CUI processing gates, processing status, troubleshooting, audit evidence, and backup considerations.</p>
+<h3 id="administrator-responsibilities">Administrator Responsibilities</h3>
+<p>Administrators are responsible for:</p>
+<ul>
+<li>Maintaining user roles and access boundaries.</li>
+<li>Ensuring at least one Proposal Manager or Admin can operate each proposal workflow.</li>
+<li>Configuring and testing the AI provider required by RFP Shredder and Compliance Matrix workflows.</li>
+<li>Governing CUI and external AI processing approvals.</li>
+<li>Monitoring failed uploads, failed processing jobs, and blocked confirmation gates.</li>
+<li>Preserving audit history for RFP upload, processing, edits, confirmation, CUI access, and AI activity.</li>
+<li>Supporting backup and restore for the standalone deployment.</li>
+</ul>
+<h3 id="security-model">Security Model</h3>
+<p>The verified RFP permission family is:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rfp:upload</code></td>
+<td>Admin, Proposal Manager</td>
+</tr>
+<tr>
+<td><code>rfp:read</code></td>
+<td>Admin, Proposal Manager, Writer, Executive Approver</td>
+</tr>
+<tr>
+<td><code>rfp:write</code></td>
+<td>Admin, Proposal Manager</td>
+</tr>
+<tr>
+<td><code>rfp:confirm</code></td>
+<td>Admin, Proposal Manager</td>
+</tr>
+</tbody>
+</table>
+<p>Related permissions include:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cui:read</code></td>
+<td>Read CUI-classified objects according to access controls.</td>
+</tr>
+<tr>
+<td><code>cui:write</code></td>
+<td>Apply or update CUI classifications.</td>
+</tr>
+<tr>
+<td><code>cui:admin</code></td>
+<td>Administer CUI controls, including classification removal where applicable.</td>
+</tr>
+<tr>
+<td><code>compliance_matrix:read</code></td>
+<td>Read Compliance Matrix data.</td>
+</tr>
+<tr>
+<td><code>compliance_matrix:write</code></td>
+<td>Generate or override Compliance Matrix data.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture-overview">Architecture Overview</h3>
+<p>Verified RFP Shredder architecture:</p>
+<pre><code class="language-text">Web proposal workspace
+  -&gt; RFP Shredder panel
+  -&gt; API RFP upload endpoint
+  -&gt; Storage
+  -&gt; RFP Shredder queue and worker
+  -&gt; Text extraction / OCR fallback / DOCX extraction
+  -&gt; AI requirement extraction
+  -&gt; rfp_documents and rfp_shredder_requirements data
+  -&gt; Confirm Requirements gate
+  -&gt; Compliance Matrix and Autonomous Pipeline unlock
+</code></pre>
+<p>[Screenshot: RFP Shredder architecture diagram placeholder]</p>
+<hr>
+<h2 id="installation">Installation</h2>
+<h3 id="supported-deployment-for-standalone-10">Supported Deployment For Standalone 1.0</h3>
+<p>Existing administrator documentation verifies Pursuite 1.0 as a standalone SMB pilot. The supported production path for that release is the signed Windows installer or signed portable launcher running a local Docker-managed stack through <strong>Pursuite Manager</strong>.</p>
+<h3 id="windows-installation-prerequisites">Windows Installation Prerequisites</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Verified Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operating system</td>
+<td>Windows 10 or Windows 11.</td>
+</tr>
+<tr>
+<td>Container runtime</td>
+<td>Docker Desktop current stable release.</td>
+</tr>
+<tr>
+<td>Installer path</td>
+<td>Signed Pursuite installer or signed portable launcher.</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>Pursuite Manager starts/stops the local stack, opens the local web app, and exposes logs, backups, restore, and diagnostics.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-launch-standalone-pursuite">Step-By-Step: Launch Standalone Pursuite</h3>
+<ol>
+<li>Install Docker Desktop current stable release on Windows 10 or Windows 11.</li>
+<li>Start Docker Desktop and wait until it reports ready.</li>
+<li>Run <code>Pursuite-Standalone-Setup-1.0.0.exe</code> or <code>Pursuite-Standalone-Launcher-1.0.0.exe</code>.</li>
+<li>Open <strong>Pursuite Manager</strong>.</li>
+<li>Confirm the Dashboard shows <strong>Standalone 1.0 Pilot</strong>, version <code>v1.0.0</code>, and local paths for data, environment, backups, launcher log, and bundled images.</li>
+<li>Select <strong>Launch Pursuite</strong>.</li>
+<li>Wait for the stack to become healthy.</li>
+<li>Sign in with the first-run Admin account.</li>
+</ol>
+<p>[Screenshot: Pursuite Manager Dashboard]</p>
+<p>Expected result: The local Pursuite web app opens and the Admin can sign in.</p>
+<h3 id="first-run-admin">First-Run Admin</h3>
+<p>On a clean standalone install, Pursuite Manager creates <code>%APPDATA%\Pursuite\first-run-admin.txt</code> after the stack becomes healthy when the default organization has no Admin user. Use organization <code>default</code>, email <code>admin@pursuite.local</code>, and the temporary password in that file.</p>
+<blockquote>
+<p><strong>Warning:</strong> Rotate the temporary Admin password immediately by creating a named Admin user or resetting the local fallback password.</p>
+</blockquote>
+<h3 id="linux-deployment">Linux Deployment</h3>
+<p>[SME Review Required: Linux deployment procedures are not verified as supported for the standalone 1.0 pilot documentation set.]</p>
+<h3 id="cloud-deployment">Cloud Deployment</h3>
+<p>Existing administrator documentation identifies SaaS/cloud hosting as roadmap for the standalone 1.0 pilot.</p>
+<p>[SME Review Required: Provide current cloud deployment architecture, prerequisites, and support boundary before publishing cloud installation steps.]</p>
+<hr>
+<h2 id="configuration">Configuration</h2>
+<h3 id="required-configuration-for-rfp-shredder">Required Configuration For RFP Shredder</h3>
+<table>
+<thead>
+<tr>
+<th>Configuration Area</th>
+<th>Required For</th>
+<th>Verified Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User roles</td>
+<td>Upload, write, confirmation</td>
+<td>Admin or Proposal Manager required for write and confirmation actions.</td>
+</tr>
+<tr>
+<td>AI Provider</td>
+<td>Requirement extraction and downstream AI workflows</td>
+<td>AI Provider settings power RFP Shredder, Compliance Matrix, Autonomous Pipeline, drafting, Ask, and analysis.</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Uploaded RFP files</td>
+<td>Standalone uses local Docker-managed volumes.</td>
+</tr>
+<tr>
+<td>Worker and queue services</td>
+<td>Background extraction</td>
+<td>RFP Shredder uses queue/worker processing.</td>
+</tr>
+<tr>
+<td>CUI processing policy</td>
+<td>Classified documents</td>
+<td>External CUI processing must be approved before classified RFP text can be sent to an AI provider.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-review-rfp-shredder-readiness">Step-By-Step: Review RFP Shredder Readiness</h3>
+<ol>
+<li>Confirm Pursuite is running.</li>
+<li>Confirm Docker Desktop is running for the standalone deployment.</li>
+<li>Confirm at least two active Admin accounts exist.</li>
+<li>Confirm Proposal Managers have appropriate access.</li>
+<li>Open Admin settings.</li>
+<li>Confirm AI Provider configuration exists.</li>
+<li>Run the AI provider connectivity test.</li>
+<li>Confirm CUI external-processing policy.</li>
+<li>Open a test proposal workspace.</li>
+<li>Upload a small PDF or DOCX RFP.</li>
+<li>Confirm extraction completes.</li>
+<li>Confirm the Compliance Matrix unlocks after requirements are confirmed.</li>
+</ol>
+<p>[Screenshot: AI Provider configuration page]</p>
+<h3 id="global-settings-and-defaults">Global Settings And Defaults</h3>
+<p>[SME Review Required: Identify the current global settings and default values that directly affect RFP Shredder behavior.]</p>
+<h3 id="workflow-configuration">Workflow Configuration</h3>
+<p>RFP Shredder confirmation is a hard gate for Compliance Matrix and Autonomous Pipeline workflows. Server-side gating verifies that requirements are confirmed before downstream workflows proceed.</p>
+<p>[SME Review Required: Confirm whether administrators can configure RFP Shredder workflow steps, thresholds, approvals, or notifications from the UI.]</p>
+<h3 id="data-retention">Data Retention</h3>
+<p>Verified retention-related behavior:</p>
+<ul>
+<li>RFP requirement deletes are soft deletes.</li>
+<li>Re-processing uses replace-on-success behavior.</li>
+<li>Existing active rows remain visible if a re-processing run fails.</li>
+<li>Old active rows are soft-deleted and replaced only after a successful extraction run.</li>
+<li>Audit history should be retained according to organization policy.</li>
+</ul>
+<p>[SME Review Required: Confirm organization-level retention periods and purge controls for uploaded RFP documents.]</p>
+<hr>
+<h2 id="user-management">User Management</h2>
+<h3 id="role-matrix">Role Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>RFP Shredder Access</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin</td>
+<td>Upload, replace, retry, re-process, add, edit, delete, mark reviewed, confirm, and view.</td>
+</tr>
+<tr>
+<td>Proposal Manager</td>
+<td>Upload, replace, retry, re-process, add, edit, delete, mark reviewed, confirm, and view.</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td>View completed requirements.</td>
+</tr>
+<tr>
+<td>Executive Approver</td>
+<td>Backend <code>rfp:read</code> permission is verified. UI behavior requires confirmation.</td>
+</tr>
+<tr>
+<td>Read-Only</td>
+<td><code>[SME Review Required: RFP Shredder visibility for Read-Only users is not verified.]</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-create-or-invite-a-user">Step-By-Step: Create Or Invite A User</h3>
+<ol>
+<li>Open <strong>Admin Console</strong>.</li>
+<li>Open <strong>Users &amp; Roles</strong>.</li>
+<li>Select <strong>Add User</strong> or <strong>Invite User</strong>.</li>
+<li>Enter the user's full name and email address.</li>
+<li>Select the appropriate system role.</li>
+<li>Send or save the invitation.</li>
+<li>Confirm the user can sign in.</li>
+<li>Add the user to proposal workspaces only where needed.</li>
+</ol>
+<p>[Screenshot: Users &amp; Roles tab]</p>
+<h3 id="step-by-step-change-a-user-role">Step-By-Step: Change A User Role</h3>
+<ol>
+<li>Open <strong>Admin Console</strong>.</li>
+<li>Open <strong>Users &amp; Roles</strong>.</li>
+<li>Search for the user.</li>
+<li>Review the current role.</li>
+<li>Confirm the business justification for the new role.</li>
+<li>Change the role.</li>
+<li>Save.</li>
+<li>Review proposal workspace membership separately.</li>
+</ol>
+<h3 id="step-by-step-disable-a-user">Step-By-Step: Disable A User</h3>
+<ol>
+<li>Confirm the offboarding or access-removal request.</li>
+<li>Identify active proposal assignments.</li>
+<li>Reassign sections, review tasks, reports, templates, and scheduled exports where needed.</li>
+<li>Remove unnecessary proposal workspace access.</li>
+<li>Deactivate the user account.</li>
+<li>Confirm the user can no longer sign in.</li>
+<li>Retain audit history.</li>
+</ol>
+<h3 id="step-by-step-reset-password-or-mfa">Step-By-Step: Reset Password Or MFA</h3>
+<ol>
+<li>Verify the user's identity through the organization's approved process.</li>
+<li>Open the user administration page.</li>
+<li>Reset the password or MFA enrollment according to available controls.</li>
+<li>Ask the user to sign in and complete any required enrollment.</li>
+<li>Record the reset if policy requires it.</li>
+</ol>
+<p>[SME Review Required: Confirm current UI labels for password reset and MFA reset controls.]</p>
+<hr>
+<h2 id="security-administration">Security Administration</h2>
+<h3 id="authentication-and-authorization">Authentication And Authorization</h3>
+<p>Existing source materials verify JWT-based authentication, optional SSO/OIDC support, local MFA/TOTP support, and role-based permissions enforced by middleware.</p>
+<h3 id="mfa">MFA</h3>
+<p>MFA applies to local email and password logins. Existing in-app guidance verifies TOTP enrollment with authenticator apps and 6-digit codes.</p>
+<h3 id="sso">SSO</h3>
+<p>Existing documentation references SSO providers such as Auth0, Okta, Azure AD, and Keycloak through OIDC configuration.</p>
+<p>[SME Review Required: Confirm the current production SSO setup procedure and IdP-specific metadata requirements before publishing customer-facing SSO instructions.]</p>
+<h3 id="session-management">Session Management</h3>
+<p>The Admin Console includes a <strong>Sessions</strong> tab where Admins can view active user sessions and terminate them.</p>
+<h3 id="password-policies">Password Policies</h3>
+<p>Existing end-user documentation verifies that profile password changes require a new password of at least 8 characters.</p>
+<p>[SME Review Required: Confirm complete password policy, lockout policy, and reset-token expiration behavior.]</p>
+<h3 id="cui-external-processing-gate">CUI External Processing Gate</h3>
+<p>When an RFP document is classified as CUI, the RFP Shredder worker checks whether the organization is approved for external CUI processing before sending document text to an AI provider.</p>
+<p>Do not enable external CUI processing unless:</p>
+<ol>
+<li>The AI provider is approved for the data type.</li>
+<li>Contract terms permit that processing.</li>
+<li>Security and compliance owners approve the configuration.</li>
+<li>The approval is documented.</li>
+</ol>
+<blockquote>
+<p><strong>Warning:</strong> Do not bypass the <code>CUI_BLOCKED</code> state by moving controlled content outside Pursuite. Resolve the policy/configuration issue first.</p>
+</blockquote>
+<hr>
+<h2 id="wizard-configuration">Wizard Configuration</h2>
+<h3 id="verified-wizard-system">Verified Wizard System</h3>
+<p>Existing source materials verify a server-driven wizard system with resumable state and seven wizard definitions. The <strong>Proposal Kickoff</strong> wizard includes RFP upload, requirement confirmation, and Compliance Matrix preview steps.</p>
+<h3 id="proposal-kickoff-wizard">Proposal Kickoff Wizard</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Verified Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Proposal Basics</td>
+<td>Captures proposal name and page limit.</td>
+</tr>
+<tr>
+<td>RFP Ingestion</td>
+<td>Uploads a solicitation PDF to <code>/proposals/:id/rfp-upload</code>.</td>
+</tr>
+<tr>
+<td>Review &amp; Confirm Requirements</td>
+<td>Instructs the user to confirm requirements in the RFP Shredder panel.</td>
+</tr>
+<tr>
+<td>Compliance Matrix Preview</td>
+<td>Queues matrix generation.</td>
+</tr>
+<tr>
+<td>Structure &amp; Team</td>
+<td>Directs assignment of writers and reviewers from the proposal workspace.</td>
+</tr>
+<tr>
+<td>Win Themes</td>
+<td>Captures optional win-theme input.</td>
+</tr>
+<tr>
+<td>Summary &amp; Launch</td>
+<td>Marks proposal draft-ready.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enable-or-disable-wizard">Enable Or Disable Wizard</h3>
+<p>[SME Review Required: No administrator UI for enabling or disabling individual wizards was verified in the provided source materials.]</p>
+<h3 id="configure-workflow-steps-validations-approvals-and-notifications">Configure Workflow Steps, Validations, Approvals, And Notifications</h3>
+<p>[SME Review Required: No administrator UI for configuring wizard steps, validations, approvals, or notifications was verified in the provided source materials.]</p>
+<hr>
+<h2 id="shred-template-administration">Shred Template Administration</h2>
+<p>The provided source materials verify proposal template governance, but do not verify a separate object named &quot;Shred Template.&quot;</p>
+<p>[SME Review Required: Confirm whether &quot;Shred Template&quot; means proposal templates, RFP extraction templates, or a future product object.]</p>
+<h3 id="verified-proposal-template-administration">Verified Proposal Template Administration</h3>
+<p>Admins can govern proposal templates through the template library:</p>
+<ol>
+<li>Create draft templates.</li>
+<li>Review requested template publication.</li>
+<li>Publish templates.</li>
+<li>Clone templates.</li>
+<li>Archive obsolete templates.</li>
+<li>Maintain bid-type and section metadata.</li>
+</ol>
+<h3 id="step-by-step-publish-a-proposal-template">Step-By-Step: Publish A Proposal Template</h3>
+<ol>
+<li>Open <strong>Templates</strong>.</li>
+<li>Filter to pending review if applicable.</li>
+<li>Open the requested template.</li>
+<li>Review title, bid type, volumes, sections, instructions, and metadata.</li>
+<li>Confirm the template follows organization proposal standards.</li>
+<li>Approve and publish, or reject with a clear reason.</li>
+<li>Notify the requester if additional changes are needed.</li>
+</ol>
+<p>[Screenshot: Template publish workflow]</p>
+<hr>
+<h2 id="ai-configuration">AI Configuration</h2>
+<h3 id="ai-provider-purpose">AI Provider Purpose</h3>
+<p>AI provider settings power drafting, RFP Shredder, Compliance Matrix, Autonomous Pipeline, Ask, analysis, and related AI features.</p>
+<h3 id="verified-provider-options">Verified Provider Options</h3>
+<p>The source materials reference AI provider configuration for:</p>
+<ul>
+<li>OpenAI.</li>
+<li>Azure OpenAI.</li>
+<li>Anthropic.</li>
+<li>PursuiteAI or custom OpenAI-compatible endpoint in existing user documentation.</li>
+<li>Ollama in wizard source for air-gapped/local provider configuration.</li>
+</ul>
+<p>[SME Review Required: Confirm the official supported provider list for the target release.]</p>
+<h3 id="step-by-step-add-or-update-an-ai-provider">Step-By-Step: Add Or Update An AI Provider</h3>
+<ol>
+<li>Open <strong>Admin Console</strong>.</li>
+<li>Open <strong>AI Provider</strong>.</li>
+<li>Select the provider type.</li>
+<li>Enter the required endpoint, deployment, model, or API key details.</li>
+<li>Save the configuration.</li>
+<li>Run the connectivity test.</li>
+<li>Confirm the test succeeds.</li>
+<li>Record approval, key owner, and rotation schedule according to internal policy.</li>
+</ol>
+<p>[Screenshot: AI Provider settings]</p>
+<h3 id="extraction-models-and-confidence-thresholds">Extraction Models And Confidence Thresholds</h3>
+<p>Verified behavior:</p>
+<ul>
+<li>RFP Shredder uses AI extraction.</li>
+<li>Low-confidence requirements below <code>0.70</code> must be reviewed before confirmation.</li>
+<li>Backend confirmation returns <code>LOW_CONFIDENCE_REVIEW_REQUIRED</code> when unreviewed low-confidence rows remain.</li>
+</ul>
+<p>[SME Review Required: Confirm whether administrators can configure extraction models, classification rules, confidence thresholds, or validation rules from the UI.]</p>
+<hr>
+<h2 id="reporting-administration">Reporting Administration</h2>
+<h3 id="verified-reports-related-to-rfp-shredder">Verified Reports Related To RFP Shredder</h3>
+<table>
+<thead>
+<tr>
+<th>Report Or Output</th>
+<th>Verified Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compliance Matrix</td>
+<td>Generated after RFP confirmation; shows missing, partial, and addressed coverage.</td>
+</tr>
+<tr>
+<td>Compliance Matrix CSV export</td>
+<td>Current UI exposes CSV export.</td>
+</tr>
+<tr>
+<td>Compliance Matrix DOCX export</td>
+<td>API reference mentions queued DOCX export.</td>
+</tr>
+<tr>
+<td>Compliance Matrix PDF export</td>
+<td>Update notes mention PDF export. Current UI source reviewed for this guide showed CSV only.</td>
+</tr>
+<tr>
+<td>RFP Analysis scheduled report</td>
+<td>Scheduled Reports source includes <code>RFP Analysis</code> as a report type.</td>
+</tr>
+</tbody>
+</table>
+<p>[SME Review Required: Confirm current customer-facing availability of DOCX/PDF Compliance Matrix export and RFP Analysis scheduled report contents.]</p>
+<h3 id="step-by-step-create-a-scheduled-report">Step-By-Step: Create A Scheduled Report</h3>
+<ol>
+<li>Open <strong>Scheduled Reports</strong>.</li>
+<li>Create a new schedule.</li>
+<li>Enter a name.</li>
+<li>Select a report type.</li>
+<li>Set frequency and timezone.</li>
+<li>Add recipients.</li>
+<li>Review whether the report contains sensitive or controlled data.</li>
+<li>Save.</li>
+<li>Confirm the first run completes.</li>
+</ol>
+<p>[Screenshot: Scheduled Reports form]</p>
+<h3 id="report-permissions">Report Permissions</h3>
+<p>Existing documentation states that Scheduled Reports can be viewed by all roles, while creating, editing, running, and deleting schedules require Proposal Manager or higher.</p>
+<p>[SME Review Required: Confirm exact backend permission mapping for scheduled report administration.]</p>
+<hr>
+<h2 id="audit-and-compliance">Audit And Compliance</h2>
+<h3 id="audit-event-categories">Audit Event Categories</h3>
+<p>Existing administrator documentation identifies these common audited actions:</p>
+<ul>
+<li>User sign-in and access-sensitive events.</li>
+<li>User and role administration.</li>
+<li>Proposal and opportunity changes.</li>
+<li>RFP upload, shredding, confirmation, and requirement edits.</li>
+<li>CUI classification and CUI access.</li>
+<li>AI provider usage and AI workflow events.</li>
+<li>Integration and export activity.</li>
+</ul>
+<h3 id="rfp-shredder-audit-relevant-behavior">RFP Shredder Audit-Relevant Behavior</h3>
+<table>
+<thead>
+<tr>
+<th>Behavior</th>
+<th>Compliance Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requirement confirmation gate</td>
+<td>Shows that a human approved the requirement set before downstream automation.</td>
+</tr>
+<tr>
+<td>Low-confidence review gate</td>
+<td>Prevents uncertain rows from being confirmed without human review.</td>
+</tr>
+<tr>
+<td>Soft delete</td>
+<td>Preserves history instead of destructive cleanup.</td>
+</tr>
+<tr>
+<td>Replace-on-success re-processing</td>
+<td>Prevents a failed re-run from deleting a usable requirement set.</td>
+</tr>
+<tr>
+<td>OCR fallback event</td>
+<td>Records when OCR was used for scanned PDFs.</td>
+</tr>
+<tr>
+<td>CUI external processing block</td>
+<td>Prevents controlled content from being sent externally without approval.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-by-step-export-audit-evidence">Step-By-Step: Export Audit Evidence</h3>
+<ol>
+<li>Open the audit or compliance area.</li>
+<li>Select the date range.</li>
+<li>Filter by user, target, module, or action category when available.</li>
+<li>Generate the export.</li>
+<li>Confirm the export opens correctly.</li>
+<li>Save it to the approved evidence repository.</li>
+<li>Record the export purpose and requestor.</li>
+</ol>
+<p>[Screenshot: Audit Log filter and export controls]</p>
+<p>[SME Review Required: Confirm exact audit export file formats and UI labels.]</p>
+<hr>
+<h2 id="backup-and-recovery">Backup And Recovery</h2>
+<h3 id="verified-standalone-backup-behavior">Verified Standalone Backup Behavior</h3>
+<p>Pursuite Manager supports backups and restore for the standalone deployment. Existing administrator documentation states that restore overwrites the current local database and uploads, then requires a stack restart.</p>
+<h3 id="step-by-step-run-a-backup">Step-By-Step: Run A Backup</h3>
+<ol>
+<li>Open <strong>Pursuite Manager</strong>.</li>
+<li>Open <strong>Backups</strong>.</li>
+<li>Start a new backup.</li>
+<li>Wait for backup completion.</li>
+<li>Confirm the backup appears in the backup list.</li>
+<li>Record the backup time and operator if required by policy.</li>
+</ol>
+<p>[Screenshot: Pursuite Manager Backups page]</p>
+<h3 id="step-by-step-restore-from-backup">Step-By-Step: Restore From Backup</h3>
+<ol>
+<li>Confirm the restore request is approved.</li>
+<li>Notify impacted users.</li>
+<li>Stop active editing work.</li>
+<li>Open <strong>Pursuite Manager</strong>.</li>
+<li>Open <strong>Backups</strong>.</li>
+<li>Select the backup to restore.</li>
+<li>Confirm that restore will overwrite the current local database and uploads.</li>
+<li>Start restore.</li>
+<li>Restart the stack when required.</li>
+<li>Validate sign-in and RFP document availability.</li>
+</ol>
+<p>[Screenshot: Backup restore confirmation]</p>
+<blockquote>
+<p><strong>Warning:</strong> Restore overwrites current local data and uploads. Confirm approval and backup selection before proceeding.</p>
+</blockquote>
+<h3 id="disaster-recovery-and-failover">Disaster Recovery And Failover</h3>
+<p>[SME Review Required: Formal disaster recovery RTO/RPO and failover procedures are not verified for the standalone 1.0 pilot.]</p>
+<hr>
+<h2 id="monitoring-and-maintenance">Monitoring And Maintenance</h2>
+<h3 id="health-checks">Health Checks</h3>
+<p>Verified standalone support guidance includes:</p>
+<ul>
+<li>Confirm Docker Desktop is running.</li>
+<li>Use Pursuite Manager Dashboard health status.</li>
+<li>Use <strong>Manager -&gt; Logs</strong> to review API, web, PostgreSQL, and Redis output.</li>
+<li>Use <strong>Copy Diagnostics</strong> when escalating.</li>
+<li>Review <code>%APPDATA%\Pursuite\launcher.log</code>.</li>
+</ul>
+<h3 id="step-by-step-review-rfp-shredder-processing-health">Step-By-Step: Review RFP Shredder Processing Health</h3>
+<ol>
+<li>Confirm Docker Desktop is running.</li>
+<li>Open <strong>Pursuite Manager</strong>.</li>
+<li>Confirm the stack is healthy.</li>
+<li>Open <strong>Manager -&gt; Logs</strong>.</li>
+<li>Review API logs.</li>
+<li>Review worker or queue-related log entries if available.</li>
+<li>Reproduce the failed RFP workflow with a known-good test document if appropriate.</li>
+<li>Capture diagnostics before escalation.</li>
+</ol>
+<p>[Screenshot: Pursuite Manager Logs]</p>
+<h3 id="scheduled-maintenance">Scheduled Maintenance</h3>
+<p>Recommended maintenance:</p>
+<ol>
+<li>Review failed RFP processing issues weekly during active proposals.</li>
+<li>Review AI provider connectivity before major proposal deadlines.</li>
+<li>Confirm backups after major proposal milestones.</li>
+<li>Review Admin and Proposal Manager access monthly.</li>
+<li>Review scheduled reports monthly.</li>
+<li>Review CUI processing approval and AI provider approval quarterly.</li>
+</ol>
+<hr>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="rfp-upload-or-processing-failures">RFP Upload Or Processing Failures</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upload rejected</td>
+<td>Unsupported file type.</td>
+<td>Use PDF or DOCX.</td>
+</tr>
+<tr>
+<td>Upload rejected</td>
+<td>File exceeds 50 MB.</td>
+<td>Reduce file size or obtain a smaller source document.</td>
+</tr>
+<tr>
+<td>User cannot upload</td>
+<td>User lacks Admin or Proposal Manager role.</td>
+<td>Update role only if justified, or have an authorized user upload.</td>
+</tr>
+<tr>
+<td>Processing failed</td>
+<td>AI provider not configured or unavailable.</td>
+<td>Test AI Provider configuration.</td>
+</tr>
+<tr>
+<td>Processing failed</td>
+<td>Worker or queue issue.</td>
+<td>Review Manager logs and queue/worker health.</td>
+</tr>
+<tr>
+<td>Processing failed with <code>CUI_BLOCKED</code></td>
+<td>CUI external processing is not approved.</td>
+<td>Review CUI policy and AI provider approval.</td>
+</tr>
+<tr>
+<td>No requirements extracted</td>
+<td>PDF may be unreadable even after OCR.</td>
+<td>Ask the user to upload a higher-quality scan or add requirements manually.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication-issues">Authentication Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User cannot sign in</td>
+<td>Account inactive, wrong tenant, SSO issue, or MFA issue.</td>
+<td>Verify account status, tenant, SSO health, and MFA enrollment.</td>
+</tr>
+<tr>
+<td>Admin item missing</td>
+<td>User is not an Admin.</td>
+<td>Confirm the role assignment.</td>
+</tr>
+<tr>
+<td>MFA reset needed</td>
+<td>User lost authenticator.</td>
+<td>Verify identity and reset MFA according to policy.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="database-or-storage-issues">Database Or Storage Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uploaded files missing</td>
+<td>Restore, storage issue, or wrong environment.</td>
+<td>Stop editing and check backup/restore status before retrying imports.</td>
+</tr>
+<tr>
+<td>RFP document not found</td>
+<td>No document uploaded or document lookup returns 404.</td>
+<td>Upload an RFP to the proposal workspace.</td>
+</tr>
+<tr>
+<td>Requirements disappear after re-process</td>
+<td>Successful re-process replaced old active rows.</td>
+<td>Review audit/history if needed. If re-process failed, old visible rows should remain.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="reporting-failures">Reporting Failures</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compliance Matrix unavailable</td>
+<td>RFP requirements are not confirmed.</td>
+<td>Confirm requirements first.</td>
+</tr>
+<tr>
+<td>Matrix generation fails</td>
+<td>AI provider, queue, or prerequisite issue.</td>
+<td>Verify AI provider, worker health, and RFP confirmation.</td>
+</tr>
+<tr>
+<td>CSV export fails</td>
+<td>Export request or download failed.</td>
+<td>Retry and review API/log output if persistent.</td>
+</tr>
+<tr>
+<td>DOCX/PDF export unavailable</td>
+<td>Current UI availability not verified.</td>
+<td><code>[SME Review Required: Confirm release-specific export controls.]</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="integration-failures">Integration Failures</h3>
+<p>[SME Review Required: No RFP Shredder-specific external integration failure procedures were verified beyond AI provider and CUI processing dependencies.]</p>
+<hr>
+<h2 id="appendix">Appendix</h2>
+<h3 id="glossary">Glossary</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>RFP Shredder feature gate.</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Compliance Matrix feature gate.</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Autonomous Pipeline feature gate.</td>
+</tr>
+<tr>
+<td>AI Provider</td>
+<td>Configured large language model provider used by AI features.</td>
+</tr>
+<tr>
+<td>CUI</td>
+<td>Controlled Unclassified Information.</td>
+</tr>
+<tr>
+<td>OCR</td>
+<td>Optical character recognition used when scanned PDFs lack embedded text.</td>
+</tr>
+<tr>
+<td>RFP</td>
+<td>Request for Proposal.</td>
+</tr>
+<tr>
+<td>RFI</td>
+<td>Request for Information.</td>
+</tr>
+<tr>
+<td>RFQ</td>
+<td>Request for Quote.</td>
+</tr>
+<tr>
+<td>SOW</td>
+<td>Statement of Work.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="acronyms">Acronyms</h3>
+<table>
+<thead>
+<tr>
+<th>Acronym</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td>Application Programming Interface</td>
+</tr>
+<tr>
+<td>CMMC</td>
+<td>Cybersecurity Maturity Model Certification</td>
+</tr>
+<tr>
+<td>CSV</td>
+<td>Comma-Separated Values</td>
+</tr>
+<tr>
+<td>DOCX</td>
+<td>Microsoft Word document format</td>
+</tr>
+<tr>
+<td>MFA</td>
+<td>Multi-Factor Authentication</td>
+</tr>
+<tr>
+<td>OIDC</td>
+<td>OpenID Connect</td>
+</tr>
+<tr>
+<td>PDF</td>
+<td>Portable Document Format</td>
+</tr>
+<tr>
+<td>RTO</td>
+<td>Recovery Time Objective</td>
+</tr>
+<tr>
+<td>RPO</td>
+<td>Recovery Point Objective</td>
+</tr>
+<tr>
+<td>SSO</td>
+<td>Single Sign-On</td>
+</tr>
+</tbody>
+</table>
+<h3 id="field-definitions">Field Definitions</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rfp_document_id</code></td>
+<td>Identifier for the uploaded RFP document.</td>
+</tr>
+<tr>
+<td><code>shred_status</code></td>
+<td>RFP Shredder processing state.</td>
+</tr>
+<tr>
+<td><code>requirement_text</code></td>
+<td>Extracted or manually entered requirement text.</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>Requirement category.</td>
+</tr>
+<tr>
+<td><code>is_mandatory</code></td>
+<td>Whether the requirement is mandatory.</td>
+</tr>
+<tr>
+<td><code>reviewed_at</code></td>
+<td>Timestamp indicating a low-confidence row has been reviewed.</td>
+</tr>
+<tr>
+<td><code>needs_review</code></td>
+<td>Boolean indicator for low-confidence review requirement.</td>
+</tr>
+<tr>
+<td><code>rfp_confirmed_at</code></td>
+<td>Proposal timestamp set when requirements are confirmed.</td>
+</tr>
+<tr>
+<td><code>rfp_confirmed_by</code></td>
+<td>User reference for the confirmer where recorded.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-dictionary">Data Dictionary</h3>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rfp_documents</code></td>
+<td>Stores uploaded RFP document metadata and processing status.</td>
+</tr>
+<tr>
+<td><code>rfp_shredder_requirements</code></td>
+<td>Stores extracted and manually added requirements.</td>
+</tr>
+<tr>
+<td><code>compliance_matrix_items</code></td>
+<td>Stores requirement coverage mapping for the Compliance Matrix.</td>
+</tr>
+<tr>
+<td><code>wizard_runs</code></td>
+<td>Stores resumable wizard state.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="verified-source-traceability">Verified Source Traceability</h3>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Source Material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RFP Shredder UI and controls</td>
+<td><code>app/apps/web/src/pages/proposals/RfpShredderPanel.tsx</code></td>
+</tr>
+<tr>
+<td>Compliance Matrix UI and CSV export</td>
+<td><code>app/apps/web/src/pages/proposals/ComplianceMatrixPanel.tsx</code></td>
+</tr>
+<tr>
+<td>Proposal Kickoff wizard</td>
+<td><code>app/apps/web/src/components/wizards/registry.tsx</code></td>
+</tr>
+<tr>
+<td>RFP permissions</td>
+<td><code>app/apps/api/src/middleware/permissions.ts</code></td>
+</tr>
+<tr>
+<td>RFP API behavior</td>
+<td><code>Docs/engineering/api-ref/Pursuite_API_Reference.md</code></td>
+</tr>
+<tr>
+<td>Admin standalone installation and operations</td>
+<td><code>app/docs/Pursuite_Admin_User_Guide.md</code></td>
+</tr>
+<tr>
+<td>End-user proposal workflow</td>
+<td><code>app/docs/Pursuite_End_User_Guide.md</code></td>
+</tr>
+<tr>
+<td>OCR fallback and in-app guidance</td>
+<td><code>Docs/060126_updates/InApp_User_Guide_Chunks.md</code></td>
+</tr>
+</tbody>
+</table>
+
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <p>Generated from administrator-guide.md. Review all SME Review Required items before final publication.</p>
+</footer>
+</body>
+</html>

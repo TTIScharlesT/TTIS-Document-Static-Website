@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TTIS AI — Agent Capabilities Guide</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="doc-page">
+  <main class="document">
+<nav aria-label="Document sections" class="doc-pager"><button data-doc-prev="" type="button">Previous</button><span class="doc-pager-status" data-doc-status=""></span><button data-doc-next="" type="button">Next</button></nav><section class="doc-section-page" data-section-index="0" data-section-title="Overview" id="overview"><h1 id="ttis-ai-agent-capabilities-guide">TTIS AI — Agent Capabilities Guide</h1>
+<p><strong>Thompson Telecom Infrastructure Solutions · Virtual Business System (VBS)</strong>
+<em>User &amp; Admin reference to all 35 agents · v1.0 · June 2026</em></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="1" data-section-title="How to read this guide" id="how-to-read-this-guide"><h2 id="how-to-read-this-guide">How to read this guide</h2>
+<p>The TTIS VBS is a multi‑agent organization: <strong>35 Claude‑backed agents</strong> that mirror a
+real company org chart. Each agent owns a function, holds a defined level of authority,
+can use a specific set of tools, and escalates up a chain that ends with <strong>APEX</strong> (the
+AI executive) and ultimately <strong>HUMAN</strong> (E. Charles Thompson). Agents are coordinated by
+<strong>COMMAND‑CORE</strong>, a deterministic rule‑based router (not an LLM) that turns business
+events into the right workflow with the right agents.</p>
+<p>Every agent entry below uses the same template:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ID</strong></td>
+<td>Stable internal identifier (A01–A35).</td>
+</tr>
+<tr>
+<td><strong>Tier</strong></td>
+<td>Claude model: <strong>Sonnet</strong> (complex reasoning/drafting/compliance/numbers) or <strong>Haiku</strong> (routine logging/scheduling/triage/coordination). EAAs pick their model via <code>EAA_MODEL</code>.</td>
+</tr>
+<tr>
+<td><strong>Authority</strong></td>
+<td>0–10 decision weight. 10 = owner‑level; 2–4 = task execution; higher numbers carry more autonomous decision latitude before a human gate.</td>
+</tr>
+<tr>
+<td><strong>Reports to</strong></td>
+<td>The agent (or HUMAN) this agent escalates to.</td>
+</tr>
+<tr>
+<td><strong>What it does</strong></td>
+<td>Core responsibilities.</td>
+</tr>
+<tr>
+<td><strong>Can / Cannot</strong></td>
+<td>Decision authority — what it may decide vs. what is gated.</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>The capabilities it is wired to (see the Tool Catalog).</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>A note on trust.</strong> Across the fleet, the same hard rules hold: agents never execute
+bank transactions, sign legally binding documents, or commit the company externally —
+those are flagged for human action. Safety holds (SENTINEL) and the audit trail are
+inviolable. Financials for TTIS and the Ross Low Voltage teaming partner are kept
+strictly separate. SDVOSB eligibility is never misrepresented.</p>
+</blockquote>
+</section><section class="doc-section-page" data-section-index="2" data-section-title="Authority levels at a glance" id="authority-levels-at-a-glance"><h3 id="authority-levels-at-a-glance">Authority levels at a glance</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Level</th>
+<th>Tier of agent</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><strong>10</strong></td>
+<td>Owner / final authority</td>
+<td>APEX</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>9</strong></td>
+<td>C‑suite / chief‑of‑staff</td>
+<td>ADMIRAL, VANTAGE, LYNNE</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>8</strong></td>
+<td>Director with override weight</td>
+<td>SENTINEL, VANGUARD</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>7</strong></td>
+<td>Senior function lead</td>
+<td>LEDGER, ARBITER, STRIKER, CONQUEST</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>6</strong></td>
+<td>Function director</td>
+<td>FIELDCOM, SCRIBE</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>5</strong></td>
+<td>Manager / lead</td>
+<td>ADMIRAL reports, GRID, QUILL, PRISM, FOREMAN, ROSS‑PRIME, OPS_SUPPORT, OPS_MANAGEMENT</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>4</strong></td>
+<td>Specialist</td>
+<td>GUARDIAN, NEXUS, CIPHER, CALC, RESEARCHER, IRONHAND, SUPPLY, HERALD</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>3</strong></td>
+<td>Coordinator / field</td>
+<td>WAYPOINT, BACKBONE, INSPECTOR, ANCHOR</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>2</strong></td>
+<td>Personal assistant</td>
+<td>SIERRA‑1, ECHO‑ALPHA, ECHO‑BRAVO</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+</section><section class="doc-section-page" data-section-index="3" data-section-title="Org at a glance" id="org-at-a-glance"><h2 id="org-at-a-glance">Org at a glance</h2>
+<ul>
+<li><strong>HUMAN — E. Charles Thompson</strong> (CEO / Veteran Owner)</li>
+<li><strong>APEX (A01)</strong> — AI Owner/President, final decision authority<ul>
+<li><strong>VANTAGE (A19)</strong> — VP Business Development → CONQUEST, PRISM, HERALD (+ QUILL, CALC under CONQUEST)</li>
+<li><strong>VANGUARD (A02)</strong> — Chief Strategy Officer</li>
+<li><strong>ADMIRAL (A24)</strong> — Chief Operating Officer → FOREMAN, SENTINEL, SUPPLY (+ ANCHOR, INSPECTOR); internal ops → NEXUS, WAYPOINT, CIPHER</li>
+<li><strong>FIELDCOM (A04)</strong> — Field Operations Director → ROSS‑PRIME (Ross LV) → IRONHAND, BACKBONE, ECHO‑ALPHA, ECHO‑BRAVO</li>
+<li><strong>LEDGER (A08)</strong> — Finance · <strong>ARBITER (A13)</strong> — Legal · <strong>STRIKER (A05)</strong> — Bid Management</li>
+<li><strong>SIERRA‑1 (A03)</strong> — Owner's Personal Assistant</li>
+</ul>
+</li>
+<li><strong>Executive Assistant Agents (EAA):</strong> <strong>LYNNE (A32)</strong> for the CEO; <strong>OPS_SUPPORT (A33)</strong> and <strong>OPS_MANAGEMENT (A34)</strong> for the two regional Field Operations Managers.</li>
+</ul>
+<hr/>
+</section><section class="doc-section-page" data-section-index="4" data-section-title="Tool Catalog" id="tool-catalog"><h2 id="tool-catalog">Tool Catalog</h2>
+<p>Tools are the concrete capabilities agents are granted. An agent can only do what its
+tools allow.</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pursuite_api</code></td>
+<td>Bidirectional integration with the <strong>Pursuite GovCon CRM</strong> — the system of record for the bid pipeline.</td>
+</tr>
+<tr>
+<td><code>pursuite_webhook_receiver</code></td>
+<td>HMAC‑verified inbound webhook receiver for Pursuite events.</td>
+</tr>
+<tr>
+<td><code>sam_gov_search</code></td>
+<td>Search <strong>SAM.gov</strong> for contract opportunities (secondary to Pursuite).</td>
+</tr>
+<tr>
+<td><code>usaspending_search</code></td>
+<td>Search <strong>USASpending.gov</strong> for federal award history / competitor analysis.</td>
+</tr>
+<tr>
+<td><code>gsa_rates_lookup</code></td>
+<td>GSA per‑diem rates and locality compensation data.</td>
+</tr>
+<tr>
+<td><code>document_search</code></td>
+<td>Semantic <strong>RAG</strong> search over the knowledge base (FAR/DFARS, SDVOSB regs, policies, proposals).</td>
+</tr>
+<tr>
+<td><code>document_draft</code></td>
+<td>Generate structured document drafts (proposals, contracts, analyses).</td>
+</tr>
+<tr>
+<td><code>notebooklm_content</code></td>
+<td>Google Gemini / NotebookLM‑style source‑grounded synthesis (SCRIBE).</td>
+</tr>
+<tr>
+<td><code>contract_db_read</code> / <code>contract_db_write</code></td>
+<td>Read / write contract terms, milestones, billing schedules (<code>contracts.db</code>).</td>
+</tr>
+<tr>
+<td><code>finance_read</code> / <code>finance_write</code></td>
+<td>Read P&amp;L, cash flow, AR, budgets, labor rates / record transactions, invoices, approvals.</td>
+</tr>
+<tr>
+<td><code>hr_db_read</code> / <code>hr_db_write</code></td>
+<td>Read / write employee records (PII‑scoped by role).</td>
+</tr>
+<tr>
+<td><code>schedule_db</code></td>
+<td>Project schedules, crew availability, milestones.</td>
+</tr>
+<tr>
+<td><code>vendor_db</code></td>
+<td>Vendor profiles, certifications, pricing, performance.</td>
+</tr>
+<tr>
+<td><code>sales_pipeline_db</code></td>
+<td>Commercial (non‑GovCon) CRM pipeline.</td>
+</tr>
+<tr>
+<td><code>project_management_db</code></td>
+<td>Contract‑project records: projects, milestones, production logs, deliveries.</td>
+</tr>
+<tr>
+<td><code>quality_inspection_db</code></td>
+<td>QA/QC inspections, NCRs, acceptance records.</td>
+</tr>
+<tr>
+<td><code>safety_incident_log</code></td>
+<td>Safety incident logging — <strong>immutable</strong> once written.</td>
+</tr>
+<tr>
+<td><code>timesheet_process</code></td>
+<td>Collect / pre‑process timesheets for LEDGER.</td>
+</tr>
+<tr>
+<td><code>email_send</code></td>
+<td>Send email.</td>
+</tr>
+<tr>
+<td><code>calendar_manage</code></td>
+<td>Create / update / delete calendar events.</td>
+</tr>
+<tr>
+<td><code>notification_send</code></td>
+<td>Internal P1/P2/P3/P4 system notifications.</td>
+</tr>
+<tr>
+<td><code>google_gmail</code> / <code>google_calendar</code> / <code>google_drive</code></td>
+<td>LYNNE's live Google Workspace access (CUI‑guarded).</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h1 id="the-35-agents-az">The 35 Agents (A–Z)</h1>
+<hr/>
+</section><section class="doc-section-page" data-section-index="5" data-section-title="ADMIRAL — Chief Operating Officer" id="admiral-chief-operating-officer"><h2 id="admiral-chief-operating-officer">ADMIRAL — Chief Operating Officer</h2>
+<p><strong>ID:</strong> A24 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 9/10 · <strong>Reports to:</strong> APEX</p>
+<p>Owns all operational delivery — project execution, safety program, procurement, field
+operations — with P&amp;L responsibility for operations.</p>
+<p><strong>What it does</strong>
+- Operational delivery oversight across all active contracts; margin defense and cost control.
+- Directs FOREMAN (PM), SENTINEL (Safety/QA), SUPPLY (Procurement), and field ops.
+- Delivery‑risk management, capacity planning for new bids, monthly performance reporting to APEX.
+- Steward of a zero‑incident safety culture.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Approve operational decisions, direct all Ops agents, authorize procurement under <strong>$25K</strong>, initiate scope‑change review, approve project staffing within budget.
+- ⛔ Execute contracts (APEX + human gate), approve spend &gt; $25K (LEDGER), make legal commitments, <strong>override a SENTINEL safety hold</strong>.</p>
+<p><strong>Tools:</strong> <code>contract_db_read</code>, <code>finance_read</code>, <code>schedule_db</code>, <code>project_management_db</code>, <code>notification_send</code>
+<strong>Escalation:</strong> Safety incident → P1 to SENTINEL + APEX; &gt;10% contract overrun → P2 to APEX.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="6" data-section-title="ANCHOR — Site Supervisor / Foreman" id="anchor-site-supervisor-foreman"><h2 id="anchor-site-supervisor-foreman">ANCHOR — Site Supervisor / Foreman</h2>
+<p><strong>ID:</strong> A28 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 3/10 · <strong>Reports to:</strong> FOREMAN</p>
+<p>The boots‑on‑the‑ground field leader: crews, safety, and daily production.</p>
+<p><strong>What it does</strong>
+- Daily crew direction and task assignment; morning toolbox talks and JHA sign‑offs.
+- Daily production tracking (footage installed, connections, tests run); material receipt tracking.
+- End‑of‑day field report to FOREMAN; on‑site subcontractor oversight.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Direct crew work, <strong>initiate a site‑level safety stop</strong>, accept material deliveries, document daily production.
+- ⛔ Authorize scope changes, accept change‑order direction without FOREMAN, release safety stops without SENTINEL clearance.</p>
+<p><strong>Tools:</strong> <code>project_management_db</code>, <code>safety_incident_log</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Any incident logged within 2 hours; safety holds reported to SENTINEL + FOREMAN within 1 hour.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="7" data-section-title="APEX — Owner / President" id="apex-owner-president"><h2 id="apex-owner-president">APEX — Owner / President</h2>
+<p><strong>ID:</strong> A01 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 10/10 · <strong>Reports to:</strong> HUMAN</p>
+<p>The AI executive representing the Owner. Final decision authority and the top escalation point.</p>
+<p><strong>What it does</strong>
+- Final authority on contracts, partnerships, and major expenditures; strategic oversight of all departments and the Ross LV teaming arrangement.
+- Signature authority on teaming agreements, contracts, and compliance filings (flagged for human signature).
+- Interface with federal contracting officers, agencies, and prime contractors; brand stewardship.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Approve bids, authorize contracts under <strong>$250K</strong>, approve hiring, approve legal strategy, authorize vendor agreements.
+- ⛔ Execute financial transactions, sign legally binding documents (human), commit over <strong>$500K</strong> without human review.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>contract_db_read</code>, <code>finance_read</code>, <code>hr_db_read</code>, <code>document_search</code>, <code>notification_send</code>
+<strong>Escalation (to HUMAN):</strong> litigation, contracts &gt; $500K, SDVOSB status challenges, media inquiries.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="8" data-section-title="ARBITER — Legal" id="arbiter-legal"><h2 id="arbiter-legal">ARBITER — Legal</h2>
+<p><strong>ID:</strong> A13 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 7/10 · <strong>Reports to:</strong> APEX</p>
+<p>Legal analysis, contract review, and SDVOSB compliance — cautious, never guesses about law.</p>
+<p><strong>What it does</strong>
+- Contract review and risk identification; standard contract‑language drafting.
+- SDVOSB compliance (ownership, control, eligibility); FAR/DFARS/SBA/state‑licensing compliance.
+- Outside‑counsel coordination, employment‑law support to NEXUS, SDVOSB protest‑defense prep.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Flag legal risks, recommend modifications, prepare issue briefs, draft standard language, produce compliance checklists.
+- ⛔ Provide definitive legal advice, execute legal strategy without APEX, settle disputes.</p>
+<p><strong>Tools:</strong> <code>document_search</code>, <code>contract_db_read</code>, <code>document_draft</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Always disclaims "legal analysis, not legal advice — outside counsel review required." SDVOSB risk flags are <strong>Priority 1</strong>.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="9" data-section-title="BACKBONE — Operational Support (Ross Low Voltage)" id="backbone-operational-support-ross-low-voltage"><h2 id="backbone-operational-support-ross-low-voltage">BACKBONE — Operational Support (Ross Low Voltage)</h2>
+<p><strong>ID:</strong> A16 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 3/10 · <strong>Reports to:</strong> ROSS‑PRIME</p>
+<p>Project logistics and operational support for the Ross LV teaming partner.</p>
+<p><strong>What it does</strong>
+- Project coordination and schedule adherence; sub‑tier subcontractor management.
+- Operations / growth‑strategy support for Ross LV; resource‑availability reporting to ROSS‑PRIME.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Coordinate schedules, track sub‑tier subs, report resource availability.
+- ⛔ Act outside the teaming‑agreement scope; commit TTIS resources.</p>
+<p><strong>Tools:</strong> <code>schedule_db</code>, <code>notification_send</code>, <code>document_search</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="10" data-section-title="CALC — Estimating Lead" id="calc-estimating-lead"><h2 id="calc-estimating-lead">CALC — Estimating Lead</h2>
+<p><strong>ID:</strong> A22 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> CONQUEST</p>
+<p>Builds defensible, FAR Part 31‑compliant cost estimates and price volumes for bids.</p>
+<p><strong>What it does</strong>
+- Bottom‑up cost estimates (labor, materials, equipment, ODCs); CLIN‑level pricing structures.
+- Labor‑rate analysis (GSA schedules, OEWS, TTIS historical rates); fee analysis (overhead, G&amp;A, profit).
+- Deltek ProPricer‑compatible rate documentation; price‑to‑win analysis when intel is available.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Produce cost estimates, request historical rate data, flag pricing risk, recommend fee structures.
+- ⛔ Set the final bid price (LEDGER), approve overhead rates, submit pricing without LEDGER sign‑off.</p>
+<p><strong>Tools:</strong> <code>finance_read</code>, <code>document_search</code>, <code>gsa_rates_lookup</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Rates sourced from the current rate card or documented market data; never includes unallowable costs (FAR 31.205).</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="11" data-section-title="CIPHER — Corporate IT" id="cipher-corporate-it"><h2 id="cipher-corporate-it">CIPHER — Corporate IT</h2>
+<p><strong>ID:</strong> A12 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Network, cloud, website, and internal communications — with a cybersecurity posture.</p>
+<p><strong>What it does</strong>
+- Network/cloud infrastructure and website maintenance; internal comms platform management.
+- Cybersecurity monitoring (CMMC / DFARS 252.204‑7012); Pursuite API + webhook‑endpoint uptime.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Monitor and report on infrastructure health and security posture.
+- ⛔ Store CUI on non‑compliant systems.</p>
+<p><strong>Tools:</strong> <code>notification_send</code>, <code>document_search</code>
+<strong>Constraints:</strong> Federal contract data handled per DFARS cybersecurity requirements; Pursuite webhook monitored 24/7.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="12" data-section-title="CONQUEST — GovCon Capture Manager" id="conquest-govcon-capture-manager"><h2 id="conquest-govcon-capture-manager">CONQUEST — GovCon Capture Manager</h2>
+<p><strong>ID:</strong> A20 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 7/10 · <strong>Reports to:</strong> VANTAGE</p>
+<p>Owns the win strategy for every bid, from opportunity identification through submission.</p>
+<p><strong>What it does</strong>
+- Capture plans, win strategy (themes, discriminators, ghosts, features‑benefits).
+- Competitive intelligence (incumbent analysis, competitor pricing, prior awards via USASpending).
+- Color‑team review management (Pink/Red/Gold); directs QUILL (writing) and CALC (estimating).</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Develop win strategy, direct QUILL and CALC, recommend teaming structure, manage color teams.
+- ⛔ Submit proposals without APEX, commit pricing without CALC + LEDGER, make compliance assertions without ARBITER.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>document_search</code>, <code>usaspending_search</code>, <code>sam_gov_search</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Pursuite is the system of record; never fabricates award history or incumbent weaknesses.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="13" data-section-title="ECHO‑ALPHA — Personal Assistant, Ross Low Voltage #1" id="echo-alpha-personal-assistant-ross-low-voltage-1"><h2 id="echoalpha-personal-assistant-ross-low-voltage-1">ECHO‑ALPHA — Personal Assistant, Ross Low Voltage #1</h2>
+<p><strong>ID:</strong> A17 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 2/10 · <strong>Reports to:</strong> ROSS‑PRIME</p>
+<p>Scheduling and communications support for Ross LV leadership.</p>
+<p><strong>What it does</strong>
+- Calendar/scheduling for Ross LV leadership; communications triage and response drafting.
+- Document prep/filing; daily status briefing for ROSS‑PRIME; TTIS↔Ross LV meeting coordination.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Schedule, triage communications, prepare documents and briefings.
+- ⛔ Make commitments or approvals on behalf of leadership.</p>
+<p><strong>Tools:</strong> <code>email_send</code>, <code>calendar_manage</code>, <code>notification_send</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="14" data-section-title="ECHO‑BRAVO — Personal Assistant, Ross Low Voltage #2" id="echo-bravo-personal-assistant-ross-low-voltage-2"><h2 id="echobravo-personal-assistant-ross-low-voltage-2">ECHO‑BRAVO — Personal Assistant, Ross Low Voltage #2</h2>
+<p><strong>ID:</strong> A18 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 2/10 · <strong>Reports to:</strong> ROSS‑PRIME</p>
+<p>Field‑logistics support and compliance paperwork for Ross LV.</p>
+<p><strong>What it does</strong>
+- Crew certification/training records; safety‑incident documentation; material delivery/receipt tracking.
+- Timesheet collection/pre‑processing for LEDGER; OSHA logs, FOA records, insurance certificates.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Maintain records, document incidents, pre‑process timesheets.
+- ⛔ Approve costs or make operational commitments.</p>
+<p><strong>Tools:</strong> <code>safety_incident_log</code>, <code>timesheet_process</code>, <code>notification_send</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="15" data-section-title="FIELDCOM — Field Operations Director" id="fieldcom-field-operations-director"><h2 id="fieldcom-field-operations-director">FIELDCOM — Field Operations Director</h2>
+<p><strong>ID:</strong> A04 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 6/10 · <strong>Reports to:</strong> APEX</p>
+<p>Oversees field execution and is the primary interface to the Ross LV subcontractor.</p>
+<p><strong>What it does</strong>
+- Coordination of all field operations across active contracts; TTIS↔Ross LV interface (via ROSS‑PRIME).
+- Safety and compliance oversight (BICSI, FOA enforced); certification tracking; status reporting to APEX.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Adjust field schedules, direct Ross LV on work orders, approve material procurement under <strong>$10K</strong>, initiate safety holds.
+- ⛔ Authorize new contracts, modify scope without GRID, exceed labor budgets without LEDGER.</p>
+<p><strong>Tools:</strong> <code>schedule_db</code>, <code>contract_db_read</code>, <code>vendor_db</code>, <code>notification_send</code>, <code>document_search</code>
+<strong>Escalation:</strong> Safety → APEX + human immediately; budget overruns → LEDGER; scope changes → GRID then APEX.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="16" data-section-title="FOREMAN — Project Manager, Field Operations" id="foreman-project-manager-field-operations"><h2 id="foreman-project-manager-field-operations">FOREMAN — Project Manager, Field Operations</h2>
+<p><strong>ID:</strong> A27 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Owns day‑to‑day project execution — schedule, budget, crew, and quality — on every active contract.</p>
+<p><strong>What it does</strong>
+- Schedule maintenance (3‑week lookahead, critical path); earned‑value budget tracking and forecast at completion.
+- Crew coordination with ANCHOR; material procurement with SUPPLY; daily/weekly status to ADMIRAL.
+- Change‑order identification/documentation; project close‑out (punch list, as‑builts).</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Direct ANCHOR, adjust daily schedules, approve material orders under <strong>$5K</strong>, document scope changes.
+- ⛔ Approve change orders (ADMIRAL/APEX), authorize over‑budget overtime (LEDGER).</p>
+<p><strong>Tools:</strong> <code>project_management_db</code>, <code>schedule_db</code>, <code>vendor_db</code>, <code>contract_db_read</code>, <code>notification_send</code>
+<strong>Constraints:</strong> SENTINEL safety holds are absolute; schedule slip &gt; 5 days flagged to ADMIRAL immediately.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="17" data-section-title="GRID — Project Management (budgets &amp; timelines)" id="grid-project-management-budgets-timelines"><h2 id="grid-project-management-budgets-timelines">GRID — Project Management (budgets &amp; timelines)</h2>
+<p><strong>ID:</strong> A07 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> FIELDCOM</p>
+<p>Owns project budgets, timelines, and scheduling across all active TTIS contracts.</p>
+<p><strong>What it does</strong>
+- Project budget tracking and variance analysis; Gantt‑level timeline management.
+- Scheduling coordination with IRONHAND; change‑order and scope documentation; close‑out documentation.
+- Status reporting to FIELDCOM and APEX.</p>
+<blockquote>
+<p><strong>Note:</strong> GRID also powers LYNNE's <strong>executive projects</strong> — lightweight workstreams the
+CEO can scope, deadline, and track via chat (separate from the contract‑project budget machinery).</p>
+</blockquote>
+<p><strong>Can / Cannot</strong>
+- ✅ Adjust internal schedules, flag budget variances, issue change‑order requests, authorize within‑budget overtime.
+- ⛔ Approve change orders (APEX), exceed project budget without LEDGER.</p>
+<p><strong>Tools:</strong> <code>schedule_db</code>, <code>contract_db_read</code>, <code>contract_db_write</code>, <code>finance_read</code>, <code>notification_send</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="18" data-section-title="GUARDIAN — Vendor Management" id="guardian-vendor-management"><h2 id="guardian-vendor-management">GUARDIAN — Vendor Management</h2>
+<p><strong>ID:</strong> A06 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> FIELDCOM</p>
+<p>Manages vendor relationships, procurement coordination, and contract compliance.</p>
+<p><strong>What it does</strong>
+- Vendor qualification/onboarding (insurance, licensing, pricing); contract and renewal tracking.
+- Procurement coordination with IRONHAND/FIELDCOM; vendor performance and BICSI/FOA‑certified vendor tracking.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Approve vendor invoices under <strong>$5K</strong>, issue POs under <strong>$10K</strong>, remove underperforming vendors from the approved list.
+- ⛔ Execute vendor contracts (ARBITER + APEX), approve spend over $10K without LEDGER.</p>
+<p><strong>Tools:</strong> <code>vendor_db</code>, <code>document_search</code>, <code>notification_send</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="19" data-section-title="HERALD — Sales &amp; BD Support" id="herald-sales-bd-support"><h2 id="herald-sales-bd-support">HERALD — Sales &amp; BD Support</h2>
+<p><strong>ID:</strong> A31 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> PRISM</p>
+<p>The execution engine behind the BD team — CRM, lead tracking, follow‑ups, and quote prep.</p>
+<p><strong>What it does</strong>
+- CRM pipeline maintenance (<code>sales_pipeline_db</code>); lead intake/triage/routing to PRISM or CONQUEST.
+- Follow‑up scheduling; quote/proposal prep support; weekly pipeline report for VANTAGE; collateral retrieval.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Update CRM, schedule follow‑ups, prepare materials, route leads, send routine BD communications.
+- ⛔ Qualify GovCon bids (CONQUEST), set commercial pricing (PRISM/CALC), commit to meetings without SIERRA‑1.</p>
+<p><strong>Tools:</strong> <code>sales_pipeline_db</code>, <code>document_search</code>, <code>notification_send</code>, <code>email_send</code>
+<strong>Constraints:</strong> External BD emails require approval by PRISM or VANTAGE before send; no pricing commitments in writing.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="20" data-section-title="INSPECTOR — QA/QC Inspector" id="inspector-qa-qc-inspector"><h2 id="inspector-qaqc-inspector">INSPECTOR — QA/QC Inspector</h2>
+<p><strong>ID:</strong> A26 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 3/10 · <strong>Reports to:</strong> SENTINEL</p>
+<p>Conducts quality inspections at project milestones and documents findings to the QMS.</p>
+<p><strong>What it does</strong>
+- Field quality inspections; punch‑list generation/tracking; NCR documentation.
+- Material receive‑and‑inspect; test/acceptance documentation (cable tests, link verification); photo docs.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Document findings, issue punch lists, flag NCRs, reject non‑conforming materials (escalate to SENTINEL).
+- ⛔ Issue safety holds (SENTINEL only), approve final delivery without SENTINEL, modify QMS procedures.</p>
+<p><strong>Tools:</strong> <code>quality_inspection_db</code>, <code>schedule_db</code>, <code>notification_send</code>
+<strong>Constraints:</strong> NCRs are immutable once logged; safety observations flagged to SENTINEL immediately.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="21" data-section-title="IRONHAND — Field Ops Management (Ross Low Voltage)" id="ironhand-field-ops-management-ross-low-voltage"><h2 id="ironhand-field-ops-management-ross-low-voltage">IRONHAND — Field Ops Management (Ross Low Voltage)</h2>
+<p><strong>ID:</strong> A15 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> ROSS‑PRIME</p>
+<p>Directs daily field execution for Ross LV: install crews, materials, QC, and safety.</p>
+<p><strong>What it does</strong>
+- Field execution oversight (daily crew assignments, job‑site status); install‑crew management/deployment.
+- Material selection/procurement coordination; QC inspections; safety enforcement (OSHA, BICSI, FOA).</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Assign crews, coordinate materials/QC, enforce safety on Ross LV sites.
+- ⛔ Override safety holds; act outside the teaming scope.</p>
+<p><strong>Tools:</strong> <code>schedule_db</code>, <code>vendor_db</code>, <code>safety_incident_log</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Safety holds are absolute (documented/reported to ROSS‑PRIME within 1 hour); BICSI/FOA docs current.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="22" data-section-title="LEDGER — Finance Director" id="ledger-finance-director"><h2 id="ledger-finance-director">LEDGER — Finance Director</h2>
+<p><strong>ID:</strong> A08 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 7/10 · <strong>Reports to:</strong> APEX</p>
+<p>Owns all financial operations, FAR Part 31 cost compliance, and DCAA audit readiness.</p>
+<p><strong>What it does</strong>
+- Payroll, expenses, budget, contract billing, invoicing, AR; cash‑flow management and 13‑week forecast.
+- Pricing support for STRIKER (cost buildup, fee analysis); FAR Part 31 compliance; DCAA audit trail.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Process invoices under <strong>$25K</strong>, flag cash‑flow risks, approve routine expense reports, produce financial reports.
+- ⛔ Execute bank transactions (human only), approve contracts, commit payment terms without APEX.</p>
+<p><strong>Tools:</strong> <code>finance_read</code>, <code>finance_write</code>, <code>contract_db_read</code>, <code>hr_db_read</code>, <code>pursuite_api</code>, <code>gsa_rates_lookup</code>, <code>document_search</code>
+<strong>Constraints:</strong> Maintains the DCAA audit trail; keeps TTIS and Ross LV financials strictly separated.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="23" data-section-title="LYNNE — CEO Executive Assistant Agent (EAA)" id="lynne-ceo-executive-assistant-agent-eaa"><h2 id="lynne-ceo-executive-assistant-agent-eaa">LYNNE — CEO Executive Assistant Agent (EAA)</h2>
+<p><strong>ID:</strong> A32 · <strong>Tier:</strong> EAA (Sonnet via <code>EAA_MODEL</code>) · <strong>Authority:</strong> 9/10 · <strong>Reports to:</strong> APEX</p>
+<p>The CEO‑facing conversational chief of staff — the primary agent you talk to in <strong>Ask‑LYNNE</strong>.
+Level‑1 Global Admin (read/write across all operational databases), RAG‑grounded, with
+identity/anti‑assumption guardrails and full audit logging.</p>
+<p><strong>What it does</strong>
+- Synthesizes Pursuite pipeline data into executive briefs; prioritizes the CEO task queue by impact.
+- Drafts summaries/decision memos/board reports; relays cross‑agent tasks (e.g., tasks <strong>GRID</strong> to run projects, delegates research to <strong>RESEARCHER</strong>); flags compliance holds to SENTINEL.
+- <strong>Live Google Workspace</strong> (Gmail, Calendar, Drive — read inbox, search &amp; read Drive files, manage events).
+- <strong>Playbooks</strong> (savable templated tasks, incl. multi‑step <em>sequences</em> and save‑to‑Drive), and <strong>rich cross‑turn memory</strong> so research/documents carry across the conversation.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Retrieve any operational data, draft any document, flag SENTINEL holds, relay tasks with CEO‑level context, create/manage executive projects through GRID.
+- ⛔ Execute financial transactions, sign contracts, commit externally — always flagged for the CEO's direct action.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>contract_db_read</code>, <code>finance_read</code>, <code>hr_db_read</code>, <code>schedule_db</code>, <code>sales_pipeline_db</code>, <code>project_management_db</code>, <code>quality_inspection_db</code>, <code>document_search</code>, <code>notification_send</code>, <code>email_send</code>, <code>google_gmail</code>, <code>google_calendar</code>, <code>google_drive</code> (+ web search, RESEARCHER delegation, GRID project tools)
+<strong>Guardrails:</strong> Distinguishes what it can <em>access</em> from what it can <em>verify</em>; never presents an assumption as fact; CEO‑only access; optional hard session‑binding.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="24" data-section-title="NEXUS — Human Resources" id="nexus-human-resources"><h2 id="nexus-human-resources">NEXUS — Human Resources</h2>
+<p><strong>ID:</strong> A10 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Talent acquisition, policies, onboarding, and HR compliance — PII‑guarded.</p>
+<p><strong>What it does</strong>
+- Talent acquisition (postings, screening, scheduling); employee onboarding/offboarding.
+- Corporate policy documentation; employment‑law compliance (FLSA, OSHA, SCA, VEVRAA); SDVOSB workforce certification.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Run HR workflows, maintain records and policies, apply veterans' preference.
+- ⛔ Make employment decisions without human (CEO) review; terminations require ARBITER (outside‑counsel) review.</p>
+<p><strong>Tools:</strong> <code>hr_db_read</code>, <code>hr_db_write</code>, <code>document_search</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Veterans' preference applied to all hiring per VEVRAA.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="25" data-section-title="OPS_MANAGEMENT — Field Ops Manager Assistant, Region Bravo (EAA)" id="ops-management-field-ops-manager-assistant-region-bravo-eaa"><h2 id="ops_management-field-ops-manager-assistant-region-bravo-eaa">OPS_MANAGEMENT — Field Ops Manager Assistant, Region Bravo (EAA)</h2>
+<p><strong>ID:</strong> A34 · <strong>Tier:</strong> EAA (Sonnet via <code>EAA_MODEL</code>) · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> FOREMAN</p>
+<p>A Level‑2 regional EAA for the Bravo Region (Systems Integration) Field Operations Manager —
+scoped strictly to project and schedule data.</p>
+<p><strong>What it does</strong>
+- Equipment inventory/asset tracking; subcontractor deliverable/milestone tracking against SOW.
+- Materials‑cost verification (flags variances &gt; 10% to FOREMAN for LEDGER review); active field‑dispatch monitoring.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Log project updates, track subcontractor milestones, flag cost variances, update dispatch schedules.
+- ⛔ Approve material purchases, modify subcontract terms, access finance.db, sign off on quality inspections.</p>
+<p><strong>Tools:</strong> <code>project_management_db</code>, <code>schedule_db</code>, <code>document_search</code>, <code>notification_send</code>
+<strong>Guardrails:</strong> Cites [REF‑N] from verified docs on subcontract/materials policy; escalates compliance ambiguities to FOREMAN. <strong>No</strong> access to financial, HR, contract, CRM, or QC databases.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="26" data-section-title="OPS_SUPPORT — Field Ops Manager Assistant, Region Alpha (EAA)" id="ops-support-field-ops-manager-assistant-region-alpha-eaa"><h2 id="ops_support-field-ops-manager-assistant-region-alpha-eaa">OPS_SUPPORT — Field Ops Manager Assistant, Region Alpha (EAA)</h2>
+<p><strong>ID:</strong> A33 · <strong>Tier:</strong> EAA (Sonnet via <code>EAA_MODEL</code>) · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> FOREMAN</p>
+<p>A Level‑2 regional EAA for the Alpha Region (Telecom Infrastructure) Field Operations Manager.</p>
+<p><strong>What it does</strong>
+- Crew‑allocation scheduling (flags conflicts); field‑safety reporting via <code>safety_incident_log</code> with OSHA documentation.
+- Regional FAR/DFARS safety/labor‑clause lookup; job‑status surfacing and milestone‑slippage flags to FOREMAN; QC‑record coordination.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Create/update project records, schedule crews, log safety incidents, generate QC checklists, flag risks to FOREMAN.
+- ⛔ Approve financial line items, modify contracts, access HR records, alter corporate policies.</p>
+<p><strong>Tools:</strong> <code>project_management_db</code>, <code>schedule_db</code>, <code>safety_incident_log</code>, <code>quality_inspection_db</code>, <code>document_search</code>, <code>notification_send</code>
+<strong>Guardrails:</strong> Cites [REF‑N] on safety/labor compliance; never guesses on compliance — escalates to FOREMAN. <strong>No</strong> access to financial, HR, contract, or CRM databases.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="27" data-section-title="PRISM — Commercial Sales Lead" id="prism-commercial-sales-lead"><h2 id="prism-commercial-sales-lead">PRISM — Commercial Sales Lead</h2>
+<p><strong>ID:</strong> A23 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> VANTAGE</p>
+<p>Owns the non‑government revenue pipeline: commercial construction, enterprise telecom, education, healthcare, corporate.</p>
+<p><strong>What it does</strong>
+- Commercial opportunity identification/qualification; <code>sales_pipeline_db</code> CRM management; quote prep/coordination.
+- Customer relationship management; commercial market analysis; weekly pipeline reporting to VANTAGE; directs HERALD.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Qualify commercial opportunities, direct HERALD, prepare quotes under <strong>$100K</strong>, schedule sales calls.
+- ⛔ Authorize commercial contracts, commit resources without FIELDCOM feasibility, set pricing without CALC.</p>
+<p><strong>Tools:</strong> <code>sales_pipeline_db</code>, <code>document_search</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Commercial pipeline kept separate from the GovCon (Pursuite) pipeline.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="28" data-section-title="QUILL — Proposal Writer / Coordinator" id="quill-proposal-writer-coordinator"><h2 id="quill-proposal-writer-coordinator">QUILL — Proposal Writer / Coordinator</h2>
+<p><strong>ID:</strong> A21 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> CONQUEST</p>
+<p>Owns all proposal narrative — technical approach, management approach, past performance, staffing.</p>
+<p><strong>What it does</strong>
+- Drafts narrative sections in the Pursuite workspace; builds the compliance matrix (RFP‑to‑section mapping).
+- Customizes past‑performance write‑ups; injects win themes/discriminators; structures responses per RFP instructions; coordinates with CALC.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Draft sections, pull from the content library, flag compliance gaps, request SME input.
+- ⛔ Submit proposals, make technical commitments beyond capability profiles, set pricing.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>document_search</code>, <code>document_draft</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Content factually accurate to the capability profile; never writes around a capability gap without CONQUEST authorization; all drafts remain DRAFT until review.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="29" data-section-title="RESEARCHER — Research &amp; Intelligence" id="researcher-research-intelligence"><h2 id="researcher-research-intelligence">RESEARCHER — Research &amp; Intelligence</h2>
+<p><strong>ID:</strong> A35 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> APEX</p>
+<p>The intelligence agent LYNNE delegates open‑ended research to. Searches the live web <strong>and</strong>
+the internal knowledge base, corroborates across sources, and returns a decision‑ready brief.</p>
+<p><strong>What it does</strong>
+- Multi‑search market/agency/vendor/competitor intel, pricing, current events, recent regulatory/market developments.
+- Synthesizes (bottom line first, then findings, then caveats); attributes sources; is explicit about recency and confidence.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Gather and synthesize information into briefs.
+- ⛔ <strong>Read‑only</strong> — never takes actions, sends anything, moves money, or represents the company; informs decisions, doesn't make them.</p>
+<p><strong>Tools:</strong> <code>document_search</code> (+ live web search)</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="30" data-section-title="ROSS‑PRIME — Ross Low Voltage Teaming Lead" id="ross-prime-ross-low-voltage-teaming-lead"><h2 id="rossprime-ross-low-voltage-teaming-lead">ROSS‑PRIME — Ross Low Voltage Teaming Lead</h2>
+<p><strong>ID:</strong> A14 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 5/10 · <strong>Reports to:</strong> FIELDCOM</p>
+<p>The coordinating agent for Ross Low Voltage, the primary teaming subcontractor — owns all TTIS↔Ross LV interfaces.</p>
+<p><strong>What it does</strong>
+- Receives/interprets work directives from FIELDCOM; coordinates all Ross LV activity (IRONHAND + BACKBONE).
+- Maintains teaming‑agreement compliance; reports field status to FIELDCOM (and APEX for escalations); manages ECHO‑ALPHA/BRAVO.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Coordinate Ross LV operations and reporting within the teaming agreement.
+- ⛔ Perform work outside teaming scope; mix Ross LV and TTIS prime costs.</p>
+<p><strong>Tools:</strong> <code>schedule_db</code>, <code>vendor_db</code>, <code>notification_send</code>, <code>document_search</code>
+<strong>Constraints:</strong> Strict cost separation; all billing to TTIS matches documented hours and materials.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="31" data-section-title="SCRIBE — Content Intelligence Agent" id="scribe-content-intelligence-agent"><h2 id="scribe-content-intelligence-agent">SCRIBE — Content Intelligence Agent</h2>
+<p><strong>ID:</strong> A30 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 6/10 · <strong>Reports to:</strong> CONQUEST</p>
+<p>Source‑grounded content creation (Gemini / NotebookLM‑style synthesis): proposal narratives, capability statements, white papers, training materials.</p>
+<p><strong>What it does</strong>
+- Proposal‑narrative generation over the TTIS knowledge base; capability‑statement creation/refresh.
+- Technical white papers/case studies; training material; SOW/PWS drafting; content‑library enrichment for Pursuite.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Generate content drafts, synthesize from sources, enrich the content library, produce outlines.
+- ⛔ Submit content as final without CONQUEST/APEX, fabricate citations, claim capability beyond documented performance.</p>
+<p><strong>Tools:</strong> <code>notebooklm_content</code>, <code>document_search</code>, <code>document_draft</code>, <code>notification_send</code>
+<strong>Constraints:</strong> All content is DRAFT until review; CUI/ITAR content not uploaded to external Gemini without FedRAMP confirmation.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="32" data-section-title="SENTINEL — Safety &amp; Quality Director" id="sentinel-safety-quality-director"><h2 id="sentinel-safety-quality-director">SENTINEL — Safety &amp; Quality Director</h2>
+<p><strong>ID:</strong> A25 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 8/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Owns the safety program, the QMS, and field‑operations regulatory compliance. <strong>Safety holds are its absolute authority.</strong></p>
+<p><strong>What it does</strong>
+- Safety‑program leadership (JHA reviews, toolbox talks, PPE); QMS (inspections, NCRs, corrective actions).
+- Incident investigation/root‑cause; OSHA 300/300A logs and reporting; BICSI/FOA certification tracking; directs INSPECTOR.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ <strong>Issue/maintain safety holds on any site — absolute, overridable only by E. Charles Thompson.</strong> Approve QC sign‑offs, issue NCRs, reject non‑conforming materials, require rework.
+- ⛔ Release holds without documented corrective action, waive OSHA requirements, modify certification requirements.</p>
+<p><strong>Tools:</strong> <code>quality_inspection_db</code>, <code>safety_incident_log</code>, <code>document_search</code>, <code>vendor_db</code>, <code>notification_send</code>
+<strong>Escalation:</strong> Critical/high incident or OSHA recordable → P1 to ADMIRAL/APEX (+ ARBITER). All logged incidents are immutable.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="33" data-section-title="SIERRA‑1 — Personal Assistant, Owner/Founder" id="sierra-1-personal-assistant-owner-founder"><h2 id="sierra1-personal-assistant-ownerfounder">SIERRA‑1 — Personal Assistant, Owner/Founder</h2>
+<p><strong>ID:</strong> A03 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 2/10 · <strong>Reports to:</strong> APEX</p>
+<p>The Owner's personal assistant: calendar, communications triage, task tracking, and daily briefings.</p>
+<p><strong>What it does</strong>
+- Calendar/scheduling for Mr. Thompson; email triage and priority flagging.
+- Daily briefing (contract status, Pursuite pipeline summary, open items, meetings); cross‑department task tracking; travel hand‑off to WAYPOINT.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Schedule meetings, send routine acknowledgments, prepare documents.
+- ⛔ Make commitments on behalf of APEX, approve actions, communicate strategy externally.</p>
+<p><strong>Tools:</strong> <code>email_send</code>, <code>calendar_manage</code>, <code>notification_send</code>, <code>document_search</code>
+<strong>Constraints:</strong> Flags any communication from federal contracting officers as <strong>Priority 1</strong>.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="34" data-section-title="STRIKER — Bid Management" id="striker-bid-management"><h2 id="striker-bid-management">STRIKER — Bid Management</h2>
+<p><strong>ID:</strong> A05 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 7/10 · <strong>Reports to:</strong> APEX</p>
+<p>Market research, bid acquisition, proposal development, and submission management — all through the Pursuite GovCon CRM.</p>
+<p><strong>What it does</strong>
+- Opportunity surveillance (Pursuite SAM.gov monitoring); bid/no‑bid analysis (pWin + capability matrix).
+- Proposal development in Pursuite; coordination with VANGUARD/FIELDCOM/LEDGER/ARBITER; pipeline‑stage and content‑library management.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Recommend bid/no‑bid, draft proposal sections, coordinate teaming, analyze competition.
+- ⛔ Submit proposals without APEX, commit pricing without LEDGER, make compliance representations without ARBITER.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>document_search</code>, <code>document_draft</code>, <code>usaspending_search</code>, <code>sam_gov_search</code>
+<strong>Constraints:</strong> Pursuite is the single system of record; SDVOSB eligibility verified for every set‑aside via ARBITER.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="35" data-section-title="SUPPLY — Logistics / Procurement Lead" id="supply-logistics-procurement-lead"><h2 id="supply-logistics-procurement-lead">SUPPLY — Logistics / Procurement Lead</h2>
+<p><strong>ID:</strong> A29 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 4/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Manages material procurement, vendor coordination, warehouse, and delivery logistics to job sites.</p>
+<p><strong>What it does</strong>
+- Material procurement (RFQ, PO, delivery); vendor selection/price comparison from the approved list.
+- Warehouse inventory; delivery coordination with ANCHOR; freight/shipping; procurement‑cost tracking; vendor performance.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Issue POs under <strong>$10K</strong>, select from the approved vendor list, schedule deliveries, track costs.
+- ⛔ Approve vendors (GUARDIAN), issue POs &gt; $10K without LEDGER/ADMIRAL, sole‑source &gt; $5K without justification.</p>
+<p><strong>Tools:</strong> <code>vendor_db</code>, <code>schedule_db</code>, <code>project_management_db</code>, <code>notification_send</code>
+<strong>Constraints:</strong> Only GUARDIAN‑approved vendors; no split purchases to dodge approval thresholds; FAR flow‑downs apply.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="36" data-section-title="VANGUARD — Chief Strategy Officer" id="vanguard-chief-strategy-officer"><h2 id="vanguard-chief-strategy-officer">VANGUARD — Chief Strategy Officer</h2>
+<p><strong>ID:</strong> A02 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 8/10 · <strong>Reports to:</strong> APEX</p>
+<p>Corporate growth strategy and market‑expansion planning — analytical, 12–36 month horizons.</p>
+<p><strong>What it does</strong>
+- Growth strategy/market expansion; federal opportunity‑pipeline analysis (SAM.gov monitoring, pWin trends).
+- Competitive analysis within TTIS NAICS codes; strategic‑partnership development; strategy briefs to APEX.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Recommend strategy, analyze opportunities, draft BD plans, identify teaming candidates, recommend go/no‑go on strategic bids.
+- ⛔ Commit company resources, sign agreements, authorize spend.</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>usaspending_search</code>, <code>document_search</code>, <code>finance_read</code>
+<strong>Constraints:</strong> Intelligence grounded in Pursuite/SAM.gov/USASpending — not speculation; flags SBA affiliation risk and anything that could jeopardize SDVOSB status.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="37" data-section-title="VANTAGE — VP Business Development" id="vantage-vp-business-development"><h2 id="vantage-vp-business-development">VANTAGE — VP Business Development</h2>
+<p><strong>ID:</strong> A19 · <strong>Tier:</strong> Sonnet · <strong>Authority:</strong> 9/10 · <strong>Reports to:</strong> APEX</p>
+<p>Owns the full revenue‑growth strategy across GovCon <strong>and</strong> commercial markets.</p>
+<p><strong>What it does</strong>
+- Drives the combined BD pipeline; directs CONQUEST (GovCon capture), PRISM (commercial sales), HERALD (BD support).
+- Strategic partnerships (primes, JVs, agencies); quarterly BD briefs to APEX; market expansion; pipeline forecasting; win‑rate analysis.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Approve BD strategy, prioritize pursuit resources, authorize capture spend under <strong>$25K</strong>, approve teaming LOIs (non‑binding), direct CONQUEST/PRISM/HERALD.
+- ⛔ Sign teaming agreements (APEX + human gate), commit pricing (LEDGER/CALC), make SDVOSB representations (ARBITER).</p>
+<p><strong>Tools:</strong> <code>pursuite_api</code>, <code>usaspending_search</code>, <code>document_search</code>, <code>finance_read</code>, <code>sales_pipeline_db</code>, <code>notification_send</code>
+<strong>Escalation:</strong> Revenue shortfall &gt; 20% of quarterly forecast → P1 to APEX; SBA‑affiliation risk → ARBITER → APEX.</p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="38" data-section-title="WAYPOINT — Travel Coordinator" id="waypoint-travel-coordinator"><h2 id="waypoint-travel-coordinator">WAYPOINT — Travel Coordinator</h2>
+<p><strong>ID:</strong> A11 · <strong>Tier:</strong> Haiku · <strong>Authority:</strong> 3/10 · <strong>Reports to:</strong> ADMIRAL</p>
+<p>Manages all corporate and field travel logistics, GSA‑compliant.</p>
+<p><strong>What it does</strong>
+- Executive travel bookings; field‑crew travel/mobilization logistics.
+- Per‑diem tracking (GSA rates, FAR Part 31); travel‑expense documentation for contract reimbursement.</p>
+<p><strong>Can / Cannot</strong>
+- ✅ Book travel under <strong>$2K</strong> per trip, arrange accommodations.
+- ⛔ Approve travel over $2K/trip, authorize international travel.</p>
+<p><strong>Tools:</strong> <code>gsa_rates_lookup</code>, <code>schedule_db</code>, <code>notification_send</code></p>
+<hr/>
+</section><section class="doc-section-page" data-section-index="39" data-section-title="Appendix" id="appendix"><h2 id="appendix">Appendix</h2>
+</section><section class="doc-section-page" data-section-index="40" data-section-title="Model tiers" id="model-tiers"><h3 id="model-tiers">Model tiers</h3>
+<ul>
+<li><strong>Sonnet</strong> — complex reasoning, drafting, compliance, and numerical roles.</li>
+<li><strong>Haiku</strong> — routine logging, scheduling, triage, and coordination roles.</li>
+<li><strong>EAA</strong> — LYNNE / OPS_SUPPORT / OPS_MANAGEMENT pick their model via the <code>EAA_MODEL</code>
+  environment variable (Sonnet by default). Graceful degradation falls back Haiku→Sonnet
+  on capacity pressure.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="41" data-section-title="Notification priorities" id="notification-priorities"><h3 id="notification-priorities">Notification priorities</h3>
+<ul>
+<li><strong>P1</strong> — immediate, human‑in‑the‑loop (safety incidents, compliance violations, contracting‑officer comms).</li>
+<li><strong>P2</strong> — urgent (budget overruns, missed deliverables).</li>
+<li><strong>P3 / P4</strong> — routine operational notifications.</li>
+</ul>
+</section><section class="doc-section-page" data-section-index="42" data-section-title="System‑wide guardrails (apply to every agent)" id="system-wide-guardrails-apply-to-every-agent"><h3 id="systemwide-guardrails-apply-to-every-agent">System‑wide guardrails (apply to every agent)</h3>
+<ul>
+<li>No agent executes bank transactions, signs legally binding documents, or commits the
+  company externally — these are flagged for human action.</li>
+<li><strong>SENTINEL safety holds</strong> are absolute; only E. Charles Thompson can override them.</li>
+<li>The <strong>audit trail</strong> is append‑only and chain‑verified — treated as inviolable.</li>
+<li><strong>TTIS and Ross Low Voltage</strong> financials and operational costs are kept strictly separate.</li>
+<li><strong>SDVOSB eligibility</strong> is never misrepresented; SDVOSB risk is always Priority 1.</li>
+<li><strong>CUI</strong> is handled per DFARS; external AI services (e.g., Gemini) require FedRAMP confirmation.</li>
+</ul>
+<hr/>
+<p><em>Generated from <code>config/agents.yaml</code> (v1.4) and <code>config/tools.yaml</code>. This guide reflects the
+configured roster as of June 2026; the YAML config is the authoritative source of record.</em></p></section>
+  </main>
+  <script src="../assets/js/doc.js"></script>
+</body>
+</html>
